@@ -1,9 +1,10 @@
 import { TabButton } from "@/src/components/TabButton";
+import { useAuth } from "@/src/context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import { Redirect, Tabs } from "expo-router";
 
 export default function AppLayout() {
-    const session = true;
+    const {session} = useAuth();
     return (
         !session ? (
             <Redirect href={"./login"}/>

@@ -22,7 +22,7 @@ export default function Home() {
     }, []);
     
     return (
-      <View style= {{flex: 1}}>
+      <View style= {{flex: 1, backgroundColor: "#fff"}}>
         <Text style={styles.greeting}>{greeting}, Aaron 👋</Text>
       </View>    
     )
