@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { SafeAreaView, StyleSheet, Text } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+
 
 export default function Home() {
 
@@ -21,9 +22,9 @@ export default function Home() {
     }, []);
     
     return (
-        <SafeAreaView>
-            <Text style={styles.greeting}>{greeting}</Text>
-        </SafeAreaView>
+      <View style= {{flex: 1}}>
+        <Text style={styles.greeting}>{greeting}, Aaron 👋</Text>
+      </View>    
     )
 }
 
@@ -32,6 +33,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginLeft: 30,
-    marginTop: 20,
+    marginTop: 80,
   }
 })
