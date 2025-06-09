@@ -1,6 +1,7 @@
 import { useAuth } from "@/src/context/AuthContext";
+import { getWeekRange } from "@/src/utils/getWeekRange";
 import { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 
 export default function Home() {
@@ -25,11 +26,43 @@ export default function Home() {
         setGreeting(getCurrentGreeting());
     }, []);
     
+    const [currentDate, setCurrentDate] = useState(new Date());
+
+    const handlePrevWeek = () => {
+      const newDate = new Date(currentDate);
+      newDate.setDate(currentDate.getDate() - 7);
+      setCurrentDate(newDate);
+    }
+
+    const handleNextWeek = () => {
+      const newDate = new Date(currentDate);
+      newDate.setDate(currentDate.getDate() + 7);
+      setCurrentDate(newDate);
+    }
+
+    const { start, end } = getWeekRange(currentDate);
+    const formatDate = (date: Date) => {
+      return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
+    }
+
+
     return (
       <View style= {{flex: 1, backgroundColor: "#fff"}}>
         <Text style={styles.greeting}>{greeting}, {user.name} 👋</Text>
-        <ScrollView>
+        
+        <View style={styles.weekSelector}>
+          <Pressable onPress={handlePrevWeek}>
+            <Image source={require("@/assets/images/back.png")} style={{width: 18, height: 18}}/>
+          </Pressable>
           
+          <Text style={styles.week}>{`${formatDate(start)} - ${formatDate(end)}`}</Text>
+
+          <Pressable onPress={handleNextWeek}>
+            <Image source={require("@/assets/images/next.png")} style={{width: 18, height: 18}}/>
+          </Pressable>
+        </View>
+        
+        <ScrollView>
         </ScrollView>
       </View>    
     )
@@ -41,5 +74,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 30,
     marginTop: 80,
+  },
+  weekSelector: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 30,
+    marginTop: 50,
+  },
+  week:{
+    fontSize: 15,
+    fontWeight: "semibold",
+    marginHorizontal: 5,
   }
 })
