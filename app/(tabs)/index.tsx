@@ -1,8 +1,9 @@
+import { databases } from "@/src/api/appwriteConfig";
 import { useAuth } from "@/src/context/AuthContext";
 import { getWeekRange } from "@/src/utils/getWeekRange";
+import { Query } from "appwrite";
 import { useEffect, useState } from "react";
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function Home() {
     const { user } = useAuth();
@@ -26,7 +27,21 @@ export default function Home() {
         setGreeting(getCurrentGreeting());
     }, []);
     
+
+
     const [currentDate, setCurrentDate] = useState(new Date());
+    const [recipes, setRecipes] = useState([]);
+
+    useEffect(() => {
+      const loadRecipes = async () => {
+        const { start } = getWeekRange(currentDate);
+        const weekStartDate = start.toISOString().split("T")[0];
+        const data = await getRecipesForWeek(weekStartDate);
+        setRecipes(data);
+      };
+
+      loadRecipes();
+    }, [currentDate]);
 
     const handlePrevWeek = () => {
       const newDate = new Date(currentDate);
@@ -45,6 +60,17 @@ export default function Home() {
       return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
     }
 
+    const getRecipesForWeek = async (weekStartDate: string) => {
+      try {
+        const response = await databases.listDocuments(
+          "6846fb7f00127239fdd7", "6846fb850031f9e6d717", [Query.equal("weekStartDate", weekStartDate)]
+        );
+        return response.documents;
+      } catch (err) {
+        console.log(err);
+        return [];
+      }
+    };
 
     return (
       <View style= {{flex: 1, backgroundColor: "#fff"}}>
@@ -62,8 +88,17 @@ export default function Home() {
           </Pressable>
         </View>
         
-        <ScrollView>
-        </ScrollView>
+        <View>
+          {recipes.length === 0 ? (
+            <Image source={require("@/assets/images/NoResult.jpg")}/>
+          ) : (
+            recipes.map((recipe) => (
+              <View key={recipe.$id}>
+                <Text>{recipe.title}</Text>
+              </View>
+            ))
+          )}
+        </View>
       </View>    
     )
 }
