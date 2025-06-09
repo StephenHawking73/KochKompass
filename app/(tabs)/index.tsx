@@ -1,9 +1,13 @@
+import { useAuth } from "@/src/context/AuthContext";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 
 export default function Home() {
+    const { user } = useAuth();
+    if (!user) return null; // Ensure user is defined before accessing properties
 
+    // Determine the greeting based on the current time
     const [greeting, setGreeting] = useState('Hallo');
     useEffect(() => {
         const getCurrentGreeting = () => {
@@ -23,7 +27,7 @@ export default function Home() {
     
     return (
       <View style= {{flex: 1, backgroundColor: "#fff"}}>
-        <Text style={styles.greeting}>{greeting}, Aaron 👋</Text>
+        <Text style={styles.greeting}>{greeting}, {user.name} 👋</Text>
       </View>    
     )
 }

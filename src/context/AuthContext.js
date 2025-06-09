@@ -1,22 +1,80 @@
-import { createContext, useContext, useState } from "react";
-import { ActivityIndicator, SafeAreaView } from "react-native";
+import { account } from "@/src/api/appwriteConfig";
+import { createContext, useContext, useEffect, useState } from "react";
+import { ActivityIndicator, Alert, SafeAreaView } from "react-native";
 
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-    const [loading, setLoading] = useState(false);
-    const [session, setSession] = useState(false);
-    const [user, setUser] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [session, setSession] = useState(null);
+    const [user, setUser] = useState(null);
 
-    const signIn = async () => {
+    useEffect(() => {
+        init()
+    }, []);
 
+    const init = async () => {
+        checkAuth();
+    }
+
+    const checkAuth = async () => {
+        setLoading(true);
+        try {
+            const responseSession = await account.getSession('current');
+            setSession(responseSession);
+
+            const responseUser = await account.get();
+            setUser(responseUser);
+        } catch (err) {
+            console.log(err);
+            setSession(null);
+            setUser(null);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const signIn = async ({ email, password }) => {
+        setLoading(true);
+        try {
+            const responseSession = await account.createEmailPasswordSession(email, password);
+            setSession(responseSession);
+
+            const responseUser = await account.get();
+            setUser(responseUser);
+        } catch (err) {
+            Alert.alert("Da ist etwas schief gelaufen", err?.message || "Bitte versuche es später erneut.");
+        } finally {
+            setLoading(false);
+        }
     }
 
     const signOut = async () => {
-
+        setLoading(true);
+        try {
+            await account.deleteSession('current');
+            setSession(null);
+            setUser(null);
+        } catch (err) {
+            Alert.alert("Da ist etwas schief gelaufen", err?.message || "Bitte versuche es später erneut.");
+        } finally {
+            setLoading(false);
+        }
     }
 
-    const contextData = {session, user, signIn, signOut};
+    const signUp = async ({ email, password, name }) => {
+        setLoading(true);
+        try {
+            await account.create('unique()', email, password, name);
+            await signIn({ email, password });
+        } catch (err) {
+            Alert.alert("Da ist etwas schief gelaufen", err?.message || "Bitte versuche es später erneut.");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const contextData = {session, user, signIn, signOut, signUp};
     return (
         <AuthContext.Provider value={contextData}>
             {loading ? (

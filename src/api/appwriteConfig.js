@@ -1,20 +1,13 @@
 import { Account, Client } from 'appwrite';
-import { Platform } from 'react-native';
+
+
+const endpoint = "https://fra.cloud.appwrite.io/v1";
+const projectID = "68457033001c656e4898";
 
 const client = new Client();
-client
-  .setEndpoint(process.env.EXPO_PUBLIC_APPWRITE_ENDPOINT) // Your Appwrite Endpoint
-  .setProject(process.env.EXPO_PUBLIC_APPWRTIE_PROCJECT_ID); // Your project ID
-
-switch (Platform.OS) {
-  case 'ios':
-    client.setPlatform(process.env.EXPO_PUBLIC_APPWRITE_BUNDLE_ID);
-    break;
-  case 'android':
-    client.setPlatform(process.env.EXPO_PUBLIC_APPWRITE_PACKAGE_NAME);
-    break;
-}
+client.setEndpoint(endpoint).setProject(projectID);
 
 const account = new Account(client);
 
 export { account };
+
