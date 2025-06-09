@@ -1,3 +1,4 @@
+import Space from '@/src/components/Space';
 import { useAuth } from '@/src/context/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import { Redirect, router } from 'expo-router';
@@ -19,6 +20,7 @@ const SignIn = () => {
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
             <ScrollView keyboardShouldPersistTaps='handled'>
                 <SafeAreaView>
+                    <Space/>
                     <Pressable onPress={() => router.back()}>
                         <Ionicons name="arrow-back" size={40} color="black" style={{marginTop: 20, marginLeft: 20}}/>
                     </Pressable>
@@ -27,13 +29,13 @@ const SignIn = () => {
                         <Image source={require("@/assets/images/Sign-In.png")} style={{width: 288, height: 254}}/>
                     </View>
                     <View style={{marginTop: 70}}>
-                        <View style={{borderWidth: 1, borderColor: '#484848', borderRadius: 9, marginHorizontal: 20, height: 45}}>
-                            <Image source={require("@/assets/images/email.png")} style={{width: 31, height: 31, left: 10, top: 7}}/>
-                            <TextInput placeholder='E-Mail' placeholderTextColor={'#484848'} style={{left: 50, bottom: 17}} value={email} onChangeText={(text) => setEmail(text)}/>
+                        <View style={{borderWidth: 1, borderColor: '#484848', borderRadius: 9, marginHorizontal: 20, height: 45, flexDirection: "row", paddingLeft: 10, alignItems: "center"}}>
+                            <Image source={require("@/assets/images/email.png")} style={{width: 31, height: 31}}/>
+                            <TextInput placeholder='E-Mail' placeholderTextColor={'#484848'} style={{flex: 1, marginLeft: 10}} value={email} onChangeText={(text) => setEmail(text)}/>
                         </View>
-                        <View style={{borderWidth: 1, borderColor: '#484848', borderRadius: 9, marginHorizontal: 20, height: 45, marginTop: 26}}>
-                            <Image source={require("@/assets/images/passwort.png")} style={{width: 31, height: 31, left: 10, top: 5}}/>
-                            <TextInput placeholder='Passwort' placeholderTextColor={'#484848'} secureTextEntry={true} style={{left: 50, bottom: 17}} value={password} onChangeText={(text) => setPassword(text)}/>
+                        <View style={{borderWidth: 1, borderColor: '#484848', borderRadius: 9, marginHorizontal: 20, height: 45, marginTop: 26, flexDirection: "row", paddingLeft: 10, alignItems: "center"}}>
+                            <Image source={require("@/assets/images/passwort.png")} style={{width: 31, height: 31}}/>
+                            <TextInput placeholder='Passwort' placeholderTextColor={'#484848'} secureTextEntry={true} style={{flex: 1, marginLeft: 10}} value={password} onChangeText={(text) => setPassword(text)}/>
                         </View>
                     </View>
                     <View style={{ alignItems: 'center', marginTop: 80}}>

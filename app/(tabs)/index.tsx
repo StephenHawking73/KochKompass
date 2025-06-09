@@ -1,6 +1,6 @@
 import { useAuth } from "@/src/context/AuthContext";
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 
 export default function Home() {
@@ -28,6 +28,9 @@ export default function Home() {
     return (
       <View style= {{flex: 1, backgroundColor: "#fff"}}>
         <Text style={styles.greeting}>{greeting}, {user.name} 👋</Text>
+        <ScrollView>
+          
+        </ScrollView>
       </View>    
     )
 }
