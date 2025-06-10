@@ -1,9 +1,11 @@
 import { databases } from "@/src/api/appwriteConfig";
+import WeekList, { RecipeEntry } from "@/src/components/WeekList";
 import { useAuth } from "@/src/context/AuthContext";
 import { getWeekRange } from "@/src/utils/getWeekRange";
 import { Query } from "appwrite";
 import { useEffect, useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+
 
 export default function Home() {
     const { user } = useAuth();
@@ -30,16 +32,54 @@ export default function Home() {
 
 
     const [currentDate, setCurrentDate] = useState(new Date());
-    const [recipes, setRecipes] = useState([]);
+    const [recipes, setRecipes] = useState<RecipeEntry[]>([]);
+
+    const weekdays = [
+      "Montag",
+      "Dienstag",
+      "Mittwoch",
+      "Donnerstag",
+      "Freitag",
+      "Samstag",
+      "Abend",
+      "Sonntag"
+    ];
+  
+    const weekEntries = weekdays.map((weekday) => {
+      // Finde das Rezept für diesen Wochentag (falls vorhanden)
+      const recipeForDay = recipes.find((recipe) => recipe.day === weekday);
+  
+      return {
+          id: recipeForDay?.id ?? "",
+          date: recipeForDay?.date ?? "",   // evtl. leer lassen
+          day: weekday,
+          title: recipeForDay?.title,
+          rating: recipeForDay?.rating,
+          image: recipeForDay?.image ?? null
+      };
+    });
+  
+
+    const loadRecipes = async () => {
+      const { start } = getWeekRange(currentDate);
+      const pad = (n: number) => n.toString().padStart(2, '0');
+      const weekStartDate = `${start.getFullYear()}-${pad(start.getMonth()+1)}-${pad(start.getDate())}`;
+  
+      const data = await getRecipesForWeek(weekStartDate);
+  
+      const formattedData = data.map((item) => ({
+        id: item.$id,
+        date: item.weekStartDate || '',
+        day: item.day,
+        title: item.title,
+        rating: item.averageRating,
+        image: null,
+      }));
+  
+      setRecipes(formattedData);
+    };
 
     useEffect(() => {
-      const loadRecipes = async () => {
-        const { start } = getWeekRange(currentDate);
-        const weekStartDate = start.toISOString().split("T")[0];
-        const data = await getRecipesForWeek(weekStartDate);
-        setRecipes(data);
-      };
-
       loadRecipes();
     }, [currentDate]);
 
@@ -92,14 +132,10 @@ export default function Home() {
           {recipes.length === 0 ? (
             <Image source={require("@/assets/images/NoResult.jpg")}/>
           ) : (
-            recipes.map((recipe) => (
-              <View key={recipe.$id}>
-                <Text>{recipe.title}</Text>
-              </View>
-            ))
+            <WeekList data={weekEntries} onRefresh={loadRecipes}/>
           )}
         </View>
-      </View>    
+      </View> 
     )
 }
 
