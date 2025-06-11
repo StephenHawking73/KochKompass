@@ -5,6 +5,7 @@ import { getWeekRange } from "@/src/utils/getWeekRange";
 import { Query } from "appwrite";
 import { useEffect, useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 
 
 export default function Home() {
@@ -33,7 +34,7 @@ export default function Home() {
 
     const [currentDate, setCurrentDate] = useState(new Date());
     const [recipes, setRecipes] = useState<RecipeEntry[]>([]);
-
+    
     const weekdays = [
       "Montag",
       "Dienstag",
@@ -130,7 +131,9 @@ export default function Home() {
         
         <View>
           {recipes.length === 0 ? (
-            <Image source={require("@/assets/images/NoResult.jpg")}/>
+            <ScrollView>
+              <Image source={require("@/assets/images/NoResult.jpg")}/>
+            </ScrollView>
           ) : (
             <WeekList data={weekEntries} onRefresh={loadRecipes}/>
           )}

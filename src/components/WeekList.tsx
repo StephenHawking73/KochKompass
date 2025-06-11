@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-import { FlatList, Image, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Animated, FlatList, Image, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Swipeable } from "react-native-gesture-handler";
 import { account, databases } from "../api/appwriteConfig";
 
 export type RecipeEntry = {
@@ -51,50 +52,74 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
         setSelectedRecipe(null);
     }
 
-    const fetchRecipeData = async () => {
+    const deleteDateFromRecipe = async (recipe: RecipeEntry) => {
         try {
-            // Hier holst du alle deine Dokumente erneut (z.B. aus Appwrite Collection)
-            const response = await databases.listDocuments(
-                "6846fb7f00127239fdd7",
-                "6846fb850031f9e6d717"
+            // Hier musst du anpassen, wie du das Datum in deiner DB entfernst
+            // Beispiel: Update Dokument, damit das Datum gelöscht/geleert wird
+            await databases.updateDocument(
+                "6846fb7f00127239fdd7",    // deine Datenbank ID
+                "6846fb850031f9e6d717",    // deine Collection ID
+                recipe.id,
+                {
+                    day: null,
+                    weekStartDate: null,
+                }
             );
-    
-            // In dein Format umwandeln
-            const updatedData: RecipeEntry[] = response.documents.map((doc: any) => ({
-                id: doc.$id,
-                date: doc.date,
-                day: doc.day,
-                image: doc.image,
-                title: doc.title,
-                rating: doc.averageRating ?? 0,   // wichtig: avgRating!
-            }));
-    
-            setRecipeData(updatedData);
+            await onRefresh(); // Daten neu laden
         } catch (error) {
-            console.error("Fehler beim Laden der Daten:", error);
+            console.error("Fehler beim Löschen des Datums:", error);
         }
     };
-    
+
+    const renderRightActions = (progress: Animated.AnimatedInterpolation, dragX: Animated.AnimatedInterpolation, item: RecipeEntry) => {
+        const scale = dragX.interpolate({
+            inputRange: [-100, 0],
+            outputRange: [1, 0],
+            extrapolate: 'clamp',
+        });
+
+        return (
+            <TouchableOpacity
+                onPress={() => deleteDateFromRecipe(item)}
+                style={{
+                    backgroundColor: 'red',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: 80,
+                    marginVertical: 4,
+                    borderRadius: 8,
+                }}
+            >
+                <Animated.View>
+                    <Ionicons name="trash-outline" size={20} color={"#fff"}/>
+                </Animated.View>
+            </TouchableOpacity>
+        );
+    };
+
 
     const renderItem = ({ item }: { item: RecipeEntry }) => {
         return (
-            <Pressable onPress={() => openModal(item)}>
-                <View style={styles.row}>
-                    <Image source={dayImageMap[item.day]} style={styles.dayImage} />
-                    
-                    <View style={styles.textContainer}>
-                        {item.title ? (
-                            <Text style={styles.recipeTitle}>{item.title}</Text>
-                        ) : (
-                            null
-                        )}
-                    </View>
+            <Swipeable renderRightActions={(progress, dragX) => renderRightActions(progress, dragX, item)}>
+                <Pressable onPress={() => openModal(item)}>
+                    <View style={styles.row}>
+                        <Image source={dayImageMap[item.day]} style={styles.dayImage} />
+                        
+                        <View style={styles.textContainer}>
+                            {item.title ? (
+                                <Text style={styles.recipeTitle}>{item.title}</Text>
+                            ) : (
+                                null
+                            )}
+                        </View>
 
-                    <View style={styles.ratingContainer}>
-                        {typeof item.rating === "number" ? renderStars(item.rating) : null}
+                        <View style={styles.ratingContainer}>
+                            {typeof item.rating === "number" ? renderStars(item.rating) : null}
+                        </View>
                     </View>
-                </View>
-            </Pressable>
+                </Pressable>
+            </Swipeable>
+            
             
         );
     };
@@ -276,9 +301,6 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
                         ) : (
                             <View style={{marginTop: 50}}/>
                         )}
-                        
-
-                        {/* Hier später User Ratings anzeigen */}
 
                         <Pressable onPress={() => closeModal()} style={styles.closeButton}>
                             <Text style={styles.closeButtonText}>Schließen</Text>
