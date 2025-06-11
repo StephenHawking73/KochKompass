@@ -308,7 +308,10 @@ export default function AddMeal() {
                                 handleSelectRecipe({ name: mealName });
                             }}>
                                 {mealName ? (
-                                    <Text style={{color: "#049280", fontSize: 17}}><Text style={{fontWeight: "bold"}}>{mealName} </Text>hinzufügen</Text>    
+                                    <View style={{flexDirection: "row", flex: 1}}>
+                                        <Ionicons name={"add-circle-outline"} size={20} color={"#049280"}/>
+                                        <Text style={{color: "#049280", fontSize: 17, marginLeft: 5}}><Text style={{fontWeight: "bold"}}>{mealName} </Text>hinzufügen</Text>    
+                                    </View>
                                 ) : (
                                     null
                                 )}
