@@ -118,13 +118,13 @@ export default function Home() {
         <Text style={styles.greeting}>{greeting}, {user.name} 👋</Text>
         
         <View style={styles.weekSelector}>
-          <Pressable onPress={handlePrevWeek}>
+          <Pressable onPress={handlePrevWeek} style={{height: 50, width: 50}}>
             <Image source={require("@/assets/images/back.png")} style={{width: 18, height: 18}}/>
           </Pressable>
           
           <Text style={styles.week}>{`${formatDate(start)} - ${formatDate(end)}`}</Text>
 
-          <Pressable onPress={handleNextWeek}>
+          <Pressable onPress={handleNextWeek} style={{height: 50, width: 50, marginLeft: 155}}>
             <Image source={require("@/assets/images/next.png")} style={{width: 18, height: 18}}/>
           </Pressable>
         </View>
@@ -158,6 +158,8 @@ const styles = StyleSheet.create({
   week:{
     fontSize: 15,
     fontWeight: "semibold",
-    marginHorizontal: 5,
+    position: "absolute",
+    left: 25,
+    bottom: 32,
   }
 })

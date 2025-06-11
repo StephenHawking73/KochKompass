@@ -22,6 +22,8 @@ export default function AddMeal() {
 
     const [isFilterActive, setIsFilterActive] = useState(false);
 
+    //const [showAddModal, setShowAddModal] = useState(false);
+
 
     useEffect(() => {
         const fetchRecipes = async () => {
@@ -83,11 +85,19 @@ export default function AddMeal() {
     }, [mealName, fullData])
 
     const sortByOldest = () => {
-        const sorted = [...data].sort((a, b) => {
-            if (!a.weekStartDate) return 1;
-            if (!b.weekStartDate) return -1;
-            return new Date(a.weekStartDate).getTime() - new Date(b.weekStartDate).getTime();
-        })
+        let sorted = [...fullData]
+        if(!isFilterActive){
+            setIsFilterActive(true);
+
+            sorted = sorted.sort((a, b) => {
+                if (!a.weekStartDate) return 1;
+                if (!b.weekStartDate) return -1;
+                return new Date(a.weekStartDate).getTime() - new Date(b.weekStartDate).getTime();
+            })
+        } else {
+            setIsFilterActive(false);
+        }
+
         setData(sorted);
     }
 
@@ -202,6 +212,11 @@ export default function AddMeal() {
         setShowRatingModal(false);
     }
 
+    const closeModal = () => {
+        hideAddMeal();
+        setIsFilterActive(false);
+    }
+
     return (
         <Modal
             animationType="slide"
@@ -214,15 +229,13 @@ export default function AddMeal() {
                     <Text style={styles.modalTitle}>Neues Gericht hinzufügen</Text>
                     
                     <View style={styles.input}>
-                        <View style={{flexDirection: "row"}}>
-                            <Ionicons name="search-outline" size={20} color="#ccc"/>
-                            <TextInput
-                                style={{marginLeft: 5}}
-                                placeholder="Gericht suchen ..."
-                                value={mealName}
-                                onChangeText={setMealName}
-                            />
-                        </View>
+                        <Ionicons name="search-outline" size={20} color="#ccc"/>
+                        <TextInput
+                            style={{marginLeft: 5, flex: 1}}
+                            placeholder="Gericht suchen ..."
+                            value={mealName}
+                            onChangeText={setMealName}
+                        />
                     </View>
 
                     <Pressable 
@@ -231,7 +244,7 @@ export default function AddMeal() {
                             paddingHorizontal: 12,
                             paddingVertical: 6,
                             backgroundColor: "#1DC0AB",
-                            borderColor: isFilterActive ? "#FF3E91" : undefined,
+                            borderColor: isFilterActive ? "#FF3E91" : "#fff",
                             borderWidth: 2,
                             opacity: 0.77,
                             borderRadius: 10,
@@ -260,7 +273,11 @@ export default function AddMeal() {
                         style={{width: "100%"}}
                         ListFooterComponent={
                             <Pressable style={{marginTop: 15, alignItems: "center"}}>
-                                <Text style={{color: "#049280", fontSize: 17}}><Text style={{fontWeight: "bold"}}>{mealName ? (mealName) : "Gericht"} </Text>hinzufügen</Text>    
+                                {mealName ? (
+                                    <Text style={{color: "#049280", fontSize: 17}}><Text style={{fontWeight: "bold"}}>{mealName} </Text>hinzufügen</Text>    
+                                ) : (
+                                    null
+                                )}
                             </Pressable>
                         }
                     />
@@ -303,7 +320,7 @@ export default function AddMeal() {
 
                     
                     <View style={{alignItems: "center", width: "100%"}}>
-                        <Pressable onPress={hideAddMeal} style={styles.cancelButton}>
+                        <Pressable onPress={() => closeModal()} style={styles.cancelButton}>
                             <Text style={styles.buttonText}>Abbrechen</Text>
                         </Pressable>
                     </View>
@@ -337,7 +354,9 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         padding: 10,
         width: "100%",
-        marginTop: 15
+        marginTop: 15,
+        alignItems: "center",
+        flexDirection: "row",
     },
     cancelButton: {
         backgroundColor: "#FF5D96",
@@ -367,7 +386,4 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         alignItems: "center",
     },
-    sortButton: {
-        
-    }
 });
