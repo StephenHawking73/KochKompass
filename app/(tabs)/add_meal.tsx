@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { ID, Query } from "appwrite";
 import { useEffect, useState } from "react";
-import { FlatList, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, FlatList, Modal, Platform, Pressable, StyleSheet, Switch, Text, TextInput, View } from "react-native";
 
 
 export default function AddMeal() {
@@ -15,6 +15,7 @@ export default function AddMeal() {
     const [selectedRecipe, setSelectedRecipe] = useState<any | null>(null);
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+    const [tempDate, setTempDate] = useState<Date>(selectedDate || new Date());
     const [fullData, setFullData] = useState<any[]>([]);
 
     const [userRatings, setUserRatings] = useState<{ [key: string]: number | undefined }>({});
@@ -22,8 +23,9 @@ export default function AddMeal() {
 
     const [isFilterActive, setIsFilterActive] = useState(false);
 
-    //const [showAddModal, setShowAddModal] = useState(false);
+    const [showAddModal, setShowAddModal] = useState(false);
 
+    const [isMeat, setisMeat] = useState(false);
 
     useEffect(() => {
         const fetchRecipes = async () => {
@@ -36,7 +38,8 @@ export default function AddMeal() {
                     id: doc.$id,
                     name: doc.title,
                     rating: doc.averageRating,
-                    weekStartDate: doc.weekStartDate ?? null
+                    weekStartDate: doc.weekStartDate ?? null,
+                    isMeat: doc.isMeat ?? false,
                 }));
                 setFullData(formattedData);
                 setData(formattedData);
@@ -121,11 +124,33 @@ export default function AddMeal() {
         return monday.toISOString().split("T")[0];
     }
 
-    const saveMeal = async (recipe: any, date: Date) => {
-        const dayNumber = date.getDay();
-        const day = weekdays[dayNumber];        
+    const saveMeal = async (recipe: any, date: Date, isMeat: Boolean) => {
+        console.log("saveMeal()")
+        if (!recipe || !date ) return;
+
+        
        
         try {
+            const weekStartDate = getWeekStartsDate(date);
+
+            const weekDocs = await databases.listDocuments("6846fb7f00127239fdd7", "6846fb850031f9e6d717", [Query.equal("weekStartDate", weekStartDate)]);
+
+            const meatCount = weekDocs.documents.filter(doc => doc.isMeat).length;
+
+            const MAX_MEAT_PER_WEEK = 2;
+            const willBeMeat = isMeat;
+            const alreadyMeat = weekDocs.documents.some(doc => doc.title === recipe.name && doc.isMeat);
+
+            const effectiveMeatCount = willBeMeat && !alreadyMeat ? meatCount + 1 : meatCount;
+
+            if (effectiveMeatCount > MAX_MEAT_PER_WEEK) {
+                Alert.alert("Zu viel Fleisch!", `Es gibt bereits ${MAX_MEAT_PER_WEEK} Fleischgericht(e) in dieser Woche`);
+                return;
+            }
+
+            const dayNumber = date.getDay();
+            const day = weekdays[dayNumber];
+        
             const doc = await databases.listDocuments("6846fb7f00127239fdd7", "6846fb850031f9e6d717", [Query.equal("title", recipe.name)]);
             if (doc.total > 0){
                 const exisingDoc = doc.documents[0];
@@ -136,31 +161,35 @@ export default function AddMeal() {
                     exisingDoc.$id,
                     {
                         day: day,
-                        weekStartDate: getWeekStartsDate(date)
+                        weekStartDate: weekStartDate,
+                        isMeat: isMeat,
                     }
                 )
-                console.log("Bestehendes Rezept aktualisiert:", recipe.name, "→", day, getWeekStartsDate(date));
+                console.log("Bestehendes Rezept aktualisiert:", recipe.name, "→", day, weekStartDate);
             } else {
                 await databases.createDocument("6846fb7f00127239fdd7", "6846fb850031f9e6d717", ID.unique(), {
                     day: day, 
                     title: recipe.name,
-                    weekStartDate: getWeekStartsDate(date),
+                    weekStartDate: weekStartDate,
+                    isMeat: isMeat,
                 })
-                console.log("Neues Rezept gespeichert:", recipe.name, "→", getWeekStartsDate(date));
+                console.log("Neues Rezept gespeichert:", recipe.name, "→", weekStartDate);
             }
         } catch (err) {
             console.error("Fehler beim Speichern der Mahlzeit:", err);
         }
-
-        hideAddMeal();
+    
+        // Erst States zurücksetzen, dann Modal schließen
         setMealName("");
         setSelectedRecipe(null);
         setSelectedDate(null);
+        closeAddModal();
     };
       
     const handleSelectRecipe = (item: any) => {
-        setSelectedRecipe(item)
-        setShowDatePicker(true);
+        setSelectedRecipe(item);
+        setisMeat(item.isMeat !== undefined ? !!item.isMeat : false);
+        openAddModal();
     }
 
     const renderStars = (rating: number) => {
@@ -187,19 +216,12 @@ export default function AddMeal() {
 
     const onDateChange = (event: any, date?: Date) => {
         if (event.type === "dismissed") {
-          setShowDatePicker(false);
-          setSelectedRecipe(null);
-          return;
+            setShowDatePicker(false);
+            return;
         }
-      
-        if (date && selectedRecipe) {
-          setSelectedDate(date);
-          console.log("Ausgewähltes Rezept:", selectedRecipe.name);
-          console.log("Ausgewähltes Datum:", date.toLocaleDateString());
-      
-          saveMeal(selectedRecipe, date);
-        }
-      
+        if (date) {
+        setSelectedDate(date);
+            }
         setShowDatePicker(false);
     };
       
@@ -216,6 +238,16 @@ export default function AddMeal() {
         hideAddMeal();
         setIsFilterActive(false);
     }
+
+    const openAddModal = () => {
+        setShowAddModal(true);
+    }
+
+    const closeAddModal = () => {
+        setShowAddModal(false);
+    }
+
+    const toggleIsMeat = () => setisMeat(value => !value);
 
     return (
         <Modal
@@ -253,7 +285,7 @@ export default function AddMeal() {
                             alignSelf: "flex-start"
                         }} 
                     >
-                        <Text style={{}}>Lange nicht gekocht</Text>
+                        <Text>Lange nicht gekocht</Text>
                     </Pressable>
 
                     <FlatList
@@ -272,7 +304,9 @@ export default function AddMeal() {
                         )}
                         style={{width: "100%"}}
                         ListFooterComponent={
-                            <Pressable style={{marginTop: 15, alignItems: "center"}}>
+                            <Pressable style={{marginTop: 15, alignItems: "center"}} onPress={() => {
+                                handleSelectRecipe({ name: mealName });
+                            }}>
                                 {mealName ? (
                                     <Text style={{color: "#049280", fontSize: 17}}><Text style={{fontWeight: "bold"}}>{mealName} </Text>hinzufügen</Text>    
                                 ) : (
@@ -307,19 +341,62 @@ export default function AddMeal() {
                         </View>
                     </Modal>
 
-                    {showDatePicker && (
-                    <View style={{ backgroundColor: "white" }}>
-                        <DateTimePicker
-                            value={new Date()}
-                            mode="date"
-                            display="default"
-                            onChange={onDateChange}
-                        />
-                    </View>
-                    )}
+                    <Modal animationType="slide" transparent={true} visible={showAddModal} onRequestClose={() => closeAddModal()}>
+                        <View style={styles.modalOverlay}>
+                            <View style={styles.addModal}>
+                                <Text style={styles.modalTitleAdd}>
+                                    {selectedRecipe?.name ?? mealName}
+                                </Text> 
+                                
+                                <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%", marginTop: 20}}>
+                                    <Text style={{fontWeight: "500", fontSize: 18}}>Datum: </Text>
+                                    {Platform.OS === "android" ? (
+                                        <>
+                                            <Pressable onPress={() => {setShowDatePicker(true)}}>
+                                                <View style={{alignItems: "center", borderRadius: 8, padding: 8, backgroundColor: "#E9E9E9"}}>
+                                                    <Text style={{fontSize: 15}}>{selectedDate ? selectedDate.toLocaleString().split(",")[0] : "Datum auswählen"}</Text>
+                                                </View> 
+                                            </Pressable>
+                                            {showDatePicker && (
+                                                <DateTimePicker
+                                                    value={selectedDate || new Date()}
+                                                    mode="date"
+                                                    display="default"
+                                                    onChange={onDateChange}
+                                                />
+                                            )}
+                                        </>
+                                    ) : (
+                                        <View>
+                                            <DateTimePicker
+                                                value={tempDate}
+                                                mode="date"
+                                                display="default"
+                                                onChange={onDateChange}
+                                                style={{backgroundColor: "white"}}
+                                            />
+                                        </View>
+                                    )}
+                                </View>
+                                <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%", marginTop: 15}}>
+                                    <Text style={{fontWeight: "500", fontSize: 18}}>Fleisch: </Text>
+                                    <Switch value={isMeat} onValueChange={toggleIsMeat} trackColor={{false: "#FF5D96", true: "#1DC0AB"}} thumbColor={"#4D94F3"} ios_backgroundColor={"#FF5D96"}/>
+                                </View>  
+                                
+                                <View style={{flexDirection: "row", marginTop: 70, gap: 5}}>
+                                    <Pressable onPress={() => saveMeal(selectedRecipe || { name: mealName }, selectedDate, isMeat)} style={styles.addButton} disabled={!selectedDate || !(selectedRecipe?.name || mealName)}>
+                                        <Text style={styles.buttonText}>Hinzufügen</Text>
+                                    </Pressable>
+                                    <Pressable onPress={() => closeAddModal()} style={styles.cancelButton}>
+                                        <Text style={styles.buttonText}>Schließen</Text>
+                                    </Pressable>
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
 
                     
-                    <View style={{alignItems: "center", width: "100%"}}>
+                    <View style={{alignItems: "center", flexDirection: "row"}}>
                         <Pressable onPress={() => closeModal()} style={styles.cancelButton}>
                             <Text style={styles.buttonText}>Abbrechen</Text>
                         </Pressable>
@@ -348,6 +425,11 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         marginBottom: 10,
     },
+    modalTitleAdd: {
+        fontSize: 25,
+        fontWeight: "bold",
+        marginBottom: 10,
+    },
     input: {
         borderWidth: 1,
         borderColor: "#ccc",
@@ -364,7 +446,17 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginLeft: 5,
         marginBottom: 60,
-        width: "100%",
+        width: "50%",
+        alignItems: "center",
+    },
+    addButton: {
+        backgroundColor: "#1DC0AB",
+        padding: 10,
+        borderRadius: 10,
+        marginLeft: 5,
+        marginBottom: 60,
+        width: "50%",
+        alignItems: "center",
     },
     buttonText: {
         color: "white",
@@ -386,4 +478,12 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         alignItems: "center",
     },
+    addModal: {
+        top: "60%",
+        backgroundColor: "white",
+        flex: 1,
+        borderRadius: 15,
+        alignItems: "center",
+        padding: 30,
+    }
 });

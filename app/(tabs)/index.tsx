@@ -5,7 +5,6 @@ import { getWeekRange } from "@/src/utils/getWeekRange";
 import { Query } from "appwrite";
 import { useEffect, useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
 
 
 export default function Home() {
@@ -29,7 +28,6 @@ export default function Home() {
       
         setGreeting(getCurrentGreeting());
     }, []);
-    
 
 
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -131,9 +129,9 @@ export default function Home() {
         
         <View>
           {recipes.length === 0 ? (
-            <ScrollView>
+            <View style={{position: "absolute"}}>
               <Image source={require("@/assets/images/NoResult.jpg")}/>
-            </ScrollView>
+            </View>
           ) : (
             <WeekList data={weekEntries} onRefresh={loadRecipes}/>
           )}

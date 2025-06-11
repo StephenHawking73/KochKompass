@@ -118,9 +118,7 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
                         </View>
                     </View>
                 </Pressable>
-            </Swipeable>
-            
-            
+            </Swipeable>            
         );
     };
 
@@ -316,8 +314,7 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
 
 const styles = StyleSheet.create({
     listContainer: {
-        marginHorizontal: 20, 
-        marginTop: 30,
+        marginHorizontal: 20
     },
     row: {
         flexDirection: 'row',
