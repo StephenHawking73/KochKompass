@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-import { Animated, FlatList, Image, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Animated, Image, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import { account, databases } from "../api/appwriteConfig";
 
@@ -11,7 +11,7 @@ export type RecipeEntry = {
     image?: any;
     title?: string;
     rating?: number;
-    isEvening: boolean;
+    mealTime: string;
 };
 
 type Props = {
@@ -264,9 +264,16 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
         fetchUserRating();
     }, [selectedRecipe])
 
+    const groupedByDay: { [day: string]: { Mittag?: RecipeEntry; Abend?: RecipeEntry } } = {};
+    data.forEach((entry) => {
+        if (!groupedByDay[entry.day]) groupedByDay[entry.day] = {};
+        groupedByDay[entry.day][entry.mealTime as "Mittag" | "Abend"] = entry;
+    });
+    const days = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
+
     return (
         <>
-            <FlatList
+            {/*<FlatList
                 data={data}
                 keyExtractor={(item) => item.day}
                 renderItem={renderItem}
@@ -278,7 +285,39 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
                     await onRefresh();
                     setRefreshing(false);
                 }}
-            />
+            />*/}
+
+            <View style={styles.listContainer}>
+                {days.map((day) => {
+                    const mittag = groupedByDay[day]?.Mittag;
+                    const abend = groupedByDay[day]?.Abend;
+                    return (
+                        <View key={day} style={styles.dayRow}>
+                            <Image source={dayImageMap[day]} style={styles.dayImage} />
+                            <View style={styles.mealSlots}>
+                                {/* Mittag */}
+                                <Pressable style={styles.mealSlot} onPress={() => mittag && openModal(mittag)}>
+                                    <Text style={styles.mealLabel}>🍽️ Mittag</Text>
+                                    {mittag?.title ? (
+                                        <Text style={styles.recipeTitle}>{mittag.title}</Text>
+                                    ) : (
+                                        <Text style={styles.noRecipe}>–</Text>
+                                    )}
+                                </Pressable>
+                                {/* Abend */}
+                                <Pressable style={styles.mealSlot} onPress={() => abend && openModal(abend)}>
+                                    <Text style={styles.mealLabel}>🌙 Abend</Text>
+                                    {abend?.title ? (
+                                        <Text style={styles.recipeTitle}>{abend.title}</Text>
+                                    ) : (
+                                        <Text style={styles.noRecipe}>–</Text>
+                                    )}
+                                </Pressable>
+                            </View>
+                        </View>
+                    );
+                })}
+            </View>
 
             <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => closeModal()}>
                 <View style={styles.modalOverlay}>
@@ -334,6 +373,8 @@ const styles = StyleSheet.create({
     recipeTitle: {
         fontSize: 16,
         fontWeight: '500',
+        textAlign: "center",
+        marginTop: 8,
     },
     noRecipe: {
         fontSize: 16,
@@ -374,6 +415,40 @@ const styles = StyleSheet.create({
     closeButtonText: {
         color: '#fff',
         fontWeight: 'bold',
+    },
+    dayRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 16,
+        backgroundColor: "#f8f8f8",
+        borderRadius: 12,
+        padding: 8,
+        shadowColor: "#000",
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    mealSlots: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginLeft: 10,
+    },
+    mealSlot: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: "center",
+        marginHorizontal: 5,
+        padding: 8,
+        backgroundColor: "#fff",
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: "#e0e0e0",
+    },
+    mealLabel: {
+        fontSize: 13,
+        color: "#888",
+        marginBottom: 2,
     },
 });
 

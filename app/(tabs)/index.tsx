@@ -42,20 +42,25 @@ export default function Home() {
       "Samstag",
       "Sonntag"
     ];
+
+    const mealTimes = ["Mittag", "Abend"];
   
-    const weekEntries = weekdays.map((weekday) => {
-      // Finde das Rezept für diesen Wochentag (falls vorhanden)
-      const recipeForDay = recipes.find((recipe) => recipe.day === weekday);
-  
-      return {
-          id: recipeForDay?.id ?? "",
-          date: recipeForDay?.date ?? "",   // evtl. leer lassen
+    const weekEntries = weekdays.flatMap((weekday) =>
+      mealTimes.map((mealTime) => {
+        const recipeForSlot = recipes.find(
+          (recipe) => recipe.day === weekday && recipe.mealTime === mealTime
+        );
+        return {
+          id: recipeForSlot?.id ?? "",
+          date: recipeForSlot?.date ?? "",
           day: weekday,
-          title: recipeForDay?.title,
-          rating: recipeForDay?.rating,
-          image: recipeForDay?.image ?? null
-      };
-    });
+          title: recipeForSlot?.title,
+          rating: recipeForSlot?.rating,
+          image: recipeForSlot?.image ?? null,
+          mealTime,
+        };
+      })
+    );
   
 
     const loadRecipes = async () => {
@@ -72,6 +77,7 @@ export default function Home() {
         title: item.title,
         rating: item.averageRating,
         image: null,
+        mealTime: item.mealTime,
       }));
   
       setRecipes(formattedData);
