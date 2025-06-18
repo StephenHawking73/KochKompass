@@ -1,7 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-import { Animated, FlatList, Image, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Swipeable } from "react-native-gesture-handler";
+import { FlatList, Image, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { account, databases } from "../api/appwriteConfig";
 
 export type RecipeEntry = {
@@ -55,92 +54,20 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
 
     const deleteDateFromRecipe = async (recipe: RecipeEntry) => {
         try {
-            // Hier musst du anpassen, wie du das Datum in deiner DB entfernst
-            // Beispiel: Update Dokument, damit das Datum gelöscht/geleert wird
             await databases.updateDocument(
-                "6846fb7f00127239fdd7",    // deine Datenbank ID
-                "6846fb850031f9e6d717",    // deine Collection ID
+                "6846fb7f00127239fdd7",   
+                "6846fb850031f9e6d717",   
                 recipe.id,
                 {
                     day: null,
                     weekStartDate: null,
                 }
             );
-            await onRefresh(); // Daten neu laden
+            closeModal();
+            await onRefresh();
         } catch (error) {
             console.error("Fehler beim Löschen des Datums:", error);
         }
-    };
-
-    const renderRightActions = (progress: Animated.AnimatedInterpolation, dragX: Animated.AnimatedInterpolation, item: RecipeEntry) => {
-        const scale = dragX.interpolate({
-            inputRange: [-100, 0],
-            outputRange: [1, 0],
-            extrapolate: 'clamp',
-        });
-
-        return (
-            <TouchableOpacity
-                onPress={() => deleteDateFromRecipe(item)}
-                style={{
-                    backgroundColor: 'red',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    width: 80,
-                    marginVertical: 4,
-                    borderRadius: 8,
-                }}
-            >
-                <Animated.View>
-                    <Ionicons name="trash-outline" size={20} color={"#fff"}/>
-                </Animated.View>
-            </TouchableOpacity>
-        );
-    };
-
-
-    const renderItem = ({ item }: { item: RecipeEntry }) => {
-        return (
-            <Swipeable renderRightActions={(progress, dragX) => renderRightActions(progress, dragX, item)}>
-                <Pressable onPress={() => openModal(item)}>
-                    <View style={styles.row}>
-                        <Image source={dayImageMap[item.day]} style={styles.dayImage} />
-                        
-                        <View style={styles.textContainer}>
-                            <Text>Mittag: {item.title && !item.isEvening ? (<Text style={styles.recipeTitle}>{item.title}</Text>) : null}</Text>
-                            <Text>Abend: {item.title && item.isEvening ?(<Text style={styles.recipeTitle}>{item.title}</Text>) : null}</Text>
-                            
-                        </View>
-
-                        <View style={styles.ratingContainer}>
-                            {typeof item.rating === "number" ? renderStars(item.rating) : null}
-                        </View>
-                    </View>
-                </Pressable>
-            </Swipeable>            
-        );
-    };
-
-    const renderStars = (rating: number) => {
-        const fullStars = Math.floor(rating);
-        const halfStar = rating % 1 >= 0.5;
-        const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-
-        const stars = [];
-
-        for (let i = 0; i < fullStars; i++) {
-            stars.push(<Ionicons key={`full-${i}`} name="star" size={20} color="#FFD700" />);
-        }
-
-        if (halfStar) {
-            stars.push(<Ionicons key="half" name="star-half" size={20} color="#FFD700" />);
-        }
-
-        for (let i = 0; i < emptyStars; i++) {
-            stars.push(<Ionicons key={`empty-${i}`} name="star-outline" size={20} color="#FFD700" />);
-        }
-
-        return <View style={{ flexDirection: 'row' }}>{stars}</View>;
     };
 
     const renderInteractiveStars = (rating: number, onPress: (rating: number) => void) => {
@@ -342,6 +269,10 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
                             <View style={{marginTop: 50}}/>
                         )}
 
+                        <Pressable onPress={() => deleteDateFromRecipe(selectedRecipe)} style={styles.deleteButton}>
+                            <Text style={styles.closeButtonText}>Löschen</Text>
+                        </Pressable>
+
                         <Pressable onPress={() => closeModal()} style={styles.closeButton}>
                             <Text style={styles.closeButtonText}>Schließen</Text>
                         </Pressable>
@@ -411,11 +342,19 @@ const styles = StyleSheet.create({
         marginTop: 10
     },
     closeButton: {
-        backgroundColor: '#007bff',
+        backgroundColor: '#1DC0AB',
         padding: 10,
         borderRadius: 8,
         alignItems: 'center',
         marginBottom: 30,
+    },
+    deleteButton: {
+        backgroundColor: '#FF5D96',
+        padding: 10,
+        borderRadius: 8,
+        alignItems: 'center',
+        marginBottom: 15,
+        marginTop: 10,
     },
     closeButtonText: {
         color: '#fff',

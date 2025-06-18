@@ -28,27 +28,28 @@ export default function AddMeal() {
 
     const [isMeat, setisMeat] = useState(false);
 
-    useEffect(() => {
-        const fetchRecipes = async () => {
-            try {
-                const recipes = await databases.listDocuments(
-                    "6846fb7f00127239fdd7", 
-                    "6846fb850031f9e6d717"
-                );
-                const formattedData = recipes.documents.map((doc: any) => ({
-                    id: doc.$id,
-                    name: doc.title,
-                    rating: doc.averageRating,
-                    weekStartDate: doc.weekStartDate ?? null,
-                    isMeat: doc.isMeat ?? false,
-                }));
-                setFullData(formattedData);
-                setData(formattedData);
-            } catch (error) {
-                console.error("Fehler beim Laden der Rezepte:", error);
-            }
-        };
+    const fetchRecipes = async () => {
+        try {
+            const recipes = await databases.listDocuments(
+                "6846fb7f00127239fdd7", 
+                "6846fb850031f9e6d717"
+            );
+            const formattedData = recipes.documents.map((doc: any) => ({
+                id: doc.$id,
+                name: doc.title,
+                rating: doc.averageRating,
+                weekStartDate: doc.weekStartDate ?? null,
+                isMeat: doc.isMeat ?? false,
+            }));
+            setFullData(formattedData);
+            setData(formattedData);
+        } catch (error) {
+            console.error("Fehler beim Laden der Rezepte:", error);
+        }
+    };
 
+    
+    useEffect(() => {
         if (isAddMealVisible) {
             fetchRecipes();
         }
@@ -247,6 +248,7 @@ export default function AddMeal() {
     }
 
     const closeAddModal = () => {
+        fetchRecipes();
         setShowAddModal(false);
     }
 
@@ -290,35 +292,33 @@ export default function AddMeal() {
                     >
                         <Text>Lange nicht gekocht</Text>
                     </Pressable>
-
                     <FlatList
                         data={data}
                         keyExtractor={(item) => item.id}
-                        showsVerticalScrollIndicator = {false}
+                        showsVerticalScrollIndicator={false}
                         renderItem={({ item }) => (
                             <Pressable onPress={() => handleSelectRecipe(item)} style={styles.recipeItem} onLongPress={() => showUserRating(item)}>
-                                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                    <Text style={{flex: 1, left: 5}}>{item.name}</Text>
-                                    <View style={{right: 5}}>
-                                        {typeof item.rating === "number" ? renderStars(item.rating) : null}
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Text style={{ flex: 1, left: 5 }}>{item.name}</Text>
+                                    <View style={{ right: 5 }}>
+                                        {typeof item.rating === "number" ? renderStars(item.rating) : renderStars(0)}
                                     </View>
                                 </View>
-                                
                             </Pressable>
                         )}
                         style={{width: "100%"}}
                         ListFooterComponent={
-                            <Pressable style={{marginTop: 15, alignItems: "center"}} onPress={() => {
+                            <Pressable style={{ marginTop: 15 }} onPress={() => {
                                 handleSelectRecipe({ name: mealName });
                             }}>
                                 {mealName ? (
-                                    <View style={{flexDirection: "row", flex: 1}}>
-                                        <Ionicons name={"add-circle-outline"} size={20} color={"#049280"}/>
-                                        <Text style={{color: "#049280", fontSize: 17, marginLeft: 5}}><Text style={{fontWeight: "bold"}}>{mealName} </Text>hinzufügen</Text>    
+                                    <View style={{ flexDirection: "row", flex: 1 }}>
+                                        <Ionicons name={"add-circle-outline"} size={20} color={"#049280"} />
+                                        <Text style={{ color: "#049280", fontSize: 17, marginLeft: 5 }}>
+                                            <Text style={{ fontWeight: "bold" }}>{mealName} </Text>hinzufügen
+                                        </Text>
                                     </View>
-                                ) : (
-                                    null
-                                )}
+                                ) : null}
                             </Pressable>
                         }
                     />
@@ -417,7 +417,7 @@ export default function AddMeal() {
                                     </View>
                                 </View>
                                 
-                                <View style={{flexDirection: "row", marginTop: 40, gap: 5}}>
+                                <View style={{flexDirection: "row", marginTop: 40, gap: 5, marginBottom: 20}}>
                                     <Pressable onPress={() => closeAddModal()} style={styles.cancelButton}>
                                         <Text style={styles.buttonText}>Schließen</Text>
                                     </Pressable>
@@ -463,6 +463,7 @@ const styles = StyleSheet.create({
         fontSize: 25,
         fontWeight: "bold",
         marginBottom: 10,
+        textAlign: "center"
     },
     input: {
         borderWidth: 1,
