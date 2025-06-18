@@ -28,6 +28,24 @@ export default function AddMeal() {
 
     const [isMeat, setisMeat] = useState(false);
 
+    const [source, setSource] = useState<string>("");
+    const [showSourceModal, setShowSourceModal] = useState(false);
+    const [showSpecificSourceModal, setShowSpecificSourceModal] = useState(false);
+    const [showOtherSourceModal, setShowSOtherSourceModal] = useState(false);
+
+    const [specificSource, setSpecificSource] = useState("");
+    const [otherSource, setOtherSource] = useState("");
+
+    const sources = [
+        "Chefkoch.de",
+        "Rewe.de",
+        "Cookidoo.de",
+        "Edeka.de",
+        "Kochbuch",
+        "Eigenes Rezept",
+        "Sonstiges",
+    ];
+
     const fetchRecipes = async () => {
         try {
             const recipes = await databases.listDocuments(
@@ -40,6 +58,8 @@ export default function AddMeal() {
                 rating: doc.averageRating,
                 weekStartDate: doc.weekStartDate ?? null,
                 isMeat: doc.isMeat ?? false,
+                from: doc.from ?? "",
+                mealTime: doc.mealTime ?? "Mittag",
             }));
             setFullData(formattedData);
             setData(formattedData);
@@ -166,6 +186,7 @@ export default function AddMeal() {
                         weekStartDate: weekStartDate,
                         isMeat: isMeat,
                         mealTime: mealTime,
+                        from: source || "",
                     }
                 )
                 console.log("Bestehendes Rezept aktualisiert:", recipe.name, "→", day, weekStartDate);
@@ -176,6 +197,7 @@ export default function AddMeal() {
                     weekStartDate: weekStartDate,
                     isMeat: isMeat,
                     mealTime: mealTime,
+                    from: source || "",
                 })
                 console.log("Neues Rezept gespeichert:", recipe.name, "→", weekStartDate);
             }
@@ -185,6 +207,7 @@ export default function AddMeal() {
     
         // Erst States zurücksetzen, dann Modal schließen
         setMealName("");
+        setSource("");
         setSelectedRecipe(null);
         setSelectedDate(null);
         closeAddModal();
@@ -193,6 +216,8 @@ export default function AddMeal() {
     const handleSelectRecipe = (item: any) => {
         setSelectedRecipe(item);
         setisMeat(item.isMeat !== undefined ? !!item.isMeat : false);
+        setSource(item.from)
+        setMealTime(item.mealTime)
         openAddModal();
     }
 
@@ -254,6 +279,26 @@ export default function AddMeal() {
 
     const toggleIsMeat = () => setisMeat(value => !value);
 
+    const setSourceFunction = (src: string) => {
+        if (src === "Kochbuch") {
+            setShowSpecificSourceModal(true);
+        } else if (src === "Sonstiges") {
+            setShowSOtherSourceModal(true);
+        } else {
+            setSource(src);
+        }
+    }
+
+    const setSourcesAfterClose = () => {
+        setShowSpecificSourceModal(false); 
+        setSpecificSource("");
+    }
+
+    const setOtherSourcesAfterClose = () => {
+        setShowSOtherSourceModal(false); 
+        setOtherSource("");
+    }
+
     return (
         <Modal
             animationType="slide"
@@ -266,7 +311,7 @@ export default function AddMeal() {
                     <Text style={styles.modalTitle}>Neues Gericht hinzufügen</Text>
                     
                     <View style={styles.input}>
-                        <Ionicons name="search-outline" size={20} color="#ccc"/>
+                        <Ionicons name="search-outline" size={20} color="#ccc" style={{marginLeft: 10}}/>
                         <TextInput
                             style={{marginLeft: 5, flex: 1}}
                             placeholder="Gericht suchen ..."
@@ -419,8 +464,123 @@ export default function AddMeal() {
 
                                 <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%", marginTop: 15}}>
                                     <Text style={{fontWeight: "500", fontSize: 18}}>Gefunden: </Text>
+                                    <Pressable
+                                        onPress={() => setShowSourceModal(true)}
+                                        style={{
+                                            backgroundColor: "#E9E9E9",
+                                            padding: 8,
+                                            borderRadius: 8,
+                                            minWidth: 120,
+                                            alignItems: "center"
+                                        }}
+                                    >
+                                        <Text style={{fontSize: 15, color: "#333"}}>
+                                            {source ? source : "Quelle wählen"}
+                                        </Text>
+                                    </Pressable>
                                 </View>
-                                
+
+                                <Modal
+                                    animationType="fade"
+                                    transparent={true}
+                                    visible={showSourceModal}
+                                    onRequestClose={() => setShowSourceModal(false)}
+                                >
+                                    <View style={styles.modalOverlay}>
+                                        <View style={[styles.addModal, {padding: 10}]}>
+                                            <Text style={{fontWeight: "bold", fontSize: 18, marginBottom: 10}}>Quelle wählen</Text>
+                                            {sources.map((src) => (
+                                                <Pressable
+                                                    key={src}
+                                                    onPress={() => {
+                                                        setSourceFunction(src);
+                                                        setShowSourceModal(false);
+                                                    }}
+                                                    style={{
+                                                        padding: 12,
+                                                        borderBottomWidth: 1,
+                                                        borderBottomColor: "#eee",
+                                                        width: 200,
+                                                        alignItems: "center"
+                                                    }}
+                                                >
+                                                    <Text style={{fontSize: 16}}>{src}</Text>
+                                                </Pressable>
+                                            ))}
+                                            <Pressable onPress={() => setShowSourceModal(false)} style={{marginTop: 10}}>
+                                                <Text style={{color: "#FF5D96", marginBottom: 20}}>Abbrechen</Text>
+                                            </Pressable>
+                                        </View>
+                                    </View>
+                                </Modal>
+
+                                <Modal
+                                    animationType="fade"
+                                    transparent={true}
+                                    visible={showSpecificSourceModal}
+                                    onRequestClose={() => setShowSpecificSourceModal(false)}
+                                >
+                                    <View style={styles.modalOverlay}>
+                                        <View style={[styles.addModal]}>
+                                            <Text style={[styles.modalTitle]}>Welches Kochbuch?</Text>
+                                            <View style={styles.input}>
+                                                <TextInput
+                                                    style={{marginLeft: 5, flex: 1}}
+                                                    placeholder="Name eingeben"
+                                                    value={specificSource}
+                                                    onChangeText={setSpecificSource}
+                                                />
+                                            </View>
+
+                                            <View style={{flexDirection: "row", marginTop: 15, gap: 5, marginBottom: 10}}>
+                                                <Pressable onPress={() => setSourcesAfterClose()} style={[styles.cancelAddButton]}>
+                                                    <Text style={styles.buttonText}>Schließen</Text>
+                                                </Pressable>
+                                                <Pressable onPress={() => {
+                                                    setSource("Kochbuch: " + specificSource);
+                                                    setShowSpecificSourceModal(false);
+                                                }} style={[styles.addButton]}>
+                                                    <Text style={styles.buttonText}>Bestätigen</Text>
+                                                </Pressable> 
+                                            </View>
+                                        </View>
+                                    </View>
+                                </Modal>
+
+                                <Modal
+                                    animationType="fade"
+                                    transparent={true}
+                                    visible={showOtherSourceModal}
+                                    onRequestClose={() => setShowSOtherSourceModal(false)}
+                                >
+                                    <View style={styles.modalOverlay}>
+                                        <View style={[styles.addModal]}>
+                                            <Text style={[styles.modalTitle]}>Sonstiges</Text>
+                                            <View style={styles.input}>
+                                                <TextInput
+                                                    style={{marginLeft: 5, flex: 1}}
+                                                    placeholder="Name eingeben"
+                                                    value={otherSource}
+                                                    onChangeText={setOtherSource}
+                                                />
+                                            </View>
+
+                                            <View style={{flexDirection: "row", marginTop: 15, gap: 5, marginBottom: 10}}>
+                                                <Pressable onPress={() => setOtherSourcesAfterClose()} style={[styles.cancelAddButton]}>
+                                                    <Text style={styles.buttonText}>Schließen</Text>
+                                                </Pressable>
+                                                <Pressable onPress={() => {
+                                                    setSource(otherSource);
+                                                    setShowSOtherSourceModal(false);
+                                                }} style={[styles.addButton]}>
+                                                    <Text style={styles.buttonText}>Bestätigen</Text>
+                                                </Pressable> 
+                                            </View>
+                                        </View>
+                                    </View>
+                                </Modal>
+                            
+
                                 <View style={{flexDirection: "row", marginTop: 40, gap: 5}}>
                                     <Pressable onPress={() => closeAddModal()} style={styles.cancelAddButton}>
                                         <Text style={styles.buttonText}>Schließen</Text>
@@ -476,7 +636,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#ccc",
         borderRadius: 10,
-        padding: 10,
+        padding: Platform.OS === "ios" ? 10 : 0,
         width: "100%",
         marginTop: 15,
         alignItems: "center",
