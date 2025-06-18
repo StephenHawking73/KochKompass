@@ -11,6 +11,7 @@ export type RecipeEntry = {
     title?: string;
     rating?: number;
     mealTime: string;
+    from?: string;
 };
 
 type Props = {
@@ -258,6 +259,15 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
                         </Text>
 
                         
+                        {selectedRecipe?.from !== null ? ( 
+                            <View style={{flexDirection: "row", alignItems: "center"}}>
+                                <Text style={{color: "#5E596E", fontSize: 15, fontStyle: "italic"}}>Gefunden: </Text>
+                                <Text style={{color: "#5E596E", fontSize: 15, fontStyle: "italic", fontWeight: "bold"}}>{selectedRecipe?.from}</Text>
+                            </View>
+                        ) : (
+                            null
+                        )}
+                        
                         {selectedRecipe?.title !== undefined ? (
                             <View style={{alignItems: "center"}}>
                                 <Text style={styles.modalSubtitle}>
@@ -335,18 +345,18 @@ const styles = StyleSheet.create({
     modalTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        marginBottom: 10,
+        marginBottom: 2,
     },
     modalSubtitle: {
         fontSize: 16,
-        marginTop: 10
+        marginTop: 20,
     },
     closeButton: {
         backgroundColor: '#1DC0AB',
         padding: 10,
         borderRadius: 8,
         alignItems: 'center',
-        marginBottom: 30,
+        marginBottom: 20,
     },
     deleteButton: {
         backgroundColor: '#FF5D96',

@@ -416,6 +416,10 @@ export default function AddMeal() {
                                         </Pressable>
                                     </View>
                                 </View>
+
+                                <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%", marginTop: 15}}>
+                                    <Text style={{fontWeight: "500", fontSize: 18}}>Gefunden: </Text>
+                                </View>
                                 
                                 <View style={{flexDirection: "row", marginTop: 40, gap: 5}}>
                                     <Pressable onPress={() => closeAddModal()} style={styles.cancelAddButton}>

@@ -74,6 +74,7 @@ export default function Home() {
           rating: recipeForSlot?.rating,
           image: recipeForSlot?.image ?? null,
           mealTime,
+          from: recipeForSlot?.from,
         };
       })
     );
@@ -94,6 +95,7 @@ export default function Home() {
         rating: item.averageRating,
         image: null,
         mealTime: item.mealTime,
+        from: item.from,
       }));
   
       setRecipes(formattedData);
