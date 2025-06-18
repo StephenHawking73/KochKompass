@@ -3,8 +3,9 @@ import WeekList, { RecipeEntry } from "@/src/components/WeekList";
 import { useAuth } from "@/src/context/AuthContext";
 import { getWeekRange } from "@/src/utils/getWeekRange";
 import { Query } from "appwrite";
+import * as Updates from "expo-updates";
 import { useEffect, useState } from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 
 export default function Home() {
@@ -27,6 +28,22 @@ export default function Home() {
           }
       
         setGreeting(getCurrentGreeting());
+    }, []);
+
+    useEffect(() => {
+      async function checkForUpdate() {
+        try {
+          const update = await Updates.checkForUpdateAsync();
+          if (update.isAvailable) {
+            await Updates.fetchUpdateAsync();
+            await Updates.reloadAsync();
+          }
+        } catch (e) {
+          Alert.alert("Update failed: ", e);
+        }
+      }
+    
+      checkForUpdate();
     }, []);
 
 

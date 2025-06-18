@@ -44,6 +44,13 @@
         "projectId": "4f14eb0c-5075-4952-9ed5-4562f3c2606c"
       }
     },
-    "owner": "programmer73"
+    "owner": "programmer73",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "enabled": true,
+      "fallbackToCacheTimeout": 0
+    }
   }
 }
