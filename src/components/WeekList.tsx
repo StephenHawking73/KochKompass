@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
         padding: 8,
         shadowColor: "#000",
         shadowOpacity: 0.05,
-        shadowRadius: 4,
+        shadowRadius: 1,
         elevation: 2,
     },
     mealSlots: {

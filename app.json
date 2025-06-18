@@ -16,7 +16,8 @@
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.programmer73.KochKompass"
     },
     "web": {
       "bundler": "metro",
@@ -41,7 +42,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "4f14eb0c-5075-4952-9ed5-4562f3c2606c"
+        "projectId": "850fde75-7018-462d-b36e-cec70035eee8"
       }
     },
     "owner": "programmer73",

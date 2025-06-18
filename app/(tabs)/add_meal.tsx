@@ -342,7 +342,7 @@ export default function AddMeal() {
                                 )}
 
                                 <Pressable onPress={() => closeUserRating()}>
-                                    <Text style={{fontSize: 16}}>Schließen</Text>
+                                    <Text style={{fontSize: 16, marginBottom: Platform.OS === "ios" ? 20 : -20}}>Schließen</Text>
                                 </Pressable>
                             </View>
                         </View>
@@ -396,7 +396,7 @@ export default function AddMeal() {
                                         <Pressable
                                             onPress={() => setMealTime("Mittag")}
                                             style={{
-                                                backgroundColor: mealTime === "Mittag" ? "#1DC0AB" : "#E9E9E9",
+                                                backgroundColor: mealTime === "Mittag" ? "#19055B" : "#E9E9E9",
                                                 padding: 8,
                                                 borderRadius: 8,
                                                 marginRight: 8,
@@ -407,7 +407,7 @@ export default function AddMeal() {
                                         <Pressable
                                             onPress={() => setMealTime("Abend")}
                                             style={{
-                                                backgroundColor: mealTime === "Abend" ? "#1DC0AB" : "#E9E9E9",
+                                                backgroundColor: mealTime === "Abend" ? "#19055B" : "#E9E9E9",
                                                 padding: 8,
                                                 borderRadius: 8,
                                             }}
@@ -417,13 +417,13 @@ export default function AddMeal() {
                                     </View>
                                 </View>
                                 
-                                <View style={{flexDirection: "row", marginTop: 40, gap: 5, marginBottom: 20}}>
-                                    <Pressable onPress={() => closeAddModal()} style={styles.cancelButton}>
+                                <View style={{flexDirection: "row", marginTop: 40, gap: 5}}>
+                                    <Pressable onPress={() => closeAddModal()} style={styles.cancelAddButton}>
                                         <Text style={styles.buttonText}>Schließen</Text>
                                     </Pressable>
                                     <Pressable onPress={() => saveMeal(selectedRecipe || { name: mealName }, selectedDate, isMeat)} style={styles.addButton} disabled={!selectedDate || !(selectedRecipe?.name || mealName)}>
                                         <Text style={styles.buttonText}>Hinzufügen</Text>
-                                    </Pressable>
+                                    </Pressable> 
                                 </View>
                             </View>
                         </View>
@@ -443,16 +443,19 @@ export default function AddMeal() {
 
 const styles = StyleSheet.create({
     modalOverlay: {
-        flex: 1,
         backgroundColor: "rgba(0,0,0,0.5)",
+        flex: 1,
+        justifyContent: "flex-end"
     },
     modalContent: {
         top: 50,
         backgroundColor: "white",
         padding: 30,
-        borderRadius: 15,
+        borderTopLeftRadius: 15,
+        borderTopRightRadius: 15,
         alignItems: "center",
         flex: 1,
+        justifyContent: "flex-end",
     },
     modalTitle: {
         fontSize: 18,
@@ -479,19 +482,23 @@ const styles = StyleSheet.create({
         backgroundColor: "#FF5D96",
         padding: 10,
         borderRadius: 10,
-        marginLeft: 5,
-        marginBottom: 60,
         width: "50%",
-        alignItems: "center",
+        marginBottom: Platform.OS === "ios" ? 80 : 50
+    },
+    cancelAddButton: {
+        backgroundColor: "#FF5D96",
+        padding: 10,
+        borderRadius: 10,
+        width: "50%",
+        marginBottom: Platform.OS === "ios" ? 40 : 0
     },
     addButton: {
         backgroundColor: "#1DC0AB",
         padding: 10,
         borderRadius: 10,
-        marginLeft: 5,
-        marginBottom: 60,
         width: "50%",
         alignItems: "center",
+        marginBottom: Platform.OS === "ios" ? 40 : 0
     },
     buttonText: {
         color: "white",
@@ -507,18 +514,19 @@ const styles = StyleSheet.create({
         fontSize: 16
     },
     userRatingModal:{
-        top: "76%",
         backgroundColor: "white",
         padding: 30,
-        borderRadius: 15,
+        borderTopRightRadius: 15,
+        borderTopLeftRadius: 15,
         alignItems: "center",
+        justifyContent: "flex-end"
     },
     addModal: {
-        top: "60%",
         backgroundColor: "white",
-        flex: 1,
-        borderRadius: 15,
+        borderTopRightRadius: 15,
+        borderTopLeftRadius: 15,
         alignItems: "center",
         padding: 30,
+        justifyContent: "flex-end",
     }
 });
