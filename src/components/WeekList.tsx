@@ -11,6 +11,7 @@ export type RecipeEntry = {
     image?: any;
     title?: string;
     rating?: number;
+    isEvening: boolean;
 };
 
 type Props = {
@@ -106,11 +107,9 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
                         <Image source={dayImageMap[item.day]} style={styles.dayImage} />
                         
                         <View style={styles.textContainer}>
-                            {item.title ? (
-                                <Text style={styles.recipeTitle}>{item.title}</Text>
-                            ) : (
-                                null
-                            )}
+                            <Text>Mittag: {item.title && !item.isEvening ? (<Text style={styles.recipeTitle}>{item.title}</Text>) : null}</Text>
+                            <Text>Abend: {item.title && item.isEvening ?(<Text style={styles.recipeTitle}>{item.title}</Text>) : null}</Text>
+                            
                         </View>
 
                         <View style={styles.ratingContainer}>

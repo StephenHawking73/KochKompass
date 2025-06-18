@@ -40,7 +40,6 @@ export default function Home() {
       "Donnerstag",
       "Freitag",
       "Samstag",
-      "Abend",
       "Sonntag"
     ];
   
