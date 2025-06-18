@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-import { Animated, Image, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Animated, FlatList, Image, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import { account, databases } from "../api/appwriteConfig";
 
@@ -273,22 +273,17 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
 
     return (
         <>
-            {/*<FlatList
-                data={data}
-                keyExtractor={(item) => item.day}
-                renderItem={renderItem}
+            <FlatList
+                data={days}
+                keyExtractor={(day) => day}
                 contentContainerStyle={styles.listContainer}
-                showsVerticalScrollIndicator= {false}
-                refreshing = {refreshing}
+                refreshing={refreshing}
                 onRefresh={async () => {
                     setRefreshing(true);
                     await onRefresh();
                     setRefreshing(false);
                 }}
-            />*/}
-
-            <View style={styles.listContainer}>
-                {days.map((day) => {
+                renderItem={({ item: day }) => {
                     const mittag = groupedByDay[day]?.Mittag;
                     const abend = groupedByDay[day]?.Abend;
                     return (
@@ -296,7 +291,11 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
                             <Image source={dayImageMap[day]} style={styles.dayImage} />
                             <View style={styles.mealSlots}>
                                 {/* Mittag */}
-                                <Pressable style={styles.mealSlot} onPress={() => mittag && openModal(mittag)}>
+                                <Pressable
+                                    style={styles.mealSlot}
+                                    onPress={() => mittag?.title && openModal(mittag)}
+                                    disabled={!mittag?.title}
+                                >
                                     <Text style={styles.mealLabel}>🍽️ Mittag</Text>
                                     {mittag?.title ? (
                                         <Text style={styles.recipeTitle}>{mittag.title}</Text>
@@ -305,7 +304,11 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
                                     )}
                                 </Pressable>
                                 {/* Abend */}
-                                <Pressable style={styles.mealSlot} onPress={() => abend && openModal(abend)}>
+                                <Pressable
+                                    style={styles.mealSlot}
+                                    onPress={() => abend?.title && openModal(abend)}
+                                    disabled={!abend?.title}
+                                >
                                     <Text style={styles.mealLabel}>🌙 Abend</Text>
                                     {abend?.title ? (
                                         <Text style={styles.recipeTitle}>{abend.title}</Text>
@@ -316,8 +319,8 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
                             </View>
                         </View>
                     );
-                })}
-            </View>
+                }}
+            />
 
             <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => closeModal()}>
                 <View style={styles.modalOverlay}>
@@ -352,7 +355,8 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
 
 const styles = StyleSheet.create({
     listContainer: {
-        marginHorizontal: 20
+        marginHorizontal: 20,
+        paddingBottom: 260,
     },
     row: {
         flexDirection: 'row',
