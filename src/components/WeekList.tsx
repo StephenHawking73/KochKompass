@@ -277,6 +277,7 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
                 data={days}
                 keyExtractor={(day) => day}
                 contentContainerStyle={styles.listContainer}
+                showsVerticalScrollIndicator = {false}
                 refreshing={refreshing}
                 onRefresh={async () => {
                     setRefreshing(true);
@@ -356,7 +357,7 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
 const styles = StyleSheet.create({
     listContainer: {
         marginHorizontal: 20,
-        paddingBottom: 260,
+        paddingBottom: 500,
     },
     row: {
         flexDirection: 'row',

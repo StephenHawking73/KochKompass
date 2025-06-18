@@ -11,6 +11,7 @@ export default function AddMeal() {
     const { isAddMealVisible, hideAddMeal } = useModal(); // Context lesen
     const [mealName, setMealName] = useState("");
     const [data, setData] = useState<any[]>([]);
+    const [mealTime, setMealTime] = useState<"Mittag" | "Abend">("Mittag");
 
     const [selectedRecipe, setSelectedRecipe] = useState<any | null>(null);
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -163,6 +164,7 @@ export default function AddMeal() {
                         day: day,
                         weekStartDate: weekStartDate,
                         isMeat: isMeat,
+                        mealTime: mealTime,
                     }
                 )
                 console.log("Bestehendes Rezept aktualisiert:", recipe.name, "→", day, weekStartDate);
@@ -172,6 +174,7 @@ export default function AddMeal() {
                     title: recipe.name,
                     weekStartDate: weekStartDate,
                     isMeat: isMeat,
+                    mealTime: mealTime,
                 })
                 console.log("Neues Rezept gespeichert:", recipe.name, "→", weekStartDate);
             }
@@ -291,6 +294,7 @@ export default function AddMeal() {
                     <FlatList
                         data={data}
                         keyExtractor={(item) => item.id}
+                        showsVerticalScrollIndicator = {false}
                         renderItem={({ item }) => (
                             <Pressable onPress={() => handleSelectRecipe(item)} style={styles.recipeItem} onLongPress={() => showUserRating(item)}>
                                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -384,14 +388,41 @@ export default function AddMeal() {
                                 <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%", marginTop: 15}}>
                                     <Text style={{fontWeight: "500", fontSize: 18}}>Fleisch: </Text>
                                     <Switch value={isMeat} onValueChange={toggleIsMeat} trackColor={{false: "#FF5D96", true: "#1DC0AB"}} thumbColor={"#4D94F3"} ios_backgroundColor={"#FF5D96"}/>
-                                </View>  
+                                </View> 
+                                 
+                                <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%", marginTop: 15}}>
+                                    <Text style={{fontWeight: "500", fontSize: 18}}>Tageszeit: </Text>
+                                    <View style={{flexDirection: "row"}}>
+                                        <Pressable
+                                            onPress={() => setMealTime("Mittag")}
+                                            style={{
+                                                backgroundColor: mealTime === "Mittag" ? "#1DC0AB" : "#E9E9E9",
+                                                padding: 8,
+                                                borderRadius: 8,
+                                                marginRight: 8,
+                                            }}
+                                        >
+                                            <Text style={{color: mealTime === "Mittag" ? "#fff" : "#333"}}>Mittag</Text>
+                                        </Pressable>
+                                        <Pressable
+                                            onPress={() => setMealTime("Abend")}
+                                            style={{
+                                                backgroundColor: mealTime === "Abend" ? "#1DC0AB" : "#E9E9E9",
+                                                padding: 8,
+                                                borderRadius: 8,
+                                            }}
+                                        >
+                                            <Text style={{color: mealTime === "Abend" ? "#fff" : "#333"}}>Abend</Text>
+                                        </Pressable>
+                                    </View>
+                                </View>
                                 
-                                <View style={{flexDirection: "row", marginTop: 70, gap: 5}}>
-                                    <Pressable onPress={() => saveMeal(selectedRecipe || { name: mealName }, selectedDate, isMeat)} style={styles.addButton} disabled={!selectedDate || !(selectedRecipe?.name || mealName)}>
-                                        <Text style={styles.buttonText}>Hinzufügen</Text>
-                                    </Pressable>
+                                <View style={{flexDirection: "row", marginTop: 40, gap: 5}}>
                                     <Pressable onPress={() => closeAddModal()} style={styles.cancelButton}>
                                         <Text style={styles.buttonText}>Schließen</Text>
+                                    </Pressable>
+                                    <Pressable onPress={() => saveMeal(selectedRecipe || { name: mealName }, selectedDate, isMeat)} style={styles.addButton} disabled={!selectedDate || !(selectedRecipe?.name || mealName)}>
+                                        <Text style={styles.buttonText}>Hinzufügen</Text>
                                     </Pressable>
                                 </View>
                             </View>
