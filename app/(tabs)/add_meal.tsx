@@ -8,7 +8,7 @@ import { Alert, FlatList, Modal, Platform, Pressable, StyleSheet, Switch, Text, 
 
 
 export default function AddMeal() {
-    const { isAddMealVisible, hideAddMeal } = useModal(); // Context lesen
+    const { isAddMealVisible, hideAddMeal } = useModal();
     const [mealName, setMealName] = useState("");
     const [data, setData] = useState<any[]>([]);
     const [mealTime, setMealTime] = useState<"Mittag" | "Abend">("Mittag");
@@ -23,6 +23,7 @@ export default function AddMeal() {
     const [showRatingModal, setShowRatingModal] = useState(false);
 
     const [isFilterActive, setIsFilterActive] = useState(false);
+    const [isPopularityActive, setIsPopularityActive] = useState(false);
 
     const [showAddModal, setShowAddModal] = useState(false);
 
@@ -111,6 +112,11 @@ export default function AddMeal() {
 
     const sortByOldest = () => {
         let sorted = [...fullData]
+
+        if(isPopularityActive){
+            setIsPopularityActive(false);
+        }
+        
         if(!isFilterActive){
             setIsFilterActive(true);
 
@@ -123,6 +129,22 @@ export default function AddMeal() {
             setIsFilterActive(false);
         }
 
+        setData(sorted);
+    }
+
+    const sortByPopularity = () => {
+        let sorted = [...fullData];
+
+        if(isFilterActive){
+            setIsFilterActive(false);
+        }
+
+        if (!isPopularityActive) {
+            setIsPopularityActive(true);
+            sorted = sorted.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+        } else {
+            setIsPopularityActive(false);
+        }
         setData(sorted);
     }
 
@@ -266,6 +288,7 @@ export default function AddMeal() {
     const closeModal = () => {
         hideAddMeal();
         setIsFilterActive(false);
+        setIsPopularityActive(false);
     }
 
     const openAddModal = () => {
@@ -320,23 +343,40 @@ export default function AddMeal() {
                         />
                     </View>
 
-                    <Pressable 
-                        onPress={() => sortByOldest()} 
-                        style={{
-                            paddingHorizontal: 12,
-                            paddingVertical: 6,
-                            backgroundColor: "#1DC0AB",
-                            borderColor: isFilterActive ? "#FF3E91" : "#fff",
-                            borderWidth: 2,
-                            opacity: 0.77,
-                            borderRadius: 10,
-                            marginTop: 15,
-                            marginBottom: 15,
-                            alignSelf: "flex-start"
-                        }} 
-                    >
-                        <Text>Lange nicht gekocht</Text>
-                    </Pressable>
+                    <View style={{flexDirection: "row", marginTop: 15, marginBottom: 15, justifyContent: "center"}}>
+                        <Pressable 
+                            onPress={() => sortByOldest()} 
+                            style={{
+                                paddingHorizontal: 12,
+                                paddingVertical: 6,
+                                backgroundColor: "#1DC0AB",
+                                borderColor: isFilterActive ? "#FF3E91" : "#fff",
+                                borderWidth: 2,
+                                opacity: 0.77,
+                                borderRadius: 10,
+                                marginLeft: -25
+                            }} 
+                        >
+                            <Text>Lange nicht gekocht</Text>
+                        </Pressable>
+                        
+                        <Pressable 
+                            onPress={() => sortByPopularity()} 
+                            style={{
+                                paddingHorizontal: 12,
+                                paddingVertical: 6,
+                                backgroundColor: "#FFD700",
+                                borderColor: isPopularityActive ? "#FF3E91" : "#fff",
+                                borderWidth: 2,
+                                opacity: 0.77,
+                                borderRadius: 10,
+                                marginLeft: 10
+                            }} 
+                        >
+                            <Text>Beliebteste zuerst</Text>
+                        </Pressable>
+                    </View>
+                    
                     <FlatList
                         data={data}
                         keyExtractor={(item) => item.id}

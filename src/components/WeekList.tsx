@@ -33,7 +33,6 @@ const dayImageMap: { [key: string]: any } = {
 const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedRecipe, setSelectedRecipe] = useState<RecipeEntry | null>(null);
-    const [recipeData, setRecipeData] = useState<RecipeEntry[]>(data);
     const [userRating, setUserRating] = useState<number>(0);
 
     const [refreshing, setRefreshing] = useState(false);
@@ -377,10 +376,6 @@ const styles = StyleSheet.create({
         backgroundColor: "#f8f8f8",
         borderRadius: 12,
         padding: 8,
-        shadowColor: "#000",
-        shadowOpacity: 0.05,
-        shadowRadius: 1,
-        elevation: 2,
     },
     mealSlots: {
         flex: 1,
