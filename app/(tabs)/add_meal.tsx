@@ -33,15 +33,18 @@ export default function AddMeal() {
     const [showSourceModal, setShowSourceModal] = useState(false);
     const [showSpecificSourceModal, setShowSpecificSourceModal] = useState(false);
     const [showOtherSourceModal, setShowSOtherSourceModal] = useState(false);
+    const [showLinkModal, setShowLinkModal] = useState(false);
 
     const [specificSource, setSpecificSource] = useState("");
     const [otherSource, setOtherSource] = useState("");
+    const [link, setLink] = useState("");
 
     const sources = [
         "Chefkoch.de",
         "Rewe.de",
         "Cookidoo.de",
         "Edeka.de",
+        "Link",
         "Kochbuch",
         "Eigenes Rezept",
         "Sonstiges",
@@ -307,6 +310,8 @@ export default function AddMeal() {
             setShowSpecificSourceModal(true);
         } else if (src === "Sonstiges") {
             setShowSOtherSourceModal(true);
+        } else if (src === "Link"){
+            setShowLinkModal(true);
         } else {
             setSource(src);
         }
@@ -320,6 +325,11 @@ export default function AddMeal() {
     const setOtherSourcesAfterClose = () => {
         setShowSOtherSourceModal(false); 
         setOtherSource("");
+    }
+
+    const setLinkAfterClose = () => {
+        setShowLinkModal(false); 
+        setLink("");
     }
 
     return (
@@ -383,7 +393,7 @@ export default function AddMeal() {
                         showsVerticalScrollIndicator={false}
                         renderItem={({ item }) => (
                             <Pressable onPress={() => handleSelectRecipe(item)} style={styles.recipeItem} onLongPress={() => showUserRating(item)}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
                                     <Text style={{ flex: 1, left: 5 }}>{item.name}</Text>
                                     <View style={{ right: 5 }}>
                                         {typeof item.rating === "number" ? renderStars(item.rating) : renderStars(0)}
@@ -515,7 +525,9 @@ export default function AddMeal() {
                                         }}
                                     >
                                         <Text style={{fontSize: 15, color: "#333"}}>
-                                            {source ? source : "Quelle wählen"}
+                                            {source
+                                                ? source.replace(/(\.de|\.com|\.net|\.org|\.info|\.io|\.co|\.app|\.at|\.eu|\.fr|\.it|\.es|\.nl|\.ru|\.uk|\.us|\.biz|\.tv|\.me|\.xyz).*/i, "$1")
+                                                : "Quelle wählen"}
                                         </Text>
                                     </Pressable>
                                 </View>
@@ -599,7 +611,7 @@ export default function AddMeal() {
                                             <View style={styles.input}>
                                                 <TextInput
                                                     style={{marginLeft: 5, flex: 1}}
-                                                    placeholder="Name eingeben"
+                                                    placeholder="Quelle ..."
                                                     value={otherSource}
                                                     onChangeText={setOtherSource}
                                                 />
@@ -619,7 +631,39 @@ export default function AddMeal() {
                                         </View>
                                     </View>
                                 </Modal>
-                            
+
+                                <Modal
+                                    animationType="fade"
+                                    transparent={true}
+                                    visible={showLinkModal}
+                                    onRequestClose={() => setShowLinkModal(false)}
+                                >
+                                    <View style={styles.modalOverlay}>
+                                        <View style={[styles.addModal]}>
+                                            <Text style={[styles.modalTitle]}>Link verknüpfen</Text>
+                                            <View style={styles.input}>
+                                                <TextInput
+                                                    style={{marginLeft: 5, flex: 1}}
+                                                    placeholder="Link einfügen"
+                                                    value={link}
+                                                    onChangeText={setLink}
+                                                />
+                                            </View>
+
+                                            <View style={{flexDirection: "row", marginTop: 15, gap: 5, marginBottom: 10}}>
+                                                <Pressable onPress={() => setLinkAfterClose()} style={[styles.cancelAddButton]}>
+                                                    <Text style={styles.buttonText}>Schließen</Text>
+                                                </Pressable>
+                                                <Pressable onPress={() => {
+                                                    setSource(link);
+                                                    setShowLinkModal(false);
+                                                }} style={[styles.addButton]}>
+                                                    <Text style={styles.buttonText}>Bestätigen</Text>
+                                                </Pressable> 
+                                            </View>
+                                        </View>
+                                    </View>
+                                </Modal>                          
 
                                 <View style={{flexDirection: "row", marginTop: 40, gap: 5}}>
                                     <Pressable onPress={() => closeAddModal()} style={styles.cancelAddButton}>

@@ -12,9 +12,13 @@ const SignIn = () => {
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
 
+    const [secureEntry, setSecureEntry] = useState(true);
+
     const handleSubmit = async () => {
         signUp({email, password, name});
     };
+
+    const toggleSecureEntry = () => setSecureEntry(!secureEntry)
 
     return (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1}}>
@@ -44,7 +48,11 @@ const SignIn = () => {
                         {/* Password Input */}
                         <View style={{borderWidth: 1, borderColor: '#484848', borderRadius: 9, marginHorizontal: 20, height: 45, marginTop: 26, flexDirection: "row", paddingLeft: 10, alignItems: "center"}}>
                             <Image source={require("@/assets/images/passwort.png")} style={{width: 31, height: 31}}/>
-                            <TextInput placeholder='Passwort' placeholderTextColor={'#484848'} secureTextEntry={true} style={{flex: 1, marginLeft: 10}} value={password} onChangeText={(text) => setPassword(text)}/>
+                            <TextInput placeholder='Passwort' placeholderTextColor={'#484848'} secureTextEntry={secureEntry} style={{flex: 1, marginLeft: 10}} value={password} onChangeText={(text) => setPassword(text)}/>
+                            <Pressable onPress={() => toggleSecureEntry()}>
+                                {secureEntry ? <Ionicons name="eye-outline" size={24} style={{right: 15}}/> : <Ionicons name="eye-off-outline" size={24} style={{right: 15}}/>}
+                                                                
+                            </Pressable>
                         </View>
                         <Text style={{color: '#484848', fontStyle: "italic", marginLeft: 25, top: 10}}>Min. 8 Zeichen</Text>
                     </View>

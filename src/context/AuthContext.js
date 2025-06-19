@@ -17,6 +17,17 @@ const AuthProvider = ({ children }) => {
         checkAuth();
     }
 
+    const resetPassword = async (email) => {
+        try {
+            const redirectUrl = 'https://deine-app.com/reset-password';
+            await account.createRecovery(email, redirectUrl);
+            Alert.alert("E-Mail verschickt", "Bitte überprüfe dein E-Mail-Postfach");
+        } catch (err) {
+            console.log(err);
+            Alert.alert("Fehler", err?.message || "Passwort-Reset fehlgeschlagen.");
+        }
+    }
+
     const checkAuth = async () => {
         setLoading(true);
         try {
@@ -74,7 +85,7 @@ const AuthProvider = ({ children }) => {
         }
     }
 
-    const contextData = {session, user, signIn, signOut, signUp};
+    const contextData = {session, user, signIn, signOut, signUp, resetPassword};
     return (
         <AuthContext.Provider value={contextData}>
             {loading ? (

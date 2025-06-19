@@ -15,11 +15,12 @@
       "autoIncrement": true
     },
     "release": {
+      "distribution": "internal",
       "android":{
-        "distribution": "internal",
-        "buildType": "apk",
-        "channel": "main"
-      }
+        "buildType": "apk"
+      },
+      "autoIncrement": true,
+      "channel": "main"
     }
   },
   "submit": {

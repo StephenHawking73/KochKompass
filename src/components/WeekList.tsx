@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-import { FlatList, Image, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Image, Linking, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { account, databases } from "../api/appwriteConfig";
 
 export type RecipeEntry = {
@@ -258,14 +258,35 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
                         </Text>
 
                         
-                        {selectedRecipe?.from !== null ? ( 
-                            <View style={{flexDirection: "row", alignItems: "center"}}>
-                                <Text style={{color: "#5E596E", fontSize: 15, fontStyle: "italic"}}>Gefunden: </Text>
-                                <Text style={{color: "#5E596E", fontSize: 15, fontStyle: "italic", fontWeight: "bold"}}>{selectedRecipe?.from}</Text>
-                            </View>
-                        ) : (
-                            null
-                        )}
+                        {selectedRecipe?.from ? (
+                            (() => {
+                                // Check if it's a valid URL (starts with http/https)
+                                const isUrl = /^https?:\/\//i.test(selectedRecipe.from);
+                                const displayText = selectedRecipe.from.replace(/(\.de|\.com|\.net|\.org|\.info|\.io|\.co|\.app|\.at|\.eu|\.fr|\.it|\.es|\.nl|\.ru|\.uk|\.us|\.biz|\.tv|\.me|\.xyz).*/i, "$1");
+                                if (isUrl) {
+                                    return (
+                                        <View style={{flexDirection: "row", alignItems: "center"}}>
+                                            <Text style={{color: "#5E596E", fontSize: 15, fontStyle: "italic"}}>Gefunden: </Text>
+                                            <Text
+                                                style={{color: "#1DC0AB", fontSize: 15, fontStyle: "italic", fontWeight: "bold", textDecorationLine: "underline"}}
+                                                onPress={() => {
+                                                    Linking.openURL(selectedRecipe.from || "");
+                                                }}
+                                            >
+                                                {displayText}
+                                            </Text>
+                                        </View>
+                                    );
+                                } else {
+                                    return (
+                                        <View style={{flexDirection: "row", alignItems: "center"}}>
+                                            <Text style={{color: "#5E596E", fontSize: 15, fontStyle: "italic"}}>Gefunden: </Text>
+                                            <Text style={{color: "#5E596E", fontSize: 15, fontStyle: "italic", fontWeight: "bold"}}>{displayText}</Text>
+                                        </View>
+                                    );
+                                }
+                            })()
+                        ) : null}
                         
                         {selectedRecipe?.title !== undefined ? (
                             <View style={{alignItems: "center"}}>
