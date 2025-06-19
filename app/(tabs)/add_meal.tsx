@@ -5,7 +5,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { ID, Query } from "appwrite";
 import { useEffect, useState } from "react";
 import { Alert, FlatList, Modal, Platform, Pressable, StyleSheet, Switch, Text, TextInput, View } from "react-native";
-
+import { Swipeable } from "react-native-gesture-handler";
 
 export default function AddMeal() {
     const { isAddMealVisible, hideAddMeal } = useModal();
@@ -330,6 +330,51 @@ export default function AddMeal() {
         setLink("");
     }
 
+    // !----- Danger zone -----!
+    const deleteRecipe = async (item: any) => {
+        const deletePermanetly = async () => {
+            try {
+                await databases.deleteDocument(
+                    "6846fb7f00127239fdd7",
+                    "6846fb850031f9e6d717",
+                    item.id
+                );
+                setData(prev => prev.filter(r => r.id !== item.id));
+                setFullData(prev => prev.filter(r => r.id !== item.id));
+            } catch (err) {
+                Alert.alert("Fehler", "Konnte das Gericht nicht löschen.");
+            }
+        }
+        
+        Alert.alert(
+            "Achtung!",
+            `${item.name} wirklich löschen?`,
+            [
+                { text: "Ja, dauerhaft löschen", onPress: deletePermanetly },
+                { text: "Nein!" }
+            ]
+        )
+        return;
+    };
+
+    const renderRightActions = (item: any) => (
+        <View style={{justifyContent: "center"}}>
+            <Pressable
+                onPress={() => deleteRecipe(item)}
+                style={{
+                    backgroundColor: "#FF5D96",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: 60,
+                    flex: 1,
+                    borderRadius: 6,
+                }}
+            >
+                <Ionicons name="trash-outline" size={24} color="#fff" />
+            </Pressable>
+        </View>
+    );
+
     return (
         <Modal
             animationType="slide"
@@ -390,14 +435,18 @@ export default function AddMeal() {
                         keyExtractor={(item) => item.id}
                         showsVerticalScrollIndicator={false}
                         renderItem={({ item }) => (
-                            <Pressable onPress={() => handleSelectRecipe(item)} style={styles.recipeItem} onLongPress={() => showUserRating(item)}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
-                                    <Text style={{ flex: 1, left: 5 }}>{item.name}</Text>
-                                    <View style={{ right: 5 }}>
-                                        {typeof item.rating === "number" ? renderStars(item.rating) : renderStars(0)}
+                            <View style={{marginBottom: 8}}>
+                            <Swipeable renderRightActions={() => renderRightActions(item)}>
+                                <Pressable onPress={() => handleSelectRecipe(item)} style={styles.recipeItem} onLongPress={() => showUserRating(item)}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
+                                        <Text style={{ flex: 1, left: 5 }}>{item.name}</Text>
+                                        <View style={{ right: 5 }}>
+                                            {typeof item.rating === "number" ? renderStars(item.rating) : renderStars(0)}
+                                        </View>
                                     </View>
-                                </View>
-                            </Pressable>
+                                </Pressable>
+                            </Swipeable>
+                            </View>
                         )}
                         style={{width: "100%"}}
                         ListFooterComponent={
@@ -754,7 +803,6 @@ const styles = StyleSheet.create({
         padding: 12,
         backgroundColor: "#eee",
         borderRadius: 6,
-        marginBottom: 8,
     },
     recipeText: {
         fontSize: 16
