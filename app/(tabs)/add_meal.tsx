@@ -124,8 +124,8 @@ export default function AddMeal() {
             setIsFilterActive(true);
 
             sorted = sorted.sort((a, b) => {
-                if (!a.weekStartDate) return 1;
-                if (!b.weekStartDate) return -1;
+                if (!a.weekStartDate) return 0;
+                if (!b.weekStartDate) return 0;
                 return new Date(a.weekStartDate).getTime() - new Date(b.weekStartDate).getTime();
             })
         } else {
