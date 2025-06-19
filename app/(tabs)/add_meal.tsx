@@ -167,14 +167,49 @@ export default function AddMeal() {
         
         const monday = new Date(date);
         monday.setDate(date.getDate() + diffToMonday);
+        monday.setHours(0, 0, 0, 0);
 
-        return monday.toISOString().split("T")[0];
+        const year = monday.getFullYear();
+        const month = String(monday.getMonth() + 1).padStart(2, '0');
+        const dayOfMonth = String(monday.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${dayOfMonth}`;
     }
 
     const saveMeal = async (recipe: any, date: Date, isMeat: Boolean) => {
-        if (!recipe || !date ) return;
+        if ( !recipe ) return;
+        if ( !date ) {
+            Alert.alert("Kein Datum", "Bitte wähle ein Datum aus");
+            return;
+        }
+        if ( !mealTime ) {
+            Alert.alert("Kein Zeitpunkt", "Bitte wähle einen Zeitpunkt aus");
+            return;
+        }
+
         try {
             const weekStartDate = getWeekStartsDate(date);
+            const dayNumber = date.getDay();
+            const day = weekdays[dayNumber];
+
+            const existingMeals = await databases.listDocuments(
+                "6846fb7f00127239fdd7",
+                "6846fb850031f9e6d717",
+                [
+                    Query.equal("weekStartDate", weekStartDate),
+                    Query.equal("day", day),
+                    Query.equal("mealTime", mealTime)
+                ]
+            );
+
+            if (existingMeals.total > 0) {
+                Alert.alert(
+                    "Schon belegt!",
+                    `Für ${day} (${mealTime}) ist bereits ein Gericht eingetragen.`
+                );
+                return;
+            }
+
             const weekDocs = await databases.listDocuments("6846fb7f00127239fdd7", "6846fb850031f9e6d717", [Query.equal("weekStartDate", weekStartDate)]);
             const meatCount = weekDocs.documents.filter(doc => doc.isMeat).length;
             const MAX_MEAT_PER_WEEK = 2;
@@ -716,7 +751,7 @@ export default function AddMeal() {
                                     <Pressable onPress={() => closeAddModal()} style={styles.cancelAddButton}>
                                         <Text style={styles.buttonText}>Schließen</Text>
                                     </Pressable>
-                                    <Pressable onPress={() => saveMeal(selectedRecipe || { name: mealName }, selectedDate, isMeat)} style={styles.addButton} disabled={!selectedDate || !(selectedRecipe?.name || mealName) || !mealTime}>
+                                    <Pressable onPress={() => saveMeal(selectedRecipe || { name: mealName }, selectedDate, isMeat)} style={styles.addButton}>
                                         <Text style={styles.buttonText}>Hinzufügen</Text>
                                     </Pressable> 
                                 </View>
