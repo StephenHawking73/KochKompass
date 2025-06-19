@@ -172,70 +172,68 @@ export default function AddMeal() {
     }
 
     const saveMeal = async (recipe: any, date: Date, isMeat: Boolean) => {
-        console.log("saveMeal()")
         if (!recipe || !date ) return;
-
-        
-       
         try {
             const weekStartDate = getWeekStartsDate(date);
-
             const weekDocs = await databases.listDocuments("6846fb7f00127239fdd7", "6846fb850031f9e6d717", [Query.equal("weekStartDate", weekStartDate)]);
-
             const meatCount = weekDocs.documents.filter(doc => doc.isMeat).length;
-
             const MAX_MEAT_PER_WEEK = 2;
             const willBeMeat = isMeat;
             const alreadyMeat = weekDocs.documents.some(doc => doc.title === recipe.name && doc.isMeat);
-
             const effectiveMeatCount = willBeMeat && !alreadyMeat ? meatCount + 1 : meatCount;
-
-            if (effectiveMeatCount > MAX_MEAT_PER_WEEK) {
-                Alert.alert("Zu viel Fleisch!", `Es gibt bereits ${MAX_MEAT_PER_WEEK} Fleischgericht(e) in dieser Woche`);
-                return;
-            }
-
-            const dayNumber = date.getDay();
-            const day = weekdays[dayNumber];
-        
-            const doc = await databases.listDocuments("6846fb7f00127239fdd7", "6846fb850031f9e6d717", [Query.equal("title", recipe.name)]);
-            if (doc.total > 0){
-                const exisingDoc = doc.documents[0];
-                
-                await databases.updateDocument(
-                    "6846fb7f00127239fdd7", 
-                    "6846fb850031f9e6d717",
-                    exisingDoc.$id,
-                    {
-                        day: day,
+    
+            const addOrUpdateMeal = async () => {
+                const dayNumber = date.getDay();
+                const day = weekdays[dayNumber];
+                const doc = await databases.listDocuments("6846fb7f00127239fdd7", "6846fb850031f9e6d717", [Query.equal("title", recipe.name)]);
+                if (doc.total > 0){
+                    const exisingDoc = doc.documents[0];
+                    await databases.updateDocument(
+                        "6846fb7f00127239fdd7", 
+                        "6846fb850031f9e6d717",
+                        exisingDoc.$id,
+                        {
+                            day: day,
+                            weekStartDate: weekStartDate,
+                            isMeat: isMeat,
+                            mealTime: mealTime,
+                            from: source || "",
+                        }
+                    )
+                } else {
+                    await databases.createDocument("6846fb7f00127239fdd7", "6846fb850031f9e6d717", ID.unique(), {
+                        day: day, 
+                        title: recipe.name,
                         weekStartDate: weekStartDate,
                         isMeat: isMeat,
                         mealTime: mealTime,
                         from: source || "",
-                    }
-                )
-                console.log("Bestehendes Rezept aktualisiert:", recipe.name, "→", day, weekStartDate);
+                    })
+                }
+                // Reset states und Modal schließen
+                setMealName("");
+                setSource("");
+                setSelectedRecipe(null);
+                setSelectedDate(null);
+                closeAddModal();
+            };
+    
+            if (effectiveMeatCount > MAX_MEAT_PER_WEEK) {
+                Alert.alert(
+                    "Zu viel Fleisch!",
+                    `Es gibt bereits ${MAX_MEAT_PER_WEEK} Fleischgericht(e) in dieser Woche`,
+                    [
+                        { text: "Okay" },
+                        { text: "Trotzdem hinzufügen", onPress: addOrUpdateMeal }
+                    ]
+                );
+                return;
             } else {
-                await databases.createDocument("6846fb7f00127239fdd7", "6846fb850031f9e6d717", ID.unique(), {
-                    day: day, 
-                    title: recipe.name,
-                    weekStartDate: weekStartDate,
-                    isMeat: isMeat,
-                    mealTime: mealTime,
-                    from: source || "",
-                })
-                console.log("Neues Rezept gespeichert:", recipe.name, "→", weekStartDate);
+                await addOrUpdateMeal();
             }
         } catch (err) {
             console.error("Fehler beim Speichern der Mahlzeit:", err);
         }
-    
-        // Erst States zurücksetzen, dann Modal schließen
-        setMealName("");
-        setSource("");
-        setSelectedRecipe(null);
-        setSelectedDate(null);
-        closeAddModal();
     };
       
     const handleSelectRecipe = (item: any) => {
@@ -669,7 +667,7 @@ export default function AddMeal() {
                                     <Pressable onPress={() => closeAddModal()} style={styles.cancelAddButton}>
                                         <Text style={styles.buttonText}>Schließen</Text>
                                     </Pressable>
-                                    <Pressable onPress={() => saveMeal(selectedRecipe || { name: mealName }, selectedDate, isMeat)} style={styles.addButton} disabled={!selectedDate || !(selectedRecipe?.name || mealName)}>
+                                    <Pressable onPress={() => saveMeal(selectedRecipe || { name: mealName }, selectedDate, isMeat)} style={styles.addButton} disabled={!selectedDate || !(selectedRecipe?.name || mealName) || !mealTime}>
                                         <Text style={styles.buttonText}>Hinzufügen</Text>
                                     </Pressable> 
                                 </View>

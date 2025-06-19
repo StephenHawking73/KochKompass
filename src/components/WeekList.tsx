@@ -93,8 +93,6 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
     };
 
     const submitRating = async () => {
-        console.log("submitRating() called", selectedRecipe?.id, userRating);
-
         if (!selectedRecipe) {
             console.log("No Recipe");
             return;
@@ -110,45 +108,47 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
                 console.error("User nicht berechtigt zu bewerten.");
                 return;
             }
-    
-            // Rating speichern
-            await databases.updateDocument(
-                "6846fb7f00127239fdd7",
-                "6846fb850031f9e6d717",
-                selectedRecipe.id,
-                {
-                    [ratingField]: userRating,
-                }
-            );
-    
-            // Durchschnitt berechnen
-            const doc = await databases.getDocument(
-                "6846fb7f00127239fdd7",
-                "6846fb850031f9e6d717",
-                selectedRecipe.id
-            );
-    
-            const ratings = [
-                doc.Anouk,
-                doc.Aaron,
-                doc.Tanja,
-                doc.Frank,
-            ].filter((r) => typeof r === "number");
-    
-            const avg = ratings.length > 0 ? ratings.reduce((sum, r) => sum + r, 0) / ratings.length : 0;
-    
-            // Average speichern
-            await databases.updateDocument(
-                "6846fb7f00127239fdd7",
-                "6846fb850031f9e6d717",
-                selectedRecipe.id,
-                {
-                    averageRating: avg,
-                }
-            );
             
+            if (userRating != 0){
+                // Rating speichern
+                await databases.updateDocument(
+                    "6846fb7f00127239fdd7",
+                    "6846fb850031f9e6d717",
+                    selectedRecipe.id,
+                    {
+                        [ratingField]: userRating,
+                    }
+                );
+        
+                // Durchschnitt berechnen
+                const doc = await databases.getDocument(
+                    "6846fb7f00127239fdd7",
+                    "6846fb850031f9e6d717",
+                    selectedRecipe.id
+                );
+
+                const ratings = [
+                    doc.Anouk,
+                    doc.Aaron,
+                    doc.Tanja,
+                    doc.Frank,
+                ].filter((r) => typeof r === "number");
+        
+                const avg = ratings.length > 0 ? ratings.reduce((sum, r) => sum + r, 0) / ratings.length : 0;
+        
+                // Average speichern
+                await databases.updateDocument(
+                    "6846fb7f00127239fdd7",
+                    "6846fb850031f9e6d717",
+                    selectedRecipe.id,
+                    {
+                        averageRating: avg,
+                    }
+                );
+                console.log("Bewertung gespeichert!");
+            }
+
             await onRefresh();
-            console.log("Bewertung gespeichert!");
         } catch (error) {
             console.error("Fehler beim Speichern der Bewertung:", error);
         }

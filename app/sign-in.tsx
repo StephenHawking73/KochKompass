@@ -53,9 +53,9 @@ const SignIn = () => {
                                 
                             </Pressable>
                         </View>
-                        <Pressable onPress={handlePasswortReset}>
+                        {/*<Pressable onPress={handlePasswortReset}>
                             <Text style={{color: '#484848', fontStyle: "italic", marginLeft: 25, top: 10, textDecorationLine: "underline"}}>Password vergessen?</Text>
-                        </Pressable>
+                        </Pressable>*/}
                         
                     </View>
                     <View style={{ alignItems: 'center', marginTop: 80}}>
