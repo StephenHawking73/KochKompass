@@ -189,7 +189,8 @@ export default function AddMeal() {
 
         try {
             const weekStartDate = getWeekStartsDate(date);
-            const dayNumber = date.getDay();
+            
+            {/*const dayNumber = date.getDay();
             const day = weekdays[dayNumber];
 
             const existingMeals = await databases.listDocuments(
@@ -208,7 +209,7 @@ export default function AddMeal() {
                     `Für ${day} (${mealTime}) ist bereits ein Gericht eingetragen.`
                 );
                 return;
-            }
+            }*/}
 
             const weekDocs = await databases.listDocuments("6846fb7f00127239fdd7", "6846fb850031f9e6d717", [Query.equal("weekStartDate", weekStartDate)]);
             const meatCount = weekDocs.documents.filter(doc => doc.isMeat).length;

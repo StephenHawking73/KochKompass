@@ -191,10 +191,12 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
         fetchUserRating();
     }, [selectedRecipe])
 
-    const groupedByDay: { [day: string]: { Mittag?: RecipeEntry; Abend?: RecipeEntry } } = {};
+    const groupedByDay: { [day: string]: { Mittag?: RecipeEntry[]; Abend?: RecipeEntry[] } } = {};
     data.forEach((entry) => {
         if (!groupedByDay[entry.day]) groupedByDay[entry.day] = {};
-        groupedByDay[entry.day][entry.mealTime as "Mittag" | "Abend"] = entry;
+        const mealTime = entry.mealTime as "Mittag" | "Abend";
+        if (!groupedByDay[entry.day][mealTime]) groupedByDay[entry.day][mealTime] = [];
+        groupedByDay[entry.day][mealTime]!.push(entry);
     });
     const days = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
 
@@ -212,38 +214,64 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
                     setRefreshing(false);
                 }}
                 renderItem={({ item: day }) => {
-                    const mittag = groupedByDay[day]?.Mittag;
-                    const abend = groupedByDay[day]?.Abend;
+                    const mittag = groupedByDay[day]?.Mittag as RecipeEntry[] | undefined;
+                    const abend = groupedByDay[day]?.Abend as RecipeEntry[] | undefined;
                     return (
                         <View key={day} style={styles.dayRow}>
                             <Image source={dayImageMap[day]} style={styles.dayImage} />
                             <View style={styles.mealSlots}>
                                 {/* Mittag */}
-                                <Pressable
-                                    style={styles.mealSlot}
-                                    onPress={() => mittag?.title && openModal(mittag)}
-                                    disabled={!mittag?.title}
-                                >
-                                    <Text style={styles.mealLabel}>🍽️ Mittag</Text>
-                                    {mittag?.title ? (
-                                        <Text style={styles.recipeTitle}>{mittag.title}</Text>
-                                    ) : (
+                                {mittag && mittag.length > 0 ? (
+                                    mittag.map((m, idx) => (
+                                        <Pressable
+                                            key={m.id || idx}
+                                            style={styles.mealSlot}
+                                            onPress={() => m?.title && openModal(m)}
+                                            disabled={!m?.title}
+                                        >
+                                            <Text style={styles.mealLabel}>🍽️ Mittag</Text>
+                                            {m?.title ? (
+                                                <Text style={styles.recipeTitle}>{m.title}</Text>
+                                            ) : (
+                                                <Text style={styles.noRecipe}>–</Text>
+                                            )}
+                                        </Pressable>
+                                    ))
+                                ) : (
+                                    <Pressable
+                                        style={styles.mealSlot}
+                                        disabled={true}
+                                    >
+                                        <Text style={styles.mealLabel}>🍽️ Mittag</Text>
                                         <Text style={styles.noRecipe}>–</Text>
-                                    )}
-                                </Pressable>
+                                    </Pressable>
+                                )}
                                 {/* Abend */}
-                                <Pressable
-                                    style={styles.mealSlot}
-                                    onPress={() => abend?.title && openModal(abend)}
-                                    disabled={!abend?.title}
-                                >
-                                    <Text style={styles.mealLabel}>🌙 Abend</Text>
-                                    {abend?.title ? (
-                                        <Text style={styles.recipeTitle}>{abend.title}</Text>
-                                    ) : (
+                                {abend && abend.length > 0 ? (
+                                    abend.map((a, idx) => (
+                                        <Pressable
+                                            key={a.id || idx}
+                                            style={styles.mealSlot}
+                                            onPress={() => a?.title && openModal(a)}
+                                            disabled={!a?.title}
+                                        >
+                                            <Text style={styles.mealLabel}>🌙 Abend</Text>
+                                            {a?.title ? (
+                                                <Text style={styles.recipeTitle}>{a.title}</Text>
+                                            ) : (
+                                                <Text style={styles.noRecipe}>–</Text>
+                                            )}
+                                        </Pressable>
+                                    ))
+                                ) : (
+                                    <Pressable
+                                        style={styles.mealSlot}
+                                        disabled={true}
+                                    >
+                                        <Text style={styles.mealLabel}>🌙 Abend</Text>
                                         <Text style={styles.noRecipe}>–</Text>
-                                    )}
-                                </Pressable>
+                                    </Pressable>
+                                )}
                             </View>
                         </View>
                     );
