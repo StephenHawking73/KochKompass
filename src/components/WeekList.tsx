@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-import { FlatList, Image, Linking, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Dimensions, FlatList, Image, Linking, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 import { account, databases } from "../api/appwriteConfig";
 
 export type RecipeEntry = {
@@ -216,10 +217,13 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
                 renderItem={({ item: day }) => {
                     const mittag = groupedByDay[day]?.Mittag as RecipeEntry[] | undefined;
                     const abend = groupedByDay[day]?.Abend as RecipeEntry[] | undefined;
+
+                    const screenWidth = Dimensions.get("window").width - 90;
+
                     return (
                         <View key={day} style={styles.dayRow}>
                             <Image source={dayImageMap[day]} style={styles.dayImage} />
-                            <View style={styles.mealSlots}>
+                            <ScrollView horizontal contentContainerStyle={styles.mealSlots} showsHorizontalScrollIndicator={false}>
                                 {/* Mittag */}
                                 {mittag && mittag.length > 0 ? (
                                     mittag.map((m, idx) => (
@@ -272,7 +276,7 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
                                         <Text style={styles.noRecipe}>–</Text>
                                     </Pressable>
                                 )}
-                            </View>
+                            </ScrollView>
                         </View>
                     );
                 }}
@@ -427,21 +431,14 @@ const styles = StyleSheet.create({
         padding: 8,
     },
     mealSlots: {
-        flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginLeft: 10,
+        flex: 1, 
     },
     mealSlot: {
-        flex: 1,
-        alignItems: 'center',
         justifyContent: "center",
-        marginHorizontal: 5,
         padding: 8,
-        backgroundColor: "#fff",
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: "#e0e0e0",
     },
     mealLabel: {
         fontSize: 13,
