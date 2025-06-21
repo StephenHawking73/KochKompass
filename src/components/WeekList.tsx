@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-import { FlatList, Image, Linking, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Dimensions, FlatList, Image, Linking, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { account, databases } from "../api/appwriteConfig";
 
 export type RecipeEntry = {
@@ -191,10 +191,12 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
         fetchUserRating();
     }, [selectedRecipe])
 
-    const groupedByDay: { [day: string]: { Mittag?: RecipeEntry; Abend?: RecipeEntry } } = {};
+    const groupedByDay: { [day: string]: { Mittag?: RecipeEntry[]; Abend?: RecipeEntry[] } } = {};
     data.forEach((entry) => {
         if (!groupedByDay[entry.day]) groupedByDay[entry.day] = {};
-        groupedByDay[entry.day][entry.mealTime as "Mittag" | "Abend"] = entry;
+        const mealTime = entry.mealTime as "Mittag" | "Abend";
+        if (!groupedByDay[entry.day][mealTime]) groupedByDay[entry.day][mealTime] = [];
+        groupedByDay[entry.day][mealTime]!.push(entry);
     });
     const days = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
 
@@ -212,39 +214,42 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
                     setRefreshing(false);
                 }}
                 renderItem={({ item: day }) => {
-                    const mittag = groupedByDay[day]?.Mittag;
-                    const abend = groupedByDay[day]?.Abend;
+                    const mittag = groupedByDay[day]?.Mittag as RecipeEntry[] | undefined;
+                    const abend = groupedByDay[day]?.Abend as RecipeEntry[] | undefined;
+
+
                     return (
                         <View key={day} style={styles.dayRow}>
                             <Image source={dayImageMap[day]} style={styles.dayImage} />
-                            <View style={styles.mealSlots}>
-                                {/* Mittag */}
-                                <Pressable
-                                    style={styles.mealSlot}
-                                    onPress={() => mittag?.title && openModal(mittag)}
-                                    disabled={!mittag?.title}
-                                >
-                                    <Text style={styles.mealLabel}>🍽️ Mittag</Text>
-                                    {mittag?.title ? (
-                                        <Text style={styles.recipeTitle}>{mittag.title}</Text>
-                                    ) : (
-                                        <Text style={styles.noRecipe}>–</Text>
-                                    )}
-                                </Pressable>
-                                {/* Abend */}
-                                <Pressable
-                                    style={styles.mealSlot}
-                                    onPress={() => abend?.title && openModal(abend)}
-                                    disabled={!abend?.title}
-                                >
-                                    <Text style={styles.mealLabel}>🌙 Abend</Text>
-                                    {abend?.title ? (
-                                        <Text style={styles.recipeTitle}>{abend.title}</Text>
-                                    ) : (
-                                        <Text style={styles.noRecipe}>–</Text>
-                                    )}
-                                </Pressable>
-                            </View>
+                            <FlatList
+                                data={[
+                                    ...(mittag && mittag.length > 0
+                                        ? mittag.map((m) => ({ ...m, mealLabel: "🍽️ Mittag" }))
+                                        : [{ mealLabel: "🍽️ Mittag", title: undefined }]),
+                                    ...(abend && abend.length > 0
+                                        ? abend.map((a) => ({ ...a, mealLabel: "🌙 Abend" }))
+                                        : [{ mealLabel: "🌙 Abend", title: undefined }]),
+                                ]}
+                                keyExtractor={(_, idx) => idx.toString()}
+                                horizontal
+                                pagingEnabled
+                                showsHorizontalScrollIndicator={false}
+                                contentContainerStyle={styles.mealSlots}
+                                renderItem={({ item }) => (
+                                    <Pressable
+                                        style={styles.mealSlot}
+                                        onPress={() => item?.title && openModal(item)}
+                                        disabled={!item?.title}
+                                    >
+                                        <Text style={styles.mealLabel}>{item.mealLabel}</Text>
+                                        {item?.title ? (
+                                            <Text style={styles.recipeTitle}>{item.title}</Text>
+                                        ) : (
+                                            <Text style={styles.noRecipe}>–</Text>
+                                        )}
+                                    </Pressable>
+                                )}
+                            />
                         </View>
                     );
                 }}
@@ -332,15 +337,15 @@ const styles = StyleSheet.create({
         height: 40,
         marginRight: 16,
         borderRadius: 8,
-    },
-    textContainer: {
-        flex: 1,  // nimmt verfügbaren Platz
+        alignSelf: "center",
     },
     recipeTitle: {
         fontSize: 16,
         fontWeight: '500',
-        textAlign: "center",
         marginTop: 8,
+        textAlign: "left",
+        flexWrap: "wrap",
+        width: Dimensions.get("window").width - 140
     },
     noRecipe: {
         fontSize: 16,
@@ -392,28 +397,20 @@ const styles = StyleSheet.create({
     },
     dayRow: {
         flexDirection: 'row',
-        alignItems: 'center',
         marginBottom: 16,
         backgroundColor: "#f8f8f8",
-        borderRadius: 12,
+        borderRadius: 15,
         padding: 8,
     },
     mealSlots: {
-        flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginLeft: 10,
     },
     mealSlot: {
-        flex: 1,
-        alignItems: 'center',
         justifyContent: "center",
-        marginHorizontal: 5,
-        padding: 8,
-        backgroundColor: "#fff",
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: "#e0e0e0",
+        width: Dimensions.get("window").width - 110,
+        alignItems: "flex-start"
     },
     mealLabel: {
         fontSize: 13,

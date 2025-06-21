@@ -61,7 +61,7 @@ export default function Home() {
 
     const mealTimes = ["Mittag", "Abend"];
   
-    const weekEntries = weekdays.flatMap((weekday) =>
+    const weekEntriesOld = weekdays.flatMap((weekday) =>
       mealTimes.map((mealTime) => {
         const recipeForSlot = recipes.find(
           (recipe) => recipe.day === weekday && recipe.mealTime === mealTime
@@ -77,6 +77,23 @@ export default function Home() {
           from: recipeForSlot?.from,
         };
       })
+    );
+
+    const weekEntries = weekdays.flatMap((weekday) =>
+      mealTimes.flatMap((mealTime) =>
+        recipes
+          .filter(recipe => recipe.day === weekday && recipe.mealTime === mealTime)
+          .map(recipe => ({
+            id: recipe.id,
+            date: recipe.date,
+            day: weekday,
+            title: recipe.title,
+            rating: recipe.rating,
+            image: recipe.image ?? null,
+            mealTime,
+            from: recipe.from,
+          }))
+      )
     );
   
 
