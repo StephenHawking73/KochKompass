@@ -5,7 +5,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { ID, Query } from "appwrite";
 import { useEffect, useState } from "react";
 import { Alert, FlatList, Modal, Platform, Pressable, StyleSheet, Switch, Text, TextInput, View } from "react-native";
-import { Swipeable } from "react-native-gesture-handler";
+import Swipeable from "react-native-gesture-handler/Swipeable";
 
 export default function AddMeal() {
     const { isAddMealVisible, hideAddMeal } = useModal();
@@ -189,27 +189,6 @@ export default function AddMeal() {
 
         try {
             const weekStartDate = getWeekStartsDate(date);
-            
-            {/*const dayNumber = date.getDay();
-            const day = weekdays[dayNumber];
-
-            const existingMeals = await databases.listDocuments(
-                "6846fb7f00127239fdd7",
-                "6846fb850031f9e6d717",
-                [
-                    Query.equal("weekStartDate", weekStartDate),
-                    Query.equal("day", day),
-                    Query.equal("mealTime", mealTime)
-                ]
-            );
-
-            if (existingMeals.total > 0) {
-                Alert.alert(
-                    "Schon belegt!",
-                    `Für ${day} (${mealTime}) ist bereits ein Gericht eingetragen.`
-                );
-                return;
-            }*/}
 
             const weekDocs = await databases.listDocuments("6846fb7f00127239fdd7", "6846fb850031f9e6d717", [Query.equal("weekStartDate", weekStartDate)]);
             const meatCount = weekDocs.documents.filter(doc => doc.isMeat).length;
@@ -472,16 +451,27 @@ export default function AddMeal() {
                         showsVerticalScrollIndicator={false}
                         renderItem={({ item }) => (
                             <View style={{marginBottom: 8}}>
-                            <Swipeable renderRightActions={() => renderRightActions(item)}>
-                                <Pressable onPress={() => handleSelectRecipe(item)} style={styles.recipeItem} onLongPress={() => showUserRating(item)}>
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
-                                        <Text style={{ flex: 1, left: 5 }}>{item.name}</Text>
-                                        <View style={{ right: 5 }}>
-                                            {typeof item.rating === "number" ? renderStars(item.rating) : renderStars(0)}
-                                        </View>
-                                    </View>
-                                </Pressable>
-                            </Swipeable>
+                                {Platform.OS === "ios" ? (
+                                    <Swipeable renderRightActions={() => renderRightActions(item)}>
+                                        <Pressable onPress={() => handleSelectRecipe(item)} style={styles.recipeItem} onLongPress={() => showUserRating(item)}>
+                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
+                                                <Text style={{ flex: 1, left: 5 }}>{item.name}</Text>
+                                                <View style={{ right: 5 }}>
+                                                    {typeof item.rating === "number" ? renderStars(item.rating) : renderStars(0)}
+                                                </View>
+                                            </View>
+                                        </Pressable>
+                                    </Swipeable>
+                                ) : (
+                                    <Pressable onPress={() => handleSelectRecipe(item)} style={styles.recipeItem} onLongPress={() => showUserRating(item)}>
+                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
+                                                <Text style={{ flex: 1, left: 5 }}>{item.name}</Text>
+                                                <View style={{ right: 5 }}>
+                                                    {typeof item.rating === "number" ? renderStars(item.rating) : renderStars(0)}
+                                                </View>
+                                            </View>
+                                        </Pressable>
+                                )}
                             </View>
                         )}
                         style={{width: "100%"}}
@@ -519,6 +509,9 @@ export default function AddMeal() {
                                     <Text style={{ fontStyle: "italic" }}>Lade Bewertungen ...</Text>
                                 )}
 
+                                <Pressable onPress={() => deleteRecipe(selectedRecipe)} style={styles.deleteButton}>
+                                    <Text style={styles.buttonText}>Löschen</Text>
+                                </Pressable>
                                 <Pressable onPress={() => closeUserRating()}>
                                     <Text style={{fontSize: 16, marginBottom: Platform.OS === "ios" ? 20 : -20}}>Schließen</Text>
                                 </Pressable>
@@ -603,11 +596,11 @@ export default function AddMeal() {
                                             backgroundColor: "#E9E9E9",
                                             padding: 8,
                                             borderRadius: 8,
-                                            minWidth: 120,
+                                            maxWidth: 200,
                                             alignItems: "center"
                                         }}
                                     >
-                                        <Text style={{fontSize: 15, color: "#333"}}>
+                                        <Text style={{fontSize: 15, color: "#333", flex: 1}}>
                                             {source
                                                 ? source.replace(/(\.de|\.com|\.net|\.org|\.info|\.io|\.co|\.app|\.at|\.eu|\.fr|\.it|\.es|\.nl|\.ru|\.uk|\.us|\.biz|\.tv|\.me|\.xyz).*/i, "$1")
                                                 : "Quelle wählen"}
@@ -815,6 +808,14 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         width: "50%",
         marginBottom: Platform.OS === "ios" ? 80 : 50
+    },
+    deleteButton: {
+        backgroundColor: "#FF5D96",
+        padding: 10,
+        borderRadius: 10,
+        width: "40%",
+        marginBottom: 10,
+        marginTop: 20,
     },
     cancelAddButton: {
         backgroundColor: "#FF5D96",

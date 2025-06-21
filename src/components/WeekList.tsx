@@ -1,7 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { Dimensions, FlatList, Image, Linking, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
 import { account, databases } from "../api/appwriteConfig";
 
 export type RecipeEntry = {
@@ -218,65 +217,39 @@ const WeekList: React.FC<Props> = ({ data, onRefresh }) => {
                     const mittag = groupedByDay[day]?.Mittag as RecipeEntry[] | undefined;
                     const abend = groupedByDay[day]?.Abend as RecipeEntry[] | undefined;
 
-                    const screenWidth = Dimensions.get("window").width - 90;
 
                     return (
                         <View key={day} style={styles.dayRow}>
                             <Image source={dayImageMap[day]} style={styles.dayImage} />
-                            <ScrollView horizontal contentContainerStyle={styles.mealSlots} showsHorizontalScrollIndicator={false}>
-                                {/* Mittag */}
-                                {mittag && mittag.length > 0 ? (
-                                    mittag.map((m, idx) => (
-                                        <Pressable
-                                            key={m.id || idx}
-                                            style={styles.mealSlot}
-                                            onPress={() => m?.title && openModal(m)}
-                                            disabled={!m?.title}
-                                        >
-                                            <Text style={styles.mealLabel}>🍽️ Mittag</Text>
-                                            {m?.title ? (
-                                                <Text style={styles.recipeTitle}>{m.title}</Text>
-                                            ) : (
-                                                <Text style={styles.noRecipe}>–</Text>
-                                            )}
-                                        </Pressable>
-                                    ))
-                                ) : (
+                            <FlatList
+                                data={[
+                                    ...(mittag && mittag.length > 0
+                                        ? mittag.map((m) => ({ ...m, mealLabel: "🍽️ Mittag" }))
+                                        : [{ mealLabel: "🍽️ Mittag", title: undefined }]),
+                                    ...(abend && abend.length > 0
+                                        ? abend.map((a) => ({ ...a, mealLabel: "🌙 Abend" }))
+                                        : [{ mealLabel: "🌙 Abend", title: undefined }]),
+                                ]}
+                                keyExtractor={(_, idx) => idx.toString()}
+                                horizontal
+                                pagingEnabled
+                                showsHorizontalScrollIndicator={false}
+                                contentContainerStyle={styles.mealSlots}
+                                renderItem={({ item }) => (
                                     <Pressable
                                         style={styles.mealSlot}
-                                        disabled={true}
+                                        onPress={() => item?.title && openModal(item)}
+                                        disabled={!item?.title}
                                     >
-                                        <Text style={styles.mealLabel}>🍽️ Mittag</Text>
-                                        <Text style={styles.noRecipe}>–</Text>
+                                        <Text style={styles.mealLabel}>{item.mealLabel}</Text>
+                                        {item?.title ? (
+                                            <Text style={styles.recipeTitle}>{item.title}</Text>
+                                        ) : (
+                                            <Text style={styles.noRecipe}>–</Text>
+                                        )}
                                     </Pressable>
                                 )}
-                                {/* Abend */}
-                                {abend && abend.length > 0 ? (
-                                    abend.map((a, idx) => (
-                                        <Pressable
-                                            key={a.id || idx}
-                                            style={styles.mealSlot}
-                                            onPress={() => a?.title && openModal(a)}
-                                            disabled={!a?.title}
-                                        >
-                                            <Text style={styles.mealLabel}>🌙 Abend</Text>
-                                            {a?.title ? (
-                                                <Text style={styles.recipeTitle}>{a.title}</Text>
-                                            ) : (
-                                                <Text style={styles.noRecipe}>–</Text>
-                                            )}
-                                        </Pressable>
-                                    ))
-                                ) : (
-                                    <Pressable
-                                        style={styles.mealSlot}
-                                        disabled={true}
-                                    >
-                                        <Text style={styles.mealLabel}>🌙 Abend</Text>
-                                        <Text style={styles.noRecipe}>–</Text>
-                                    </Pressable>
-                                )}
-                            </ScrollView>
+                            />
                         </View>
                     );
                 }}
@@ -364,15 +337,15 @@ const styles = StyleSheet.create({
         height: 40,
         marginRight: 16,
         borderRadius: 8,
-    },
-    textContainer: {
-        flex: 1,  // nimmt verfügbaren Platz
+        alignSelf: "center",
     },
     recipeTitle: {
         fontSize: 16,
         fontWeight: '500',
-        textAlign: "center",
         marginTop: 8,
+        textAlign: "left",
+        flexWrap: "wrap",
+        width: Dimensions.get("window").width - 140
     },
     noRecipe: {
         fontSize: 16,
@@ -424,21 +397,20 @@ const styles = StyleSheet.create({
     },
     dayRow: {
         flexDirection: 'row',
-        alignItems: 'center',
         marginBottom: 16,
         backgroundColor: "#f8f8f8",
-        borderRadius: 12,
+        borderRadius: 15,
         padding: 8,
     },
     mealSlots: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginLeft: 10,
-        flex: 1, 
     },
     mealSlot: {
         justifyContent: "center",
-        padding: 8,
+        width: Dimensions.get("window").width - 110,
+        alignItems: "flex-start"
     },
     mealLabel: {
         fontSize: 13,

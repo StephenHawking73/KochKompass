@@ -4,7 +4,6 @@ import { ModalProvider } from "@/src/context/ModalContext";
 import { Ionicons } from "@expo/vector-icons";
 import { Redirect, Tabs } from "expo-router";
 import "react-native-gesture-handler";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import AddMeal from "./add_meal";
 
 export default function AppLayout() {
@@ -13,7 +12,6 @@ export default function AppLayout() {
         !session ? (
             <Redirect href={"./login"}/>
         ) : (
-            <GestureHandlerRootView>
                 <ModalProvider>
                     <Tabs screenOptions={{
                         headerShown: false,
@@ -49,9 +47,7 @@ export default function AppLayout() {
                     </Tabs>
 
                     <AddMeal/>
-                </ModalProvider>
-            </GestureHandlerRootView>
-            
+                </ModalProvider>            
         )
     )
 }
