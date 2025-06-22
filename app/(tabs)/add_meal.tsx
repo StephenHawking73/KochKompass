@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { ID, Query } from "appwrite";
 import { useEffect, useState } from "react";
-import { Alert, FlatList, Modal, Platform, Pressable, StyleSheet, Switch, Text, TextInput, View } from "react-native";
+import { Alert, FlatList, Modal, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 
 export default function AddMeal() {
@@ -24,6 +24,7 @@ export default function AddMeal() {
 
     const [isFilterActive, setIsFilterActive] = useState(false);
     const [isPopularityActive, setIsPopularityActive] = useState(false);
+    const [isVegetarianFilterActive, setIsVegetarianFilterActive] = useState(false);
 
     const [showAddModal, setShowAddModal] = useState(false);
 
@@ -107,19 +108,15 @@ export default function AddMeal() {
     }, [selectedRecipe, showRatingModal]);
     
     useEffect(() => {
-        const filtered = fullData.filter(recipe => 
+        const filtered = data.filter(recipe => 
             recipe.name.toLowerCase().includes(mealName.toLowerCase())
         );
         setData(filtered);
     }, [mealName, fullData])
 
     const sortByOldest = () => {
-        let sorted = [...fullData]
+        let sorted = [...data]
 
-        if(isPopularityActive){
-            setIsPopularityActive(false);
-        }
-        
         if(!isFilterActive){
             setIsFilterActive(true);
 
@@ -130,23 +127,33 @@ export default function AddMeal() {
             })
         } else {
             setIsFilterActive(false);
+            sorted = [...fullData];
         }
-
         setData(sorted);
     }
 
     const sortByPopularity = () => {
-        let sorted = [...fullData];
-
-        if(isFilterActive){
-            setIsFilterActive(false);
-        }
+        let sorted = [...data];
 
         if (!isPopularityActive) {
             setIsPopularityActive(true);
             sorted = sorted.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
         } else {
             setIsPopularityActive(false);
+            sorted = [...fullData];
+        }
+        setData(sorted);
+    }
+
+    const sortByVegetarian = () =>{
+        let sorted = [...data];
+
+        if (!isVegetarianFilterActive) {
+            setIsVegetarianFilterActive(true);
+            sorted = sorted.filter(recipe => !recipe.isMeat)
+        } else {
+            setIsVegetarianFilterActive(false);
+            sorted = [...fullData];
         }
         setData(sorted);
     }
@@ -345,6 +352,10 @@ export default function AddMeal() {
         setLink("");
     }
 
+    const showRecipeSource = () => {
+        Alert.alert("Quelle", selectedRecipe?.from)
+    }
+
     // !----- Danger zone -----!
     const deleteRecipe = async (item: any) => {
         const deletePermanetly = async () => {
@@ -412,37 +423,54 @@ export default function AddMeal() {
                     </View>
 
                     <View style={{flexDirection: "row", marginTop: 15, marginBottom: 15, justifyContent: "center"}}>
-                        <Pressable 
-                            onPress={() => sortByOldest()} 
-                            style={{
-                                paddingHorizontal: 12,
-                                paddingVertical: 6,
-                                backgroundColor: "#1DC0AB",
-                                borderColor: isFilterActive ? "#FF3E91" : "#fff",
-                                borderWidth: 2,
-                                opacity: 0.77,
-                                borderRadius: 10,
-                                marginLeft: -25
-                            }} 
-                        >
-                            <Text>Lange nicht gekocht</Text>
-                        </Pressable>
-                        
-                        <Pressable 
-                            onPress={() => sortByPopularity()} 
-                            style={{
-                                paddingHorizontal: 12,
-                                paddingVertical: 6,
-                                backgroundColor: "#FFD700",
-                                borderColor: isPopularityActive ? "#FF3E91" : "#fff",
-                                borderWidth: 2,
-                                opacity: 0.77,
-                                borderRadius: 10,
-                                marginLeft: 10
-                            }} 
-                        >
-                            <Text>Beliebteste zuerst</Text>
-                        </Pressable>
+                        <ScrollView horizontal contentContainerStyle={{minWidth: "100%"}} showsHorizontalScrollIndicator={false}>
+                            <Pressable 
+                                onPress={() => sortByOldest()} 
+                                style={{
+                                    paddingHorizontal: 12,
+                                    paddingVertical: 6,
+                                    backgroundColor: "#1DC0AB",
+                                    borderColor: isFilterActive ? "#FF3E91" : "#fff",
+                                    borderWidth: 2,
+                                    opacity: 0.77,
+                                    borderRadius: 10,
+                                }} 
+                            >
+                                <Text>Lange nicht gekocht</Text>
+                            </Pressable>
+                            
+                            <Pressable 
+                                onPress={() => sortByPopularity()} 
+                                style={{
+                                    paddingHorizontal: 12,
+                                    paddingVertical: 6,
+                                    backgroundColor: "#FFD700",
+                                    borderColor: isPopularityActive ? "#FF3E91" : "#fff",
+                                    borderWidth: 2,
+                                    opacity: 0.77,
+                                    borderRadius: 10,
+                                    marginLeft: 7
+                                }} 
+                            >
+                                <Text>Beliebteste zuerst</Text>
+                            </Pressable>
+
+                            <Pressable 
+                                onPress={() => sortByVegetarian()} 
+                                style={{
+                                    paddingHorizontal: 12,
+                                    paddingVertical: 6,
+                                    backgroundColor: "#AF5DB2",
+                                    borderColor: isVegetarianFilterActive ? "#FF3E91" : "#fff",
+                                    borderWidth: 2,
+                                    opacity: 0.77,
+                                    borderRadius: 10,
+                                    marginLeft: 7
+                                }} 
+                            >
+                                <Text>Ohne Fleisch</Text>
+                            </Pressable>
+                        </ScrollView>
                     </View>
                     
                     <FlatList
@@ -597,10 +625,13 @@ export default function AddMeal() {
                                             padding: 8,
                                             borderRadius: 8,
                                             maxWidth: 200,
-                                            alignItems: "center"
+                                            alignItems: "center",
+                                            paddingInline: 15,
+                                            height: 38,
                                         }}
+                                        onLongPress={() => showRecipeSource()}
                                     >
-                                        <Text style={{fontSize: 15, color: "#333", flex: 1}}>
+                                        <Text style={{fontSize: 15, color: "#333", flex: 1}} numberOfLines={1}>
                                             {source
                                                 ? source.replace(/(\.de|\.com|\.net|\.org|\.info|\.io|\.co|\.app|\.at|\.eu|\.fr|\.it|\.es|\.nl|\.ru|\.uk|\.us|\.biz|\.tv|\.me|\.xyz).*/i, "$1")
                                                 : "Quelle wählen"}

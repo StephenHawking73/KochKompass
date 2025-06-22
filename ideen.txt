@@ -1,29 +1,11 @@
-Favoriten-Funktion:
-Nutzer können Rezepte als Favoriten markieren und schnell darauf zugreifen.
-
-Einkaufsliste:
-Automatische Generierung einer Einkaufsliste basierend auf den geplanten Gerichten der Woche.
-
-Zutatenverwaltung:
-Rezepte mit Zutaten versehen und ggf. Nährwerte anzeigen.
-
 Benachrichtigungen:
 Erinnerungen für das Kochen oder Einkaufen per Push Notification (expo-notifications).
-
-Mehrsprachigkeit:
-Unterstützung für mehrere Sprachen (z.B. Deutsch/Englisch) mit i18n.
 
 Dark Mode:
 Unterstützung für einen dunklen Modus.
 
 Bilder-Upload:
 Nutzer können eigene Bilder zu Rezepten hochladen.
-
-Teilen-Funktion:
-Rezepte oder Wochenpläne mit anderen Nutzern teilen.
-
-Statistiken:
-Auswertung, wie oft ein Gericht gekocht wurde oder welche Gerichte am beliebtesten sind.
 
 Bessere Suche & Filter:
 Erweiterte Such- und Filtermöglichkeiten (z.B. nach Zutaten, vegetarisch, vegan, etc.).
@@ -37,5 +19,4 @@ Nutzer können ihr Profilbild ändern oder persönliche Einstellungen vornehmen.
 Onboarding:
 Kurze Einführung für neue Nutzer.
 
-Drag & Drop für Wochenplan:
-Gerichte per Drag & Drop im Wochenplan verschieben.
+Mehrere Filter gleichzeitig!
