@@ -5,14 +5,14 @@
     "scheme": "kochkompass",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "@/assets/img/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "experiments": {
       "typedRoutes": true
     },
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "@/assets/img/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -21,14 +21,14 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "@/assets/img/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png",
+      "favicon": "@/assets/img/favicon.png",
       "bundler": "metro"
     },
     "plugins": [
