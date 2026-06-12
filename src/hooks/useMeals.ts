@@ -1,33 +1,29 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { getMeals } from "@/services/mealService";
 
 export function useMeals() {
-    const [meals, setMeals] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+  const [meals, setMeals] = useState<any>([]);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        loadMeals();
-    }, []);
+  useEffect(() => {
+    let active = true;
 
-    async function loadMeals() {
-        try {
-            const { data, error } = await supabase
-                .from("meals")
-                .select("*");
+    async function load() {
+      setLoading(true);
+      const data = await getMeals();
 
-            if (error) throw error;
-
-            setMeals(data ?? []);
-        } catch (err) {
-            console.log(err);
-        } finally {
-            setLoading(false);
-        }
+      if (active) {
+        setMeals(data);
+        setLoading(false);
+      }
     }
 
-    return {
-        meals,
-        loading,
-        reloadMeals: loadMeals,
+    load();
+
+    return () => {
+      active = false;
     };
+  }, []);
+
+  return { meals, loading };
 }
