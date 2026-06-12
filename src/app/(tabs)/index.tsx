@@ -4,6 +4,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { useMeals } from "@/hooks/useMeals";
 import { LoadingScreen } from "@/components/loadingScreen";
 import MealCard from "@/components/MealCard";
+import { Key } from "react";
 
 export default function HomeScreen() {
     const theme = useTheme();
@@ -15,13 +16,11 @@ export default function HomeScreen() {
         return <LoadingScreen text="Lade Meals..."/>
     }
 
-    console.log(loadingMeals);
-
     return (
         <SafeAreaView style={styles.container}>
             <Text style={styles.title}>Home</Text>
 
-            {meals.map((meal) => (
+            {meals.map((meal: { id: Key | null | undefined; name: string; }) => (
                 <MealCard key={meal.id} title={meal.name}/>
             ))}
         </SafeAreaView>
