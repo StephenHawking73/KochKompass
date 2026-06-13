@@ -2,30 +2,36 @@ import { useEffect, useState } from "react";
 import { getMeals } from "@/services/mealService";
 
 export function useMeals(weekStart?: Date | null, weekEnd?: Date | null) {
-  const [meals, setMeals] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+    const [meals, setMeals] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
 
-  if (!weekStart || !weekEnd) return;
+    useEffect(() => {
+        if (!weekStart || !weekEnd) return;
 
-  useEffect(() => {
-    let active = true;
+        let cancelled = false;
 
-    async function load() {
-      setLoading(true);
-      const data = await getMeals(weekStart, weekEnd);
+        async function load() {
+            setLoading(true);
 
-      if (active) {
-        setMeals(data);
-        setLoading(false);
-      }
-    }
+            try {
+                const data = await getMeals(weekStart, weekEnd);
 
-    load();
+                if (!cancelled) {
+                    setMeals(data);
+                }
+            } finally {
+                if (!cancelled) {
+                    setLoading(false);
+                }
+            }
+        }
 
-    return () => {
-      active = false;
-    };
-  }, []);
+        load();
 
-  return { meals, loading };
+        return () => {
+            cancelled = true;
+        };
+    }, [weekStart?.getTime(), weekEnd?.getTime()]);
+
+    return { meals, loading };
 }

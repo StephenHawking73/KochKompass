@@ -15,6 +15,7 @@ type Props = {
     dateLabel: string;
     onPrev: () => void;
     onNext: () => void;
+    onPressTitle: () => void;
 };
 
 export function AnimatedWeekSelector({
@@ -22,6 +23,7 @@ export function AnimatedWeekSelector({
     dateLabel,
     onPrev,
     onNext,
+    onPressTitle,
 }: Props) {
     const theme = useTheme();
     const styles = createStyles(theme);
@@ -72,6 +74,7 @@ export function AnimatedWeekSelector({
                 dateLabel={dateLabel}
                 onPrev={animatePreviousWeek}
                 onNext={animateNextWeek}
+                onPressTitle={onPressTitle}
             >
                 <Animated.View style={animatedStyle}>
                     <Text style={styles.label}>

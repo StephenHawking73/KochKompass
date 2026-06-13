@@ -9,9 +9,10 @@ type WeekSelectorProps = {
     onPrev: () => void;
     onNext: () => void;
     children?: React.ReactNode;
+    onPressTitle: () => void;
 };
 
-export function WeekSelector({ label, dateLabel, onPrev, onNext, children }: WeekSelectorProps) {
+export function WeekSelector({ label, dateLabel, onPrev, onNext, onPressTitle  }: WeekSelectorProps) {
     const theme = useTheme();
     const styles = createStyles(theme);
 
@@ -25,10 +26,10 @@ export function WeekSelector({ label, dateLabel, onPrev, onNext, children }: Wee
             </View>
 
             {/* Center */}
-            <View style={styles.center}>
+            <TouchableOpacity onPress={onPressTitle} style={styles.center}>
                 <Text style={styles.label} numberOfLines={1}>{label}</Text>
                 <Text style={styles.dateLabel} numberOfLines={1}>{dateLabel}</Text>   
-            </View>    
+            </TouchableOpacity>    
 
             {/* Right */}
             <View style={styles.sideButtonWrapper}>
@@ -50,15 +51,13 @@ const createStyles = (theme: any) => StyleSheet.create({
     },
 
     sideButtonWrapper: {
-        width: 44,
-        height: 44,
         justifyContent: "center",
         alignItems: "center",
     },
 
     button: {
-        width: 36,
-        height: 36,
+        width: 44,
+        height: 44,
         borderRadius: 10,
 
         backgroundColor: theme.card.background,
@@ -77,7 +76,6 @@ const createStyles = (theme: any) => StyleSheet.create({
 
         paddingHorizontal: 8,
         minWidth: 0,
-        maxWidth: 220,
     },
 
     label: {

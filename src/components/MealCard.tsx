@@ -7,6 +7,7 @@ type MealCardProps = {
     subtitle?: string,
     rightSlot?: ReactNode;
     onPress?: () => void;
+    loading?: boolean;
 };
 
 export default function MealCard({ title }: MealCardProps) {

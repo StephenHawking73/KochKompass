@@ -8,7 +8,9 @@ import { Key, useState } from "react";
 import { useWeekNavigation } from "@/hooks/useWeekNavigation";
 import { AnimatedWeekSelector } from "@/components/weekSelector/AnimatedWeekSelector";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { runOnJS } from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut, runOnJS } from "react-native-reanimated";
+import WeekView from "@/components/screens/WeekView";
+import MonthView from "@/components/screens/MonthView";
 
 export default function HomeScreen() {
     const theme = useTheme();
@@ -23,9 +25,10 @@ export default function HomeScreen() {
         goToPreviousWeek,
     } = useWeekNavigation();
 
-    const { meals, loading: loadingMeals } = useMeals(weekStart, weekEnd) ?? { meals: [], loading: true };
+    const { meals, loading: loadingMeals } = useMeals(weekStart, weekEnd);
+    const isUpdating = loadingMeals && meals.length === 0;
 
-    const gesture = Gesture.Pan().onEnd((event) => {
+    const gesture = Gesture.Pan().activeOffsetX([-20, 20]).onEnd((event) => {
         if (event.translationX < -50) {
             runOnJS(goToNextWeek)();
         }
@@ -35,27 +38,28 @@ export default function HomeScreen() {
         }
     })
 
-    if (loadingMeals) {
-        return <LoadingScreen text="Lade Meals..."/>
-    }
+    const [viewMode, setViewMode] = useState<"week" | "month">("week");
+    console.log("VIEW MODE: ", viewMode);
 
     return (
-        <GestureDetector gesture={gesture}>
-            <SafeAreaView style={styles.container}>
-                {/* Heading */}
-                <Text style={styles.title}>Speiseplan</Text>
+        <SafeAreaView style={styles.container}>
+            <GestureDetector gesture={gesture}>
+                <View style={{flex: 1}}>
+                    {/* Heading */}
+                    <Text style={styles.title}>Speiseplan</Text>
 
-                {/* Week Selector */}
-                <AnimatedWeekSelector label={weekLabel} dateLabel={dateLabel} onPrev={goToPreviousWeek} onNext={goToNextWeek}/>
+                    {/* Week Selector */}
+                    <AnimatedWeekSelector label={weekLabel} dateLabel={dateLabel} onPrev={goToPreviousWeek} onNext={goToNextWeek} onPressTitle={() => setViewMode(v => (v === "week" ? "month" : "week"))}/>
 
-                {/* Meals */}
-                <View style={{marginTop: 10}}>
-                    {meals.map((meal: { id: Key; name: string; }) => (
-                        <MealCard key={meal.id} title={meal.name}/>
-                    ))}
+                    {/* Meals */}
+                    {viewMode === "week" ? (
+                        <WeekView meals={meals} loading={loadingMeals}/>
+                    ) : (
+                        <MonthView weekStart={weekStart} meals={meals}/>
+                    )}
                 </View>
-            </SafeAreaView>
-        </GestureDetector>
+            </GestureDetector>
+        </SafeAreaView>
     )
 }
 
