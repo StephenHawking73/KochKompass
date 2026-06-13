@@ -55,33 +55,11 @@ export default function TabBar({ state, descriptors, navigation }: TabBarProps) 
             onLongPress={onLongPress}
             isFocused={isFocused}
             routeName={route.name}
-            color={isFocused ? theme.accent.primary: theme.text.op}
+            color={isFocused ? theme.accent.primary: theme.tabBar.text}
             label={label}
           />
         )
 
-        /*return (
-          <TouchableOpacity
-            key={route.key}
-            accessibilityRole='button'
-            accessibilityState={isFocused ? { selected: true } : {}}
-            accessibilityLabel={options.tabBarAccessibilityLabel}
-            testID={options.tabBarButtonTestID}
-            onPress={onPress}
-            onLongPress={onLongPress}
-            style={styles.tabbarItem}
-          >
-            {
-              icons[route.name as RouteName]({
-                color: isFocused ? theme.accent.primary : theme.text.op
-              })
-            }
-
-            <Text style={{ color: isFocused ? theme.accent.primary : theme.text.op }}>
-              {label}
-            </Text>
-          </TouchableOpacity>
-        );*/
       })}
     </View>
   )
@@ -94,14 +72,21 @@ const createStyles = (theme: any) => StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "white",
+
+    backgroundColor: theme.tabBar.background,
+
     marginHorizontal: 50,
     paddingVertical: 15,
+
     borderRadius: 25,
-    borderCurve: "continuous",
-    shadowColor: "black",
-    shadowOffset: {width: 0, height: 10},
-    shadowRadius: 10,
-    shadowOpacity: 0.1,
+    borderWidth: 1,
+    borderColor: theme.tabBar.border,
+
+    shadowColor: theme.tabBar.shadow,
+    shadowOffset: {width: 0, height: 12},
+    shadowRadius: 18,
+    shadowOpacity: 1,
+
+    elevation: 12,
   }
 })
