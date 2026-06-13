@@ -1,19 +1,25 @@
 import { useState } from "react";
 
 export function useWeekNavigation() {
-    const [currentDate, setCurrentDate] = useState(
-        new Date()
-    );
+    const [currentDate, setCurrentDate] = useState(new Date());
 
     const startOfWeek = getStartOfWeek(currentDate);
     const endOfWeek = addDays(startOfWeek, 6);
+    const startOfMonth = getStartOfMonth(currentDate);
+    const endOfMonth = getEndOfMonth(currentDate);
 
     const weekNumber = getWeekNumber(currentDate);
 
     const weekLabel = `KW ${weekNumber}`;
+    const monthLabel = currentDate.toLocaleDateString("de-DE", {
+        month: "long",
+        year: "numeric",
+    });
 
     const dateLabel =
         `${formatDate(startOfWeek)} - ${formatDate(endOfWeek)}`;
+    const monthDateLabel =
+        `${formatDate(startOfMonth)} - ${formatDate(endOfMonth)}`;
 
     const goToNextWeek = () => {
         setCurrentDate(prev => addDays(prev, 7));
@@ -23,13 +29,27 @@ export function useWeekNavigation() {
         setCurrentDate(prev => addDays(prev, -7));
     };
 
+    const goToNextMonth = () => {
+        setCurrentDate(prev => addMonths(prev, 1));
+    };
+
+    const goToPreviousMonth = () => {
+        setCurrentDate(prev => addMonths(prev, -1));
+    };
+
     return {
         weekStart: startOfWeek,
         weekEnd: endOfWeek,
         weekLabel,
         dateLabel,
+        monthStart: startOfMonth,
+        monthEnd: endOfMonth,
+        monthLabel,
+        monthDateLabel,
         goToNextWeek,
         goToPreviousWeek,
+        goToNextMonth,
+        goToPreviousMonth,
     };
 }
 
@@ -37,6 +57,20 @@ function addDays(date: Date, days: number) {
     const d = new Date(date);
     d.setDate(d.getDate() + days);
     return d;
+}
+
+function addMonths(date: Date, months: number) {
+    const d = new Date(date);
+    d.setMonth(d.getMonth() + months);
+    return d;
+}
+
+function getStartOfMonth(date: Date) {
+    return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+function getEndOfMonth(date: Date) {
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0);
 }
 
 function getStartOfWeek(date: Date) {
