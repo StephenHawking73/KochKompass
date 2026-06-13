@@ -31,7 +31,7 @@ const createStyles = (theme: any) => StyleSheet.create({
 
     title: {
         color: theme.text.primary,
-        opacity: 0.5,
+        opacity: 1,
         fontSize: 14,
         fontWeight: 500,
     }

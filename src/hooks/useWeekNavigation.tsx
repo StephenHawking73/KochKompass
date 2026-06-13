@@ -1,45 +1,93 @@
 import { useState } from "react";
-import { addDays, format, startOfWeek } from "date-fns";
 
 export function useWeekNavigation() {
-    const today = new Date();
-
-    const [weekStart, setWeekStart] = useState(
-        startOfWeek(today, { weekStartsOn: 1 })
+    const [currentDate, setCurrentDate] = useState(
+        new Date()
     );
 
-    const weekEnd = addDays(weekStart, 6);
+    const startOfWeek = getStartOfWeek(currentDate);
+    const endOfWeek = addDays(startOfWeek, 6);
 
-    const goToPreviousWeek = () => {
-        setWeekStart(prev => addDays(prev, -7));
-    };
+    const weekNumber = getWeekNumber(currentDate);
+
+    const weekLabel = `KW ${weekNumber}`;
+
+    const dateLabel =
+        `${formatDate(startOfWeek)} - ${formatDate(endOfWeek)}`;
 
     const goToNextWeek = () => {
-        setWeekStart(prev => addDays(prev, 7))
-    }
+        setCurrentDate(prev => addDays(prev, 7));
+    };
 
-    const weekLabel = `KW ${getWeekNumber(weekStart)}`
-    const weekDatesLabel = `${format(weekStart, "dd.MM.yy")} - ${format(weekEnd, "dd.MM.yy")}`;
+    const goToPreviousWeek = () => {
+        setCurrentDate(prev => addDays(prev, -7));
+    };
 
     return {
-        weekStart,
-        weekEnd,
+        weekStart: startOfWeek,
+        weekEnd: endOfWeek,
         weekLabel,
-        weekDatesLabel,
+        dateLabel,
         goToNextWeek,
         goToPreviousWeek,
-    }
+    };
+}
+
+function addDays(date: Date, days: number) {
+    const d = new Date(date);
+    d.setDate(d.getDate() + days);
+    return d;
+}
+
+function getStartOfWeek(date: Date) {
+    const d = new Date(date);
+
+    const day = d.getDay();
+
+    const diff =
+        d.getDate() -
+        day +
+        (day === 0 ? -6 : 1);
+
+    d.setDate(diff);
+
+    return d;
+}
+
+function formatDate(date: Date) {
+    return date.toLocaleDateString("de-DE", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "2-digit",
+    });
 }
 
 function getWeekNumber(date: Date) {
-    const temp = new Date(date.getTime());
+    const temp = new Date(date);
+
     temp.setHours(0, 0, 0, 0);
-    temp.setDate(temp.getDate() + 3 - ((temp.getDay() + 6) % 7));
-    const week1 = new Date(temp.getFullYear(), 0, 4);
+
+    temp.setDate(
+        temp.getDate() +
+            3 -
+            ((temp.getDay() + 6) % 7)
+    );
+
+    const week1 = new Date(
+        temp.getFullYear(),
+        0,
+        4
+    );
+
     return (
         1 +
         Math.round(
-            ((temp.getTime() - week1.getTime()) / 86400000 - 3 +((week1.getDay() + 6) % 7)) / 7
+            ((temp.getTime() -
+                week1.getTime()) /
+                86400000 -
+                3 +
+                ((week1.getDay() + 6) % 7)) /
+                7
         )
     );
 }

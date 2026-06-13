@@ -5,8 +5,10 @@ import { useMeals } from "@/hooks/useMeals";
 import { LoadingScreen } from "@/components/loadingScreen";
 import MealCard from "@/components/MealCard";
 import { Key, useState } from "react";
-import { WeekSelector } from "@/components/weekSelector";
 import { useWeekNavigation } from "@/hooks/useWeekNavigation";
+import { AnimatedWeekSelector } from "@/components/weekSelector/AnimatedWeekSelector";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { runOnJS } from "react-native-reanimated";
 
 export default function HomeScreen() {
     const theme = useTheme();
@@ -16,32 +18,44 @@ export default function HomeScreen() {
         weekStart,
         weekEnd,
         weekLabel,
-        weekDatesLabel,
+        dateLabel,
         goToNextWeek,
         goToPreviousWeek,
     } = useWeekNavigation();
 
     const { meals, loading: loadingMeals } = useMeals(weekStart, weekEnd) ?? { meals: [], loading: true };
 
+    const gesture = Gesture.Pan().onEnd((event) => {
+        if (event.translationX < -50) {
+            runOnJS(goToNextWeek)();
+        }
+
+        if (event.translationX > 50) {
+            runOnJS(goToPreviousWeek)();
+        }
+    })
+
     if (loadingMeals) {
         return <LoadingScreen text="Lade Meals..."/>
     }
 
     return (
-        <SafeAreaView style={styles.container}>
-            {/* Heading */}
-            <Text style={styles.title}>Speiseplan</Text>
+        <GestureDetector gesture={gesture}>
+            <SafeAreaView style={styles.container}>
+                {/* Heading */}
+                <Text style={styles.title}>Speiseplan</Text>
 
-            {/* Week Selector */}
-            <WeekSelector label={weekLabel} dateLabel={weekDatesLabel} onPrev={goToPreviousWeek} onNext={goToNextWeek}/>
+                {/* Week Selector */}
+                <AnimatedWeekSelector label={weekLabel} dateLabel={dateLabel} onPrev={goToPreviousWeek} onNext={goToNextWeek}/>
 
-            {/* Meals */}
-            <View style={{marginTop: 10}}>
-                {meals.map((meal: { id: Key; name: string; }) => (
-                    <MealCard key={meal.id} title={meal.name}/>
-                ))}
-            </View>
-        </SafeAreaView>
+                {/* Meals */}
+                <View style={{marginTop: 10}}>
+                    {meals.map((meal: { id: Key; name: string; }) => (
+                        <MealCard key={meal.id} title={meal.name}/>
+                    ))}
+                </View>
+            </SafeAreaView>
+        </GestureDetector>
     )
 }
 
