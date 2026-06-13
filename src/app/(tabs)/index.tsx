@@ -55,7 +55,7 @@ export default function HomeScreen() {
                     {viewMode === "week" ? (
                         <WeekView meals={meals} loading={loadingMeals}/>
                     ) : (
-                        <MonthView weekStart={weekStart} meals={meals}/>
+                        <MonthView referenceDate={weekStart} meals={meals}/>
                     )}
                 </View>
             </GestureDetector>
