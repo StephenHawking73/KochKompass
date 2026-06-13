@@ -18,6 +18,7 @@ export const Colors = {
 
         card: {
             background: "#ffffff",
+            border: "#e6e8ef",
         },
 
         tabBar: {
@@ -49,6 +50,7 @@ export const Colors = {
 
         card: {
             background: "#141922",
+            border: "#232a36",
         },
 
         tabBar: {

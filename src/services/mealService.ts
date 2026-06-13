@@ -1,11 +1,22 @@
 import { supabase } from "@/lib/supabase";
 
-export async function getMeals() {
-  const { data, error } = await supabase
-    .from("meals")
-    .select("*");
+export async function getMeals(weekStart?: Date | null, weekEnd?: Date | null) {
+    let query = supabase.from("meals").select("*");
 
-  if (error) throw error;
+    if (weekStart && weekEnd) {
+        query = query
+            .gte("planned_date", weekStart.toISOString().split("T")[0])
+            .lte("planned_date", weekEnd.toISOString().split("T")[0]);
+    }
 
-  return data;
+    const { data, error } = await query.order("planned_date", {
+        ascending: true,
+    });
+
+    if (error) {
+        console.error(error);
+        return [];
+    }
+
+    return data;
 }

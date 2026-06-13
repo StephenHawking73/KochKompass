@@ -6,3 +6,9 @@ export type Meal = {
     rating?: number,
     
 }
+
+export type WeekPlan = {
+    weekId: string | number,
+    label: string;          // "KW 24"
+    meals: Meal[];
+}

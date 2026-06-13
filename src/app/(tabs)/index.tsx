@@ -4,13 +4,24 @@ import { useTheme } from "@/hooks/useTheme";
 import { useMeals } from "@/hooks/useMeals";
 import { LoadingScreen } from "@/components/loadingScreen";
 import MealCard from "@/components/MealCard";
-import { Key } from "react";
+import { Key, useState } from "react";
+import { WeekSelector } from "@/components/weekSelector";
+import { useWeekNavigation } from "@/hooks/useWeekNavigation";
 
 export default function HomeScreen() {
     const theme = useTheme();
     const styles = createStyles(theme);
 
-    const { meals, loading: loadingMeals } = useMeals();
+    const {
+        weekStart,
+        weekEnd,
+        weekLabel,
+        weekDatesLabel,
+        goToNextWeek,
+        goToPreviousWeek,
+    } = useWeekNavigation();
+
+    const { meals, loading: loadingMeals } = useMeals(weekStart, weekEnd) ?? { meals: [], loading: true };
 
     if (loadingMeals) {
         return <LoadingScreen text="Lade Meals..."/>
@@ -18,9 +29,15 @@ export default function HomeScreen() {
 
     return (
         <SafeAreaView style={styles.container}>
+            {/* Heading */}
             <Text style={styles.title}>Speiseplan</Text>
+
+            {/* Week Selector */}
+            <WeekSelector label={weekLabel} dateLabel={weekDatesLabel} onPrev={goToPreviousWeek} onNext={goToNextWeek}/>
+
+            {/* Meals */}
             <View style={{marginTop: 10}}>
-                {meals.map((meal: { id: Key | null | undefined; name: string; }) => (
+                {meals.map((meal: { id: Key; name: string; }) => (
                     <MealCard key={meal.id} title={meal.name}/>
                 ))}
             </View>
@@ -35,7 +52,7 @@ const createStyles = (theme: any) => StyleSheet.create({
         paddingHorizontal: 30,
     },
     title: {
-        fontSize: 27,
+        fontSize: 30,
         fontWeight: 700,
         color: theme.text.primary,
         marginTop: 20,
