@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import React, { JSX } from 'react'
 import { useTheme } from '@/hooks/useTheme'
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
+import TabBarButton from './TabBarButton';
 
 type TabBarProps = {
   state: any
@@ -9,17 +10,9 @@ type TabBarProps = {
   navigation: any
 }
 
-type RouteName = "index" | "profile" | "ratings";
-
 export default function TabBar({ state, descriptors, navigation }: TabBarProps) {
   const theme = useTheme();
   const styles = createStyles(theme);
-
-  const icons: Record<RouteName, (props: any) => JSX.Element> = {
-    index: (props: any) => <AntDesign name="home" size={20} color={theme.text.op} {...props} />,
-    ratings: (props: any) => <FontAwesome name="star" size={20} color={theme.text.op} {...props} />,
-    profile: (props: any) => <AntDesign name="user" size={20} color={theme.text.op} {...props} />
-  }
 
   return (
     <View style={styles.tabbar}>
@@ -56,6 +49,18 @@ export default function TabBar({ state, descriptors, navigation }: TabBarProps) 
         };
 
         return (
+          <TabBarButton
+            key={route.key}
+            onPress={onPress}
+            onLongPress={onLongPress}
+            isFocused={isFocused}
+            routeName={route.name}
+            color={isFocused ? theme.accent.primary: theme.text.op}
+            label={label}
+          />
+        )
+
+        /*return (
           <TouchableOpacity
             key={route.key}
             accessibilityRole='button'
@@ -76,7 +81,7 @@ export default function TabBar({ state, descriptors, navigation }: TabBarProps) 
               {label}
             </Text>
           </TouchableOpacity>
-        );
+        );*/
       })}
     </View>
   )
@@ -98,10 +103,5 @@ const createStyles = (theme: any) => StyleSheet.create({
     shadowOffset: {width: 0, height: 10},
     shadowRadius: 10,
     shadowOpacity: 0.1,
-  },
-  tabbarItem: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
   }
 })
