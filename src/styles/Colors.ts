@@ -19,7 +19,7 @@ export const Colors = {
         card: {
             background: "#fff",
         },
-
+        
     },
 
     dark: {

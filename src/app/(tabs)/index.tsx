@@ -1,5 +1,5 @@
 import { SafeAreaView } from "react-native-safe-area-context";
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { useTheme } from "@/hooks/useTheme";
 import { useMeals } from "@/hooks/useMeals";
 import { LoadingScreen } from "@/components/loadingScreen";
@@ -18,11 +18,12 @@ export default function HomeScreen() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Text style={styles.title}>Home</Text>
-
-            {meals.map((meal: { id: Key | null | undefined; name: string; }) => (
-                <MealCard key={meal.id} title={meal.name}/>
-            ))}
+            <Text style={styles.title}>Speiseplan</Text>
+            <View style={{marginTop: 10}}>
+                {meals.map((meal: { id: Key | null | undefined; name: string; }) => (
+                    <MealCard key={meal.id} title={meal.name}/>
+                ))}
+            </View>
         </SafeAreaView>
     )
 }

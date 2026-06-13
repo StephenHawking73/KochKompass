@@ -15,10 +15,8 @@ export default function MealCard({ title }: MealCardProps) {
     const styles = createStyles(theme);
     
     return (
-        <View>
-            <View style={styles.card}>
-                <Text style={styles.title}>{title}</Text>
-            </View>
+        <View style={styles.card}>
+            <Text style={styles.title}>{title}</Text>
         </View>
     )
 }
