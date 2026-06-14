@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import type { Meal } from "@/types/meal";
 
 export async function getMeals(weekStart?: Date | null, weekEnd?: Date | null) {
     let query = supabase.from("meals").select("*");
@@ -18,5 +19,8 @@ export async function getMeals(weekStart?: Date | null, weekEnd?: Date | null) {
         return [];
     }
 
-    return data;
+    return ((data ?? []) as Meal[]).map((meal) => ({
+        ...meal,
+        date: meal.date ?? meal.planned_date,
+    }));
 }

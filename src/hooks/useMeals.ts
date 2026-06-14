@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { getMeals } from "@/services/mealService";
+import type { Meal } from "@/types/meal";
 
 export function useMeals(weekStart?: Date | null, weekEnd?: Date | null) {
-    const [meals, setMeals] = useState<any[]>([]);
+    const [meals, setMeals] = useState<Meal[]>([]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {

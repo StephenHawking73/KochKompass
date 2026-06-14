@@ -1,12 +1,7 @@
 import React, { useMemo } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { useTheme } from "@/hooks/useTheme";
-
-type Meal = {
-    id: string;
-    name: string;
-    date: string | Date;
-};
+import type { Meal } from "@/types/meal";
 
 type DayItem = {
     date: Date;
@@ -30,13 +25,7 @@ export default function MonthView({
     const today = useMemo(() => {
         const d = new Date();
 
-        return (
-            d.getFullYear() +
-            "-" +
-            d.getMonth() +
-            "-" +
-            d.getDate()
-        );
+        return normalizeDate(d).getTime();
     }, []);
 
     if (!safe) {
@@ -79,10 +68,10 @@ export default function MonthView({
                         "-" +
                         day.date.getDate();
 
-                    const isToday = key === today;
+                    const isToday = normalizeDate(day.date).getTime() === today;
 
                     const dayMeals = meals.filter((meal) =>
-                        isSameDay(meal.date, day.date)
+                        isSameDay(meal.date ?? meal.planned_date ?? "", day.date)
                     );
 
                     const visibleMeals =
@@ -323,6 +312,11 @@ const createStyles = (theme: any) =>
         },
     });
 
+
+function normalizeDate(d: Date) {
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
 function generateCalendarGrid(
     reference: Date
 ) {
@@ -360,7 +354,9 @@ function generateCalendarGrid(
         });
     }
 
-    while (days.length < 42) {
+    const totalCells = Math.ceil(days.length / 7) * 7;
+
+    while (days.length < totalCells) {
         const nextDay =
             days.length -
             (startWeekday + daysInMonth) +
@@ -383,14 +379,10 @@ function isSameDay(
     a: string | Date,
     b: Date
 ) {
-    const da = new Date(a);
+    const da = normalizeDate(new Date(a));
+    const db = normalizeDate(b);
 
-    return (
-        da.getFullYear() ===
-            b.getFullYear() &&
-        da.getMonth() === b.getMonth() &&
-        da.getDate() === b.getDate()
-    );
+    return da.getTime() === db.getTime();
 }
 
 function safeDate(input: any) {
