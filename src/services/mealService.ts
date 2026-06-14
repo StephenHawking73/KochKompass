@@ -6,8 +6,8 @@ export async function getMeals(weekStart?: Date | null, weekEnd?: Date | null) {
 
     if (weekStart && weekEnd) {
         query = query
-            .gte("planned_date", weekStart.toISOString().split("T")[0])
-            .lte("planned_date", weekEnd.toISOString().split("T")[0]);
+            .gte("planned_date", formatLocalDate(weekStart))
+            .lte("planned_date", formatLocalDate(weekEnd));
     }
 
     const { data, error } = await query.order("planned_date", {
@@ -23,4 +23,12 @@ export async function getMeals(weekStart?: Date | null, weekEnd?: Date | null) {
         ...meal,
         date: meal.date ?? meal.planned_date,
     }));
+}
+
+function formatLocalDate(date: Date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
 }

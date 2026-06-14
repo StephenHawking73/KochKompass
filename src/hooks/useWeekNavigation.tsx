@@ -37,6 +37,10 @@ export function useWeekNavigation() {
         setCurrentDate(prev => addMonths(prev, -1));
     };
 
+    const setWeekByDate = (date: Date) => {
+        setCurrentDate(date);
+    };
+
     return {
         weekStart: startOfWeek,
         weekEnd: endOfWeek,
@@ -50,6 +54,7 @@ export function useWeekNavigation() {
         goToPreviousWeek,
         goToNextMonth,
         goToPreviousMonth,
+        setWeekByDate,
     };
 }
 

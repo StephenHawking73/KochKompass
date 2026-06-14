@@ -29,6 +29,7 @@ export default function HomeScreen() {
         goToPreviousWeek,
         goToNextMonth,
         goToPreviousMonth,
+        setWeekByDate,
     } = useWeekNavigation();
 
     const rangeStart = viewMode === "week" ? weekStart : monthStart;
@@ -73,7 +74,12 @@ export default function HomeScreen() {
                         {viewMode === "week" ? (
                             <WeekView meals={meals} loading={loadingMeals} />
                         ) : (
-                            <MonthView referenceDate={rangeStart} meals={meals} />
+                            <MonthView referenceDate={rangeStart} meals={meals} onSelectDay={(date) => {
+                                setWeekByDate(date);
+                                requestAnimationFrame(() => {
+                                    setViewMode("week");
+                                })
+                            }}/>
                         )}
                     </Animated.View>
                 </View>
@@ -102,3 +108,14 @@ const createStyles = (theme: any) =>
             flex: 1,
         },
     });
+
+
+function getWeekStart(date: Date) {
+    const d = new Date(date);
+    const day = (d.getDay() + 6) % 7; // Montag = 0
+
+    d.setDate(d.getDate() - day);
+    d.setHours(0, 0, 0, 0);
+
+    return d;
+}
