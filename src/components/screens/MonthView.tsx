@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { ScrollView, View, Text, StyleSheet, Dimensions } from "react-native";
 import { useTheme } from "@/hooks/useTheme";
 import type { Meal } from "@/types/meal";
 
@@ -41,18 +41,22 @@ export default function MonthView({
     const { days } = generateCalendarGrid(safe);
 
     return (
-        <View style={styles.container}>
+        <ScrollView
+            style={styles.container}
+            contentContainerStyle={styles.content}
+            showsVerticalScrollIndicator={false}
+        >
             {/* Wochentage */}
 
             <View style={styles.weekRow}>
                 {["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map(
                     (day) => (
-                        <Text
+                        <View
                             key={day}
-                            style={styles.weekLabel}
+                            style={styles.weekLabelCell}
                         >
-                            {day}
-                        </Text>
+                            <Text style={styles.weekLabel}>{day}</Text>
+                        </View>
                     )
                 )}
             </View>
@@ -83,7 +87,7 @@ export default function MonthView({
 
                     return (
                         <View
-                            key={index}
+                            key={key}
                             style={styles.cell}
                         >
                             {/* Tagesnummer */}
@@ -145,7 +149,7 @@ export default function MonthView({
 
                                             <Text
                                                 numberOfLines={
-                                                    1
+                                                    2
                                                 }
                                                 style={[
                                                     styles.mealText,
@@ -179,15 +183,26 @@ export default function MonthView({
                     );
                 })}
             </View>
-        </View>
+        </ScrollView>
     );
 }
+
+const H_PADDING = 18;
+const SCREEN_WIDTH = Dimensions.get("window").width;
+const INNER_WIDTH = SCREEN_WIDTH - H_PADDING * 2;
+const CELL_SIZE = INNER_WIDTH / 7;
 
 const createStyles = (theme: any) =>
     StyleSheet.create({
         container: {
             flex: 1,
-            marginTop: 8,
+            marginHorizontal: -30,
+        },
+
+        content: {
+            paddingTop: 8,
+            paddingBottom: 24,
+            paddingHorizontal: H_PADDING,
         },
 
         loadingContainer: {
@@ -203,28 +218,43 @@ const createStyles = (theme: any) =>
         weekRow: {
             flexDirection: "row",
             marginBottom: 4,
+            marginTop: 20,
+            backgroundColor: theme.background,
+            paddingBottom: 6,
+            zIndex: 10,
+            width: "100%",
+        },
+
+        weekLabelCell: {
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "row",
         },
 
         weekLabel: {
-            flex: 1,
-            textAlign: "center",
-            fontSize: 12,
-            fontWeight: "600",
+            fontSize: 13,
+            fontWeight: "700",
             color: theme.text.op,
-            paddingVertical: 8,
+            paddingVertical: 10,
+            width: "100%",
+            textAlign: "center",
+            includeFontPadding: false,
         },
 
         grid: {
             flexDirection: "row",
             flexWrap: "wrap",
+            width: "100%",
         },
 
         cell: {
-            width: "14.285%",
-            aspectRatio: 0.72,
+            width: CELL_SIZE,
+            aspectRatio: 1.42,
+            minHeight: 126,
 
-            paddingTop: 4,
-            paddingHorizontal: 4,
+            paddingTop: 8,
+            paddingHorizontal: 3,
 
             borderRightWidth:
                 StyleSheet.hairlineWidth,
@@ -239,11 +269,11 @@ const createStyles = (theme: any) =>
 
         dayHeader: {
             alignItems: "flex-end",
-            marginBottom: 4,
+            marginBottom: 6,
         },
 
         dayNumber: {
-            fontSize: 13,
+            fontSize: 14,
             fontWeight: "600",
             color: theme.text.primary,
         },
@@ -276,37 +306,47 @@ const createStyles = (theme: any) =>
 
         mealRow: {
             flexDirection: "row",
-            alignItems: "center",
-            marginTop: 3,
+            alignItems: "flex-start",
+            marginTop: 4,
+            paddingVertical: 5,
+            paddingHorizontal: 4,
+            borderRadius: 8,
+            width: "100%",
+            backgroundColor:
+                theme.name === "dark"
+                    ? "rgba(255,255,255,0.06)"
+                    : "rgba(0,0,0,0.05)",
         },
 
         mealDot: {
             width: 5,
             height: 5,
             borderRadius: 999,
-
-            backgroundColor:
-                theme.accent.primary,
-
-            marginRight: 4,
+            backgroundColor: theme.accent.primary,
+            marginRight: 5,
+            marginTop: 4,
+            flexShrink: 0,
         },
 
         mealText: {
             flex: 1,
-            fontSize: 9,
+            fontSize: 9.5,
+            lineHeight: 12,
+            fontWeight: "600",
             color: theme.text.primary,
+            paddingRight: 2,
         },
 
         outsideMealText: {
-            opacity: 0.4,
+            opacity: 0.45,
         },
 
         moreMeals: {
-            marginTop: 2,
-            marginLeft: 9,
+            marginTop: 5,
+            marginLeft: 0,
 
-            fontSize: 9,
-            fontWeight: "600",
+            fontSize: 11,
+            fontWeight: "700",
 
             color: theme.text.op,
         },
