@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -14,7 +14,9 @@ import { useWeekNavigation } from "@/hooks/useWeekNavigation";
 export default function HomeScreen() {
     const theme = useTheme();
     const styles = createStyles(theme);
+
     const [viewMode, setViewMode] = useState<"week" | "month">("week");
+    const [refreshing, setRefreshing] = useState(false);
 
     const {
         weekStart,
@@ -34,10 +36,23 @@ export default function HomeScreen() {
 
     const rangeStart = viewMode === "week" ? weekStart : monthStart;
     const rangeEnd = viewMode === "week" ? weekEnd : monthEnd;
-    const { meals, loading: loadingMeals } = useMeals(rangeStart, rangeEnd);
+
+    const { meals, loading: loadingMeals, refresh } = useMeals(rangeStart, rangeEnd);
+
+    const onRefresh = async () => {
+        setRefreshing(true);
+
+        try {
+            await refresh();
+        } finally {
+            setRefreshing(false);
+        }
+
+    }
 
     const gesture = Gesture.Pan()
         .activeOffsetX([-20, 20])
+        .failOffsetY([-10, 10])
         .onEnd((event) => {
             if (event.translationX < -50) {
                 runOnJS(viewMode === "week" ? goToNextWeek : goToNextMonth)();
@@ -72,7 +87,7 @@ export default function HomeScreen() {
                         exiting={FadeOut.duration(160)}
                     >
                         {viewMode === "week" ? (
-                            <WeekView meals={meals} loading={loadingMeals} />
+                            <WeekView meals={meals} loading={loadingMeals} refreshing={refreshing} onRefresh={onRefresh}/>
                         ) : (
                             <MonthView referenceDate={rangeStart} meals={meals} onSelectDay={(date) => {
                                 setWeekByDate(date);

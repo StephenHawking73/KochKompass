@@ -1,7 +1,8 @@
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 import MealCard from "@/components/MealCard";
+import { RefreshControl } from "react-native-gesture-handler";
 
-export default function WeekView({ meals, loading }: any) {
+export default function WeekView({ meals, loading, onRefresh, refreshing }: any) {
     if (loading) {
         return (
             <View style={{ marginTop: 10 }}>
@@ -13,10 +14,15 @@ export default function WeekView({ meals, loading }: any) {
     }
 
     return (
-        <View style={{ marginTop: 10 }}>
+        <ScrollView 
+            style={{ marginTop: 10, flex: 1 }}
+            refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
+            }
+        >
             {meals.map((meal: any) => (
                 <MealCard key={meal.id} title={meal.title} />
             ))}
-        </View>
+        </ScrollView>
     );
 }

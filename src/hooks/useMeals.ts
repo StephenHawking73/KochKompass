@@ -1,10 +1,15 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getMeals } from "@/services/mealService";
 import type { Meal } from "@/types/meal";
 
 export function useMeals(weekStart?: Date | null, weekEnd?: Date | null) {
     const [meals, setMeals] = useState<Meal[]>([]);
     const [loading, setLoading] = useState(false);
+    const [refreshIndex, setRefreshIndex] = useState(0);
+
+    const refresh = useCallback(() => {
+        setRefreshIndex((v) => v + 1);
+    }, []);
 
     useEffect(() => {
         if (!weekStart || !weekEnd) return;
@@ -32,7 +37,7 @@ export function useMeals(weekStart?: Date | null, weekEnd?: Date | null) {
         return () => {
             cancelled = true;
         };
-    }, [weekStart?.getTime(), weekEnd?.getTime()]);
+    }, [weekStart?.getTime(), weekEnd?.getTime(), refreshIndex]);
 
-    return { meals, loading };
+    return { meals, loading, refresh };
 }
