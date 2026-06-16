@@ -2,7 +2,7 @@ import { supabase } from "@/lib/supabase";
 import type { Meal } from "@/types/meal";
 
 export async function getMeals(weekStart?: Date | null, weekEnd?: Date | null) {
-    let query = supabase.from("meals").select("*");
+    let query = supabase.from("meal_plan").select("id, planned_date, recipes(id, title)");
 
     if (weekStart && weekEnd) {
         query = query
@@ -19,9 +19,13 @@ export async function getMeals(weekStart?: Date | null, weekEnd?: Date | null) {
         return [];
     }
 
-    return ((data ?? []) as Meal[]).map((meal) => ({
-        ...meal,
-        date: meal.date ?? meal.planned_date,
+    console.log(JSON.stringify(data, null, 2))
+
+    return (data ?? []).map((meal: any) => ({
+        id: meal.id,
+        recipieId: meal.recipes?.id ?? null,
+        planned_date: meal.planned_date,
+        title: meal.recipes?.title ?? "->Unknown<-",
     }));
 }
 

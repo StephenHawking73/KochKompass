@@ -77,7 +77,7 @@ export default function MonthView({
                     const isToday = normalizeDate(day.date).getTime() === today;
 
                     const dayMeals = meals.filter((meal) =>
-                        isSameDay(meal.date ?? meal.planned_date ?? "", day.date)
+                        isSameDay(meal.planned_date ?? "", day.date)
                     );
 
                     const visibleMeals =
@@ -161,7 +161,7 @@ export default function MonthView({
                                                 ]}
                                             >
                                                 {
-                                                    meal.name
+                                                    meal.title
                                                 }
                                             </Text>
                                         </View>

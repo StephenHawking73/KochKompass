@@ -15,7 +15,7 @@ export default function WeekView({ meals, loading }: any) {
     return (
         <View style={{ marginTop: 10 }}>
             {meals.map((meal: any) => (
-                <MealCard key={meal.id} title={meal.name} />
+                <MealCard key={meal.id} title={meal.title} />
             ))}
         </View>
     );
