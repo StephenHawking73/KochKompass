@@ -39,15 +39,14 @@ export default function HomeScreen() {
 
     const { meals, loading: loadingMeals, refresh } = useMeals(rangeStart, rangeEnd);
 
-    const onRefresh = async () => {
+    const onRefresh = () => {
         setRefreshing(true);
 
         try {
-            await refresh();
+            refresh();
         } finally {
             setRefreshing(false);
         }
-
     }
 
     const gesture = Gesture.Pan()
@@ -89,7 +88,7 @@ export default function HomeScreen() {
                         {viewMode === "week" ? (
                             <WeekView meals={meals} loading={loadingMeals} refreshing={refreshing} onRefresh={onRefresh}/>
                         ) : (
-                            <MonthView referenceDate={rangeStart} meals={meals} onSelectDay={(date) => {
+                            <MonthView referenceDate={rangeStart} meals={meals} refreshing={refreshing} onRefresh={onRefresh} onSelectDay={(date) => {
                                 setWeekByDate(date);
                                 requestAnimationFrame(() => {
                                     setViewMode("week");
@@ -123,14 +122,3 @@ const createStyles = (theme: any) =>
             flex: 1,
         },
     });
-
-
-function getWeekStart(date: Date) {
-    const d = new Date(date);
-    const day = (d.getDay() + 6) % 7; // Montag = 0
-
-    d.setDate(d.getDate() - day);
-    d.setHours(0, 0, 0, 0);
-
-    return d;
-}

@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { ScrollView, View, Text, StyleSheet, Dimensions, Pressable } from "react-native";
+import { ScrollView, View, Text, StyleSheet, Dimensions, Pressable, RefreshControl } from "react-native";
 import { useTheme } from "@/hooks/useTheme";
 import type { Meal } from "@/types/meal";
 
@@ -12,12 +12,16 @@ type Props = {
     referenceDate: Date | string;
     meals: Meal[];
     onSelectDay?: (date: Date) => void;
+    refreshing: any;
+    onRefresh: any;
 };
 
 export default function MonthView({
     referenceDate,
     meals,
     onSelectDay,
+    refreshing,
+    onRefresh,
 }: Props) {
     const theme = useTheme();
     const styles = createStyles(theme);
@@ -47,6 +51,9 @@ export default function MonthView({
             style={styles.container}
             contentContainerStyle={styles.content}
             showsVerticalScrollIndicator={false}
+            refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
+            }
         >
             {/* Wochentage */}
 
