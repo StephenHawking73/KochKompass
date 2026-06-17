@@ -1,7 +1,10 @@
 export type Meal = {
     id: string | number;
+    recipeId: string;
     title: string;
-    planned_date: string | Date;
+    planned_date: Date;
+    meal_type: "lunch" | "dinner";
+    meal_position: number;
     description?: string;
     image_url?: string;
 };

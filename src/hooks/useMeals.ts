@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { getMeals } from "@/services/mealService";
-import type { Meal } from "@/types/meal";
+import type { Meal } from "@/types/types";
 
 export function useMeals(weekStart?: Date | null, weekEnd?: Date | null) {
     const [meals, setMeals] = useState<Meal[]>([]);

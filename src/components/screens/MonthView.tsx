@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { ScrollView, View, Text, StyleSheet, Dimensions, Pressable, RefreshControl } from "react-native";
 import { useTheme } from "@/hooks/useTheme";
-import type { Meal } from "@/types/meal";
+import type { Meal } from "@/types/types";
 
 type DayItem = {
     date: Date;

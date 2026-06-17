@@ -1,8 +1,8 @@
 import { supabase } from "@/lib/supabase";
-import type { Meal } from "@/types/meal";
+import type { Meal } from "@/types/types";
 
 export async function getMeals(weekStart?: Date | null, weekEnd?: Date | null) {
-    let query = supabase.from("meal_plan").select("id, planned_date, recipes(id, title)");
+    let query = supabase.from("meal_plan").select("id, planned_date, recipes(id, title), meal_type, position");
 
     if (weekStart && weekEnd) {
         query = query
@@ -26,6 +26,8 @@ export async function getMeals(weekStart?: Date | null, weekEnd?: Date | null) {
         recipieId: meal.recipes?.id ?? null,
         planned_date: meal.planned_date,
         title: meal.recipes?.title ?? "->Unknown<-",
+        meal_type: meal.meal_type,
+        position: meal.position,
     }));
 }
 
