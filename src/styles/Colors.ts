@@ -22,6 +22,11 @@ export const Colors = {
             border_op: "#AFCDAF",
         },
 
+        button: {
+            background: "#ffffff",
+            border: "#e6e8ef",
+        },
+
         tabBar: {
             background: "#ffffff",
             border: "#e6e8ef",
@@ -29,6 +34,11 @@ export const Colors = {
             inactive: "#9aa3b2",
             activeBg: "#eef6ee",
             shadow: "rgba(20, 25, 35, 0.08)",
+        },
+
+        icons: {
+            sun: "#fcb635",
+            moon: "#6667bb",
         }
     },
 
@@ -51,6 +61,12 @@ export const Colors = {
 
         card: {
             background: "#141922",
+            border: "#7bdc5a",
+            border_op: "#264421",
+        },
+
+        button: {
+            background: "#141922",
             border: "#232a36",
         },
 
@@ -61,6 +77,11 @@ export const Colors = {
             inactive: "#6b7280",
             activeBg: "#1f2633",
             shadow: "rgba(0,0,0,0.35)",
+        },
+
+        icons: {
+            sun: "#fcb635",
+            moon: "#6667bb",
         }
     }
 }

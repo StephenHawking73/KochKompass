@@ -60,9 +60,9 @@ const createStyles = (theme: any) => StyleSheet.create({
         height: 44,
         borderRadius: 10,
 
-        backgroundColor: theme.card.background,
+        backgroundColor: theme.button.background,
         borderWidth: 1,
-        borderColor: theme.card.border,
+        borderColor: theme.button.border,
 
         justifyContent: "center",
         alignItems: "center",
