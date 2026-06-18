@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native'
 import React, { JSX } from 'react'
 import { useTheme } from '@/hooks/useTheme'
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
@@ -68,10 +68,13 @@ export default function TabBar({ state, descriptors, navigation }: TabBarProps) 
 const createStyles = (theme: any) => StyleSheet.create({
   tabbar: {
     position: "absolute",
-    bottom: 30,
+    bottom: 20,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    alignSelf: "center",
+    
+    width: Platform.OS === 'web' ? 300: null,
 
     backgroundColor: theme.tabBar.background,
 
