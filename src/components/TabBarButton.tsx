@@ -4,7 +4,7 @@ import { icons } from "@/assets/icons";
 import { useTheme } from '@/hooks/useTheme';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
-type RouteName = "index" | "ratings" | "profile";
+type RouteName = "index" | "recipes" | "profile";
 
 const TabBarButton = (props: any) => {
     const {isFocused, label, routeName, color} = props;

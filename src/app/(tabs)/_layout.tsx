@@ -15,17 +15,17 @@ export default function TabLayout() {
             }}    
         />
         <Tabs.Screen
-            name = "ratings"
+            name = "recipes"
             options={{
                 headerShown: false,
-                title: "Bewertungen",
+                title: "Rezepte",
             }}    
         />
         <Tabs.Screen
             name = "profile"
             options={{
                 headerShown: false,
-                title: "Profile",
+                title: "Profil",
             }}    
         />
     </Tabs>
