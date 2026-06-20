@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 export default function Ratings() {
   return (
     <SafeAreaView>
-      <Text>Ratings</Text>
+      <Text>Recipes</Text>
     </SafeAreaView>
   )
 }

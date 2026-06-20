@@ -8,25 +8,6 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 
 export default function RootLayout() {
-
-    /*const [fontsLoaded] = useFonts({
-        LatoRegular: require("@/assets/fonts/Lato/Lato-Regular.ttf"),
-        LatoBold: require("@/assets/fonts/Lato/Lato-Bold.ttf"),
-        LatoItalic: require("@/assets/fonts/Lato/Lato-Italic.ttf"),
-        LatoThin: require("@/assets/fonts/Lato/Lato-Thin.ttf"),
-        LatoLight: require("@/assets/fonts/Lato/Lato-Light.ttf"),
-    });
-
-    useEffect(() => {
-        if (fontsLoaded) {
-            SplashScreen.hideAsync();
-        }
-    }, [fontsLoaded]);
-
-    if (!fontsLoaded) {
-        return null;
-    }*/
-
     return (
         <SafeAreaProvider>
             <GestureHandlerRootView style={{flex: 1}}>

@@ -24,7 +24,7 @@ export default function WeekView({ meals, loading, onRefresh, refreshing }: any)
     }
 
     return (
-        <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <ScrollView style={styles.container} showsVerticalScrollIndicator={false} contentContainerStyle={{paddingBottom: 80}}>
             {/* Header */}
             <View style={styles.header}>
                 <View style={styles.dayColumn} />
