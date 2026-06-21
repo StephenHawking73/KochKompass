@@ -24,7 +24,7 @@ export default function MealCard({ title }: MealCardProps) {
 
 const createStyles = (theme: any) => StyleSheet.create({
     card: {
-        backgroundColor: theme.card.background,
+        backgroundColor: theme.accent.op,
         padding: 14,
         borderRadius: 12,
         marginTop: 10,

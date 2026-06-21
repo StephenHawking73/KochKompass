@@ -1,150 +1,236 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import MealCard from "@/components/MealCard";
-import { RefreshControl } from "react-native-gesture-handler";
 import { Meal } from "@/types/types";
 import { useTheme } from "@/hooks/useTheme";
 import { icons } from "@/assets/icons";
+import { useMemo } from "react";
 
+type MealType = "lunch" | "dinner";
 
-const weekDays = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+export default function WeekView({
+    meals = [],
+    weekStart,
+}: any) {
 
-export default function WeekView({ meals, loading, onRefresh, refreshing }: any) {
     const theme = useTheme();
     const styles = createStyles(theme);
 
+    // -----------------------------
+    // Woche erzeugen
+    // -----------------------------
+    const getWeekDates = (startDate: Date) => {
+        return Array.from({ length: 7 }).map((_, i) => {
+            const d = new Date(startDate);
+            d.setDate(d.getDate() + i);
+            return d;
+        });
+    };
 
-    if (loading) {
+    const formatDate = (date: Date) => {
         return (
-            <View style={{ marginTop: 10 }}>
-                {Array.from({ length: 4 }).map((_, i) => (
-                    <MealCard key={i} title=" "/>
-                ))}
+            date.getFullYear() +
+            "-" +
+            String(date.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(date.getDate()).padStart(2, "0")
+        );
+    };
+
+    const weekDates = getWeekDates(weekStart);
+
+    // -----------------------------
+    // Slots: date -> type -> list (stacked slots)
+    // -----------------------------
+    const slots = useMemo(() => {
+        const map = new Map<string, Map<MealType, Meal[]>>();
+
+        for (const meal of meals ?? []) {
+            const dateKey = meal.planned_date;
+            const type = meal.meal_type as MealType;
+
+            if (!map.has(dateKey)) {
+                map.set(dateKey, new Map());
+            }
+
+            const dayMap = map.get(dateKey)!;
+
+            if (!dayMap.has(type)) {
+                dayMap.set(type, []);
+            }
+
+            dayMap.get(type)!.push(meal);
+        }
+
+        // Sortierung innerhalb eines Slots nach position
+        map.forEach((typeMap) => {
+            typeMap.forEach((list) => {
+                list.sort((a, b) => a.meal_position - b.meal_position);
+            });
+        });
+
+        return map;
+    }, [meals]);
+
+    // -----------------------------
+    // Slot Renderer
+    // -----------------------------
+    const renderSlotRow = (
+        dateKey: string,
+        index: number,
+        lunchSlots: Meal[],
+        dinnerSlots: Meal[]
+    ) => {
+        const lunch = lunchSlots[index];
+        const dinner = dinnerSlots[index];
+
+        return (
+            <View key={`${dateKey}-${index}`} style={styles.row}>
+                <View style={styles.dayColumn}>
+                    {index === 0 && (
+                        <Text style={styles.day}>
+                            {new Date(dateKey).getDate()}
+                        </Text>
+                    )}
+                </View>
+
+                <View style={styles.mealSlot}>
+                    {lunch ? <MealCard title={lunch.title} /> : null}
+                </View>
+
+                <View style={styles.mealSlot}>
+                    {dinner ? <MealCard title={dinner.title} /> : null}
+                </View>
+
+                <View style={styles.plusColumn}>
+                    {index === 0 && (
+                        <Text style={styles.plus}>+</Text>
+                    )}
+                </View>
             </View>
         );
-    }
+    };
 
+    // -----------------------------
+    // Render
+    // -----------------------------
     return (
-        <ScrollView style={styles.container} showsVerticalScrollIndicator={false} contentContainerStyle={{paddingBottom: 80}}>
+        <ScrollView
+            style={styles.container}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 80 }}
+        >
             {/* Header */}
             <View style={styles.header}>
                 <View style={styles.dayColumn} />
 
-                <View style={{alignItems: "center", justifyContent: "center", flex: 1, flexDirection: "row", gap: 10, }}>
-                    {
-                        icons.sun({color: theme.icons.sun})
-                    }
-                    <Text style={styles.headerText}>
-                        Mittagessen
-                    </Text>
+                <View style={styles.headerCenter}>
+                    {icons.sun({ color: theme.icons.sun })}
+                    <Text style={styles.headerText}>Mittagessen</Text>
                 </View>
 
-                <View style={{alignItems: "center", justifyContent: "center", flex: 1, flexDirection: "row", gap: 10, }}>
-                    {
-                        icons.moon({color: theme.icons.moon})
-                    }
-                    <Text style={styles.headerText}>
-                        Abendessen
-                    </Text>
+                <View style={styles.headerCenter}>
+                    {icons.moon({ color: theme.icons.moon })}
+                    <Text style={styles.headerText}>Abendessen</Text>
                 </View>
 
                 <View style={styles.plusColumn} />
             </View>
 
-            {weekDays.map((day) => (
-                <View key={day} style={styles.row}>
-                    <View style={styles.dayColumn}>
-                        <Text style={styles.day}>
-                            {day}
-                        </Text>
+            {/* Week */}
+            {weekDates.map((date) => {
+                const dateKey = formatDate(date);
+
+                const lunchSlots =
+                    slots.get(dateKey)?.get("lunch") ?? [];
+
+                const dinnerSlots =
+                    slots.get(dateKey)?.get("dinner") ?? [];
+
+                const maxRows = Math.max(
+                    lunchSlots.length,
+                    dinnerSlots.length,
+                    1
+                );
+
+                return (
+                    <View key={dateKey}>
+                        {Array.from({ length: maxRows }).map((_, i) =>
+                            renderSlotRow(
+                                dateKey,
+                                i,
+                                lunchSlots,
+                                dinnerSlots
+                            )
+                        )}
                     </View>
-
-                    {/* Morning */}
-                    <View style={styles.mealSlot}>
-                        
-                    </View>
-
-                    {/* Evening */}
-                    <View style={styles.mealSlot}>
-
-                    </View>
-
-                    <Pressable style={styles.plusColumn}>
-                        <Text style={styles.plus}>+</Text>
-                    </Pressable>
-                </View>
-            ))}
+                );
+            })}
         </ScrollView>
     );
 }
 
+const createStyles = (theme: any) =>
+    StyleSheet.create({
+        container: {
+            paddingHorizontal: 6,
+        },
 
-        {/*<ScrollView 
-            style={{ marginTop: 10, flex: 1 }}
-            refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
-            }
-        >
-            {meals.length === 0 && (
-                <Text>No meals found</Text>
-            )}
+        header: {
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 12,
+            marginTop: 30,
+        },
 
-            {meals.map((meal: Meal) => (
-                <MealCard key={meal.id} title={meal.title} />
-            ))}
-        </ScrollView>*/}
+        headerCenter: {
+            flex: 1,
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 10,
+        },
 
-const createStyles = (theme: any) => StyleSheet.create({
-    container: {
-        paddingHorizontal: 6,
-    },
-    header: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 12,
-        marginTop: 30,
-    },
+        headerText: {
+            fontWeight: "600",
+            color: theme.text.primary,
+        },
 
-    headerText: {
-        fontWeight: "600",
-        color: theme.text.primary,
-    },
+        row: {
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 10,
+        },
 
-    row: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 12,
-    },
+        dayColumn: {
+            width: 40,
+            justifyContent: "flex-start",
+        },
 
-    dayColumn: {
-        width: 40,
-        justifyContent: "center",
-    },
+        day: {
+            fontSize: 18,
+            fontWeight: "600",
+            color: theme.text.primary,
+        },
 
-    day: {
-        fontSize: 18,
-        fontWeight: "600",
-        color: theme.text.primary,
-    },
+        mealSlot: {
+            flex: 1,
+            minHeight: 80,
+            backgroundColor: theme.card.background,
+            borderColor: theme.card.border_op,
+            borderWidth: 1,
+            borderStyle: "dashed",
+            borderRadius: 12,
+            marginHorizontal: 4,
+            justifyContent: "center",
+        },
 
-    mealSlot: {
-        flex: 1,
-        height: 80,
-        backgroundColor: theme.card.background,
-        borderColor: theme.card.border_op,
-        borderWidth: 1,
-        borderStyle: "dashed",
-        borderRadius: 12,
-        marginHorizontal: 4,
-    },
+        plusColumn: {
+            width: 20,
+            alignItems: "center",
+        },
 
-    plusColumn: {
-        width: 20,
-        alignItems: "center",
-        paddingLeft: 2,
-    },
-
-    plus: {
-        fontSize: 24,
-        color: theme.accent.primary,
-    },
-});
+        plus: {
+            fontSize: 24,
+            color: theme.accent.primary,
+        },
+    });
