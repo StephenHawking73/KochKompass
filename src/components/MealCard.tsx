@@ -1,9 +1,10 @@
 import { useTheme } from "@/hooks/useTheme";
 import { ReactNode } from "react";
-import { StyleSheet, View, Text, Pressable } from "react-native";
+import { StyleSheet, View, Text, Pressable, Image } from "react-native";
 
 type MealCardProps = {
     title: string;
+    image_url?: string;
     subtitle?: string;
     rightSlot?: ReactNode;
     onPress?: () => void;
@@ -12,6 +13,7 @@ type MealCardProps = {
 
 export default function MealCard({
     title,
+    image_url,
     onPress,
 }: MealCardProps) {
 
@@ -21,9 +23,27 @@ export default function MealCard({
     return (
         <Pressable onPress={onPress} style={styles.card}>
             <View style={styles.content}>
-                <Text style={styles.title} numberOfLines={2}>
+
+                {/* IMAGE */}
+                {image_url ? (
+                    <Image
+                        source={{ uri: image_url }}
+                        style={styles.image}
+                        resizeMode="cover"
+                    />
+                ) : (
+                    <Image
+                        source={require("../assets/img/Placeholder.jpg")}
+                        style={styles.image}
+                        resizeMode="cover"
+                    />
+                )}
+
+                {/* TEXT */}
+                <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">
                     {title}
                 </Text>
+
             </View>
         </Pressable>
     );
@@ -40,24 +60,22 @@ const createStyles = (theme: any) =>
             left: -4,
             right: -4,
 
-            backgroundColor: theme.card.background,
+            flex: 1,
 
+            backgroundColor: theme.card.background,
             borderRadius: 16,
 
             paddingHorizontal: 12,
             paddingVertical: 10,
 
-            // subtiler Rahmen statt harter Box
             borderWidth: 1,
             borderColor: "rgba(255,255,255,0.06)",
 
-            // moderner Soft-Shadow (iOS-like)
-            shadowColor: "#5E5D5D",
+            shadowColor: "#000",
             shadowOpacity: 0.08,
             shadowRadius: 10,
             shadowOffset: { width: 0, height: 4 },
 
-            // Android
             elevation: 2,
 
             justifyContent: "center",
@@ -66,14 +84,31 @@ const createStyles = (theme: any) =>
         content: {
             flexDirection: "row",
             alignItems: "center",
-            gap: 8,
+            flex: 1,
+            gap: 10,
+        },
+
+        image: {
+            width: 50,
+            height: 50,
+            borderRadius: 10,
+            flexShrink: 0,
+        },
+
+        placeholder: {
+            width: 50,
+            height: 50,
+            borderRadius: 10,
+            backgroundColor: "rgba(103 103 103 / 0.06)",
+            flexShrink: 0,
         },
 
         title: {
             flex: 1,
+
             color: theme.text.primary,
-            fontSize: 13.5,
+            fontSize: 14,
             fontWeight: "500",
-            letterSpacing: 0.2,
+            letterSpacing: 0.3,
         },
     });

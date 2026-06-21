@@ -42,6 +42,11 @@ export default function WeekView({
         );
     };
 
+    const todayKey = useMemo(() => {
+        const now = new Date();
+        return formatDate(now);
+    }, []);
+
     const weekDays = getWeekDays(weekStart);
 
     // -----------------------------
@@ -86,6 +91,7 @@ export default function WeekView({
         lunchSlots: Meal[],
         dinnerSlots: Meal[],
         label: string,
+        isToday: boolean,
     ) => {
         const lunch = lunchSlots[index];
         const dinner = dinnerSlots[index];
@@ -94,18 +100,18 @@ export default function WeekView({
             <View key={`${dateKey}-${index}`} style={styles.row}>
                 <View style={styles.dayColumn}>
                     {index === 0 && (
-                        <Text style={styles.day}>
+                        <Text style={[styles.day, isToday && styles.todayText]}>
                             {label}
                         </Text>
                     )}
                 </View>
 
                 <View style={styles.mealSlot}>
-                    {lunch ? <MealCard title={lunch.title} /> : null}
+                    {lunch ? <MealCard title={lunch.title} image_url={lunch.image_url}/> : null}
                 </View>
 
                 <View style={styles.mealSlot}>
-                    {dinner ? <MealCard title={dinner.title} /> : null}
+                    {dinner ? <MealCard title={dinner.title} image_url={dinner.image_url}/> : null}
                 </View>
 
                 <View style={styles.plusColumn}>
@@ -147,6 +153,8 @@ export default function WeekView({
             {weekDays.map(({ date, label }) => {
                 const dateKey = formatDate(date);
 
+                const isToday = dateKey === todayKey;
+
                 const lunchSlots =
                     slots.get(dateKey)?.get("lunch") ?? [];
 
@@ -160,7 +168,7 @@ export default function WeekView({
                 );
 
                 return (
-                    <View key={dateKey}>
+                    <View key={dateKey} style={[isToday && styles.todayRow]}>
                         {Array.from({ length: maxRows }).map((_, i) =>
                             renderSlotRow(
                                 dateKey,
@@ -168,6 +176,7 @@ export default function WeekView({
                                 lunchSlots,
                                 dinnerSlots,
                                 label,
+                                isToday,
                             )
                         )}
                     </View>
@@ -242,5 +251,15 @@ const createStyles = (theme: any) =>
         plus: {
             fontSize: 24,
             color: theme.accent.primary,
+        },
+
+        todayRow: {
+            backgroundColor: "rgba(255, 255, 255, 0.02)",
+            borderRadius: 12,
+        },
+
+        todayText: {
+            color: theme.text.colored,
+            fontWeight: "700",
         },
     });
