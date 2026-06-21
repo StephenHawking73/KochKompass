@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import MealCard from "@/components/MealCard";
 import { Meal } from "@/types/types";
 import { useTheme } from "@/hooks/useTheme";
@@ -117,7 +117,7 @@ export default function WeekView({
         <ScrollView
             style={styles.container}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 80 }}
+            contentContainerStyle={{ paddingBottom: Platform.OS === "android" ? 120 : 80 }}
         >
             {/* Header */}
             <View style={styles.header}>
@@ -215,13 +215,15 @@ const createStyles = (theme: any) =>
         mealSlot: {
             flex: 1,
             minHeight: 80,
-            backgroundColor: theme.card.background,
-            borderColor: theme.card.border_op,
+            backgroundColor: theme.slot.background,
+            borderColor: theme.slot.border_op,
             borderWidth: 1,
             borderStyle: "dashed",
             borderRadius: 12,
             marginHorizontal: 4,
             justifyContent: "center",
+            overflow: "visible",
+            position: "relative",
         },
 
         plusColumn: {

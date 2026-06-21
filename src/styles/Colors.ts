@@ -16,10 +16,15 @@ export const Colors = {
             op: "#eaf6ea",
         },
 
-        card: {
-            background: "#ffffff",
+        slot: {
+            background: "#F5F5F5",
             border: "#4caf50",
             border_op: "#AFCDAF",
+        },
+
+        card: {
+            background: "#ffffff",
+            
         },
 
         button: {
@@ -59,10 +64,14 @@ export const Colors = {
             op: "#1f3a1a",
         },
 
-        card: {
-            background: "#141922",
+        slot: {
+            background: "#141A25",
             border: "#7bdc5a",
             border_op: "#264421",
+        },
+
+        card: {
+            background: "#141922",
         },
 
         button: {

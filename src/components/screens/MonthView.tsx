@@ -340,7 +340,7 @@ const createStyles = (theme: any) =>
 
         mealText: {
             flex: 1,
-            fontSize: 9.5,
+            fontSize: 12,
             lineHeight: 12,
             fontWeight: "600",
             color: theme.text.primary,

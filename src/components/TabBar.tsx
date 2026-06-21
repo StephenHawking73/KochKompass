@@ -74,7 +74,7 @@ const createStyles = (theme: any) => StyleSheet.create({
     alignItems: "center",
     alignSelf: "center",
     
-    width: Platform.OS === 'web' ? 300: null,
+    width: Platform.OS === 'web' ? 300 : null,
 
     backgroundColor: theme.tabBar.background,
 
