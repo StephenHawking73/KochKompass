@@ -18,11 +18,17 @@ export default function WeekView({
     // -----------------------------
     // Woche erzeugen
     // -----------------------------
-    const getWeekDates = (startDate: Date) => {
+    const getWeekDays = (startDate: Date) => {
+        const labels = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+
         return Array.from({ length: 7 }).map((_, i) => {
             const d = new Date(startDate);
             d.setDate(d.getDate() + i);
-            return d;
+
+            return {
+                date: d,
+                label: labels[i],
+            };
         });
     };
 
@@ -36,7 +42,7 @@ export default function WeekView({
         );
     };
 
-    const weekDates = getWeekDates(weekStart);
+    const weekDays = getWeekDays(weekStart);
 
     // -----------------------------
     // Slots: date -> type -> list (stacked slots)
@@ -78,7 +84,8 @@ export default function WeekView({
         dateKey: string,
         index: number,
         lunchSlots: Meal[],
-        dinnerSlots: Meal[]
+        dinnerSlots: Meal[],
+        label: string,
     ) => {
         const lunch = lunchSlots[index];
         const dinner = dinnerSlots[index];
@@ -88,7 +95,7 @@ export default function WeekView({
                 <View style={styles.dayColumn}>
                     {index === 0 && (
                         <Text style={styles.day}>
-                            {new Date(dateKey).getDate()}
+                            {label}
                         </Text>
                     )}
                 </View>
@@ -137,7 +144,7 @@ export default function WeekView({
             </View>
 
             {/* Week */}
-            {weekDates.map((date) => {
+            {weekDays.map(({ date, label }) => {
                 const dateKey = formatDate(date);
 
                 const lunchSlots =
@@ -159,7 +166,8 @@ export default function WeekView({
                                 dateKey,
                                 i,
                                 lunchSlots,
-                                dinnerSlots
+                                dinnerSlots,
+                                label,
                             )
                         )}
                     </View>
