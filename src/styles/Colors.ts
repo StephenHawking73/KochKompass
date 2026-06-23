@@ -41,6 +41,11 @@ export const Colors = {
             shadow: "rgba(20, 25, 35, 0.08)",
         },
 
+        searchBar: {
+            background: "#EBEBF2",
+            border: "#BDBDC4",
+        },
+
         icons: {
             sun: "#fcb635",
             moon: "#6667bb",
@@ -60,8 +65,8 @@ export const Colors = {
         notification: "#ff5a5a",
 
         accent: {
-            primary: "#7bdc5a",
-            op: "#1f3a1a",
+            primary: "#2D5320",
+            op: "#7BDC5A36",
         },
 
         slot: {
@@ -86,6 +91,11 @@ export const Colors = {
             inactive: "#6b7280",
             activeBg: "#1f2633",
             shadow: "rgba(0,0,0,0.35)",
+        },
+        
+        searchBar: {
+            background: "#141922",
+            border: "#232a36",
         },
 
         icons: {

@@ -7,6 +7,7 @@ export type Meal = {
     meal_position: number;
     description?: string;
     image_url?: string;
+    attribute?: "vegan" | "vegetarian" | "meat";
 };
 
 export type WeekPlan = {

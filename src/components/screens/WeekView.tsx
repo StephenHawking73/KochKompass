@@ -168,7 +168,7 @@ export default function WeekView({
                 );
 
                 return (
-                    <View key={dateKey} style={[isToday && styles.todayRow]}>
+                    <View key={dateKey}>
                         {Array.from({ length: maxRows }).map((_, i) =>
                             renderSlotRow(
                                 dateKey,
@@ -251,11 +251,6 @@ const createStyles = (theme: any) =>
         plus: {
             fontSize: 24,
             color: theme.accent.primary,
-        },
-
-        todayRow: {
-            backgroundColor: "rgba(255, 255, 255, 0.02)",
-            borderRadius: 12,
         },
 
         todayText: {

@@ -12,8 +12,6 @@ export function useMeals(weekStart?: Date | null, weekEnd?: Date | null) {
     }, []);
 
     useEffect(() => {
-        if (!weekStart || !weekEnd) return;
-
         let cancelled = false;
 
         async function load() {

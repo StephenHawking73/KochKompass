@@ -32,11 +32,7 @@ export default function MealCard({
                         resizeMode="cover"
                     />
                 ) : (
-                    <Image
-                        source={require("../assets/img/Placeholder.jpg")}
-                        style={styles.image}
-                        resizeMode="cover"
-                    />
+                    <Text style={styles.placeholderText}>🍽️</Text>
                 )}
 
                 {/* TEXT */}
@@ -111,4 +107,8 @@ const createStyles = (theme: any) =>
             fontWeight: "500",
             letterSpacing: 0.3,
         },
+
+        placeholderText: {
+            fontSize: 30,
+        }
     });
