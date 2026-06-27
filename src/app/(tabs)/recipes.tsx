@@ -40,12 +40,11 @@ export default function Ratings() {
         numColumns={2}
         columnWrapperStyle={{
           gap: 15,
-          marginBottom: 15,
+          marginBottom: 20,
         }}
         contentContainerStyle={{
-          paddingTop: 20,
+          paddingTop: 30,
           paddingBottom: 80,
-          marginTop: 20,
         }}
         renderItem={({ item }) => (
           <MealCardList recipe={item} favorites={favorites.favorites} toggleFavorite={favorites.toggle}/>

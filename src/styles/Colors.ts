@@ -65,7 +65,7 @@ export const Colors = {
         notification: "#ff5a5a",
 
         accent: {
-            primary: "#2D5320",
+            primary: "#54993D",
             op: "#7BDC5A36",
         },
 

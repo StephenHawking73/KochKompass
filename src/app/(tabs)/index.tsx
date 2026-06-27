@@ -53,19 +53,16 @@ export default function HomeScreen() {
     {/* DEBUG */}
     useEffect(() => {
         async function login() {
-        const { data, error } =
-            await supabase.auth.signInWithPassword({
-                email: "dr-25@gmx.de",
-                password: "KochKompass",
-            });
+            const { data, error } =
+                await supabase.auth.signInWithPassword({
+                    email: "dev@dev.com",
+                    password: "KochKompass",
+                });
 
-        if (error) {
-            console.log(error);
-        } else {
-            console.log("Eingeloggt:", data.user);
+            if (error) {
+                console.log(error);
+            } 
         }
-        }
-
         login();
     }, []);
 

@@ -54,7 +54,7 @@ export default function MealCardList({ recipe, onPress, favorites, toggleFavorit
         <View style={styles.subtitleRow}>
           <View style={styles.ratingContainer}>
             <Text style={styles.ratingTitle}>4.6</Text>
-            {icons.star({color: theme.accent.primary})}
+            {icons.star({color: theme.text.colored})}
           </View>
           
           {/* Attributes */}
@@ -146,7 +146,7 @@ const createStyles = (theme: any) =>
     },
 
     ratingTitle: {
-      color: theme.accent.primary,
+      color: theme.text.colored,
       fontSize: 12,
       fontWeight: 600,
     },

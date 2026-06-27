@@ -10,8 +10,8 @@ export const icons = {
 
     search: (props) => <Feather name="search" size={18} {...props}/>,
 
-    heart: (props) => <Feather name="heart" size={18} {...props}/>,
-    heart_filled: (props) => <FontAwesome name="heart" size={18} {...props}/>,
+    heart: (props) => <Feather name="heart" size={16} {...props}/>,
+    heart_filled: (props) => <FontAwesome name="heart" size={16} {...props}/>,
 
     vegan: (props) => <Ionicons name="leaf" size={14} {...props}/>,
     vegetarian: (props) => <MaterialCommunityIcons name="food-apple-outline" size={14} {...props}/>,
