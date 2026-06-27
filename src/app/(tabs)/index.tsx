@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -10,6 +10,7 @@ import { AnimatedWeekSelector } from "@/components/weekSelector/AnimatedWeekSele
 import { useMeals } from "@/hooks/useMeals";
 import { useTheme } from "@/hooks/useTheme";
 import { useWeekNavigation } from "@/hooks/useWeekNavigation";
+import { supabase } from "@/lib/supabase";
 
 export default function HomeScreen() {
     const theme = useTheme();
@@ -48,6 +49,25 @@ export default function HomeScreen() {
             setRefreshing(false);
         }
     }
+
+    {/* DEBUG */}
+    useEffect(() => {
+        async function login() {
+        const { data, error } =
+            await supabase.auth.signInWithPassword({
+                email: "dr-25@gmx.de",
+                password: "KochKompass",
+            });
+
+        if (error) {
+            console.log(error);
+        } else {
+            console.log("Eingeloggt:", data.user);
+        }
+        }
+
+        login();
+    }, []);
 
     const gesture = Gesture.Pan()
         .activeOffsetX([-20, 20])

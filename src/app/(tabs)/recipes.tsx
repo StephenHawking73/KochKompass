@@ -5,18 +5,22 @@ import { useTheme } from '@/hooks/useTheme';
 import { useMeals } from '@/hooks/useMeals';
 import { icons } from '@/assets/icons';
 import MealCardList from '@/components/mealCardList';
+import { useFavorites } from '@/hooks/useFavorites';
+import { useRecipes } from '@/hooks/useRecipes';
 
 export default function Ratings() {
   const theme = useTheme();
   const styles = createStyles(theme);
 
-  const { meals, loading: loadingMeals } = useMeals();    
+  const { recipes, loading: loadingRecipes } = useRecipes();    
   
   const [inputText, setInputText] = useState("");
 
-  const filteredMeals = meals.filter((meal) =>
-    meal.title.toLowerCase().includes(inputText.toLowerCase())
+  const filteredMeals = recipes.filter((recipe) =>
+    recipe.title.toLowerCase().includes(inputText.toLowerCase())
   );
+
+  const favorites = useFavorites();
 
   return (
     <SafeAreaView style={{flex: 1, paddingHorizontal: 30, backgroundColor: theme.background}}>
@@ -25,7 +29,7 @@ export default function Ratings() {
 
       {/* Search */}
       <View style={styles.searchBar}>
-        {icons.search({ color: theme.text.primary, marginLeft: 20, })}      
+        {icons.search({ color: theme.text.primary, marginLeft: 17, })}      
         <TextInput style={styles.inputField} placeholder='Rezepte suchen...' onChangeText={setInputText} value={inputText}/>  
       </View>
 
@@ -44,7 +48,7 @@ export default function Ratings() {
           marginTop: 20,
         }}
         renderItem={({ item }) => (
-          <MealCardList meal={item} />
+          <MealCardList recipe={item} favorites={favorites.favorites} toggleFavorite={favorites.toggle}/>
         )}
         showsVerticalScrollIndicator={false}
       />    
@@ -62,10 +66,10 @@ const createStyles = (theme: any) =>
     },
 
     searchBar: {
-      height: 50,
+      height: 45,
       marginTop: 20,
 
-      borderRadius: 15,
+      borderRadius: 12,
       borderColor: theme.searchBar.border,
       borderWidth: 0.5,
 

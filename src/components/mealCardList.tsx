@@ -5,46 +5,50 @@ import {
   Text,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@/hooks/useTheme";
-import { Meal } from "@/types/types";
+import { Recipe } from "@/types/types";
 import { icons } from "@/assets/icons";
 
 type Props = {
-  meal: Meal;
+  recipe: Recipe;
+  favorites: Set<string>;
+  toggleFavorite: (id: string) => any;
   onPress?: () => void;
 };
 
-export default function MealCardList({ meal, onPress }: Props) {
+export default function MealCardList({ recipe, onPress, favorites, toggleFavorite }: Props) {
   const theme = useTheme();
   const styles = createStyles(theme);
 
-  const onPressHeart = null;
+  const isFavorite = favorites.has(recipe.id);
+
+  const onPressHeart = () => {
+    toggleFavorite(recipe.id);
+  };
 
   return (
     <Pressable style={styles.card} onPress={onPress}>
       <View style={styles.imageContainer}>
         <Image
           source={
-            meal.image_url
-              ? { uri: meal.image_url }
+            recipe.image_url
+              ? { uri: recipe.image_url }
               : { uri: "https://www.gesundfit.de/wp-content/uploads/2023/09/hirse-kochen-wuerzen-adobe-scaled.jpeg" }
           }
           style={styles.image}
         />
 
         <Pressable style={styles.heartButton} onPress={onPressHeart}>
-          {icons.heart({
-            color: theme.text.primary,
-          })}
+          {isFavorite 
+            ? icons.heart_filled({color: theme.accent.primary})
+            : icons.heart({color: theme.text.primary})
+          }
         </Pressable>
       </View>
 
-      
-
       <View style={styles.content}>
         <Text numberOfLines={2} style={styles.title}>
-            {meal.title}
+            {recipe.title}
         </Text>
           
         <View style={styles.subtitleRow}>
@@ -52,27 +56,29 @@ export default function MealCardList({ meal, onPress }: Props) {
             <Text style={styles.ratingTitle}>4.6</Text>
             {icons.star({color: theme.accent.primary})}
           </View>
-            
+          
+          {/* Attributes */}
           <View style={styles.attributeContainer}>
-            {meal.attribute === "meat" && (
+            {recipe.attribute === "meat" && (
               <>
                 {icons.meat({color: "brown"})}
                 <Text style={styles.subtitle}>Fleisch</Text>
               </>
             )}
-            {meal.attribute === "vegetarian" && (
+            {recipe.attribute === "vegetarian" && (
               <>
                 {icons.vegetarian({color: "yellowgreen"})}
                 <Text style={styles.subtitle}>Veggie</Text>
               </>
             )}
-            {meal.attribute === "vegan" && (
+            {recipe.attribute === "vegan" && (
               <>
                 {icons.meat({color: "darkcyan"})}
                 <Text style={styles.subtitle}>Vegan</Text>
               </>
             )}
           </View>
+
         </View>
       </View>
     </Pressable>

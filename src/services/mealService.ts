@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase";
 
 export async function getMeals(weekStart?: Date | null, weekEnd?: Date | null) {
-    let query = supabase.from("meal_plan").select("id, planned_date, recipes(id, title, image_url, description, attribute), meal_type, position");
+    let query = supabase.from("meal_plan").select("id, planned_date, recipes(title, image_url, description, attribute), meal_type, position");
 
     if (weekStart && weekEnd) {
         query = query
@@ -17,8 +17,6 @@ export async function getMeals(weekStart?: Date | null, weekEnd?: Date | null) {
         console.error(error);
         return [];
     }
-
-    console.log(JSON.stringify(data, null, 2))
 
     return (data ?? []).map((meal: any) => ({
         id: meal.id,
