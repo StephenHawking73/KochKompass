@@ -53,8 +53,9 @@ export default function MealCardList({ recipe, onPress, favorites, toggleFavorit
           
         <View style={styles.subtitleRow}>
           <View style={styles.ratingContainer}>
-            <Text style={styles.ratingTitle}>4.6</Text>
+            <Text style={styles.ratingTitle}>{recipe.rating?.toFixed(1) ?? "-"}</Text>
             {icons.star({color: theme.text.colored})}
+            <Text style={styles.ratingTitle}>({recipe.rating_count > 0 ? recipe.rating_count : "-"})</Text>
           </View>
           
           {/* Attributes */}

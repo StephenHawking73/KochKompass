@@ -16,7 +16,7 @@ type Option = {
   value: SortOption;
 }
 
-export default function Ratings() {
+export default function RecipiesScreen() {
   const theme = useTheme();
   const styles = createStyles(theme);
 

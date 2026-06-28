@@ -14,7 +14,7 @@ export type Recipe = {
     image_url?: string;
     attribute: "vegan" | "vegetarian" | "meat";
     rating: number;
-    ratings_count: number;
+    rating_count: number;
     last_cooked_at: string;
     created_at: string;
 }
