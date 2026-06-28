@@ -9,20 +9,24 @@ import { useFavorites } from '@/hooks/useFavorites';
 import { useRecipes } from '@/hooks/useRecipes';
 import { FilterState, SortOption } from '@/types/recipeFilters';
 import RecipeFilterBar from '@/components/Filter/RecipeFilterBar';
+import SortDropdown from '@/components/SortDropdown';
 
+type Option = {
+  label: string;
+  value: SortOption;
+}
 
 export default function Ratings() {
   const theme = useTheme();
   const styles = createStyles(theme);
 
-  const sortOptions = [
+  const sortOptions: Option[] = [
     { label: "Beliebteste", value: "popular" },
     { label: "A-Z", value: "az" },
     { label: "Z-A", value: "za" },
     { label: "Lange nicht gekocht", value: "lastCooked" },
     { label: "Noch nie gekocht", value: "neverCooked" },
     { label: "Neu hinzugefügt", value: "new" },
-    { label: "Älteste zuerst", value: "old" },
   ];
 
   const { recipes, loading: loadingRecipes } = useRecipes();  
@@ -81,12 +85,6 @@ export default function Ratings() {
             new Date(a.created_at).getTime()
           );
 
-        case "old":
-          return (
-            new Date(a.created_at).getTime() -
-            new Date(b.created_at).getTime()
-          );
-
         default:
           return 0;
       }
@@ -122,7 +120,7 @@ export default function Ratings() {
           marginBottom: 20,
         }}
         ListHeaderComponent={
-          <>
+          <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center",}}>
             {/* Count */}
             <Text style={styles.countText}>
               {count === recipes.length
@@ -134,10 +132,13 @@ export default function Ratings() {
             </Text>
 
             {/* Order */}
-          </>
+            <SortDropdown value={sortBy} onChange={setSortBy} options={sortOptions}/>
+          </View>
         }
         ListHeaderComponentStyle={{
           marginBottom: 20,
+          zIndex: 100,
+          overflow: "visible",
         }}
         contentContainerStyle={{
           paddingBottom: 80,

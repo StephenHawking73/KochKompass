@@ -17,5 +17,7 @@ export const icons = {
     vegetarian: (props) => <MaterialCommunityIcons name="food-apple-outline" size={14} {...props}/>,
     meat: (props) => <MaterialCommunityIcons name="food-drumstick-outline" size={14} {...props}/>,
 
-    star: (props) => <AntDesign name="star" size={14} {...props}/>
+    star: (props) => <AntDesign name="star" size={14} {...props}/>,
+
+    down: (props) => <FontAwesome6 name="chevron-down" size={14} {...props}/>
 }

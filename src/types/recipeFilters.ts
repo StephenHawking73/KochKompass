@@ -5,7 +5,6 @@ export type SortOption =
   | "lastCooked"
   | "neverCooked"
   | "new"
-  | "old"
 
 type RecipeType =
   | "all"
