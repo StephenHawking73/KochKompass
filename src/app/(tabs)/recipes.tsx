@@ -10,6 +10,7 @@ import { useRecipes } from '@/hooks/useRecipes';
 import { FilterState, SortOption } from '@/types/recipeFilters';
 import RecipeFilterBar from '@/components/Filter/RecipeFilterBar';
 import SortDropdown from '@/components/SortDropdown';
+import { router } from 'expo-router';
 
 type Option = {
   label: string;
@@ -145,7 +146,7 @@ export default function RecipiesScreen() {
           paddingBottom: 80,
         }}
         renderItem={({ item }) => (
-          <MealCardList recipe={item} favorites={favorites.favorites} toggleFavorite={favorites.toggle}/>
+          <MealCardList recipe={item} favorites={favorites.favorites} toggleFavorite={favorites.toggle} onPress={() => router.push({pathname: "/recipe/[id]", params: { id: item.id }})}/>
         )}
         showsVerticalScrollIndicator={false}
       />    
