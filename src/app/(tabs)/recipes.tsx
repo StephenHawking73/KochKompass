@@ -50,7 +50,9 @@ export default function Ratings() {
 
       const matchesFavorite = !filters.favoritesOnly || favorites.favorites.has(recipe.id);
 
-      return matchesType && matchesFavorite;
+      const matchesNeverCooked = sortBy !== "neverCooked" || recipe.last_cooked_at === null;
+
+      return matchesType && matchesFavorite && matchesNeverCooked;
     })
 
     return [...filteredMeals].sort((a, b) => {
@@ -69,15 +71,10 @@ export default function Ratings() {
           if (!a.last_cooked_at) return 1;
           if (!b.last_cooked_at) return -1;
 
-          return (
-            new Date(a.last_cooked_at).getTime() -
-            new Date(b.last_cooked_at).getTime()
-          );
+          const timeA = new Date(a.last_cooked_at).getTime();
+          const timeB = new Date(b.last_cooked_at).getTime();
 
-        case "neverCooked":
-          if (!a.last_cooked_at && b.last_cooked_at) return -1;
-          if (a.last_cooked_at && !b.last_cooked_at) return 1;
-          return 0;
+          return timeA - timeB;
 
         case "new":
           return (
