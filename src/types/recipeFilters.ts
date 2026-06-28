@@ -7,12 +7,11 @@ export type SortOption =
   | "new"
 
 type RecipeType =
-  | "all"
   | "vegetarian"
   | "vegan"
   | "meat"
 
 export type FilterState = {
-  type: RecipeType;
+  type: RecipeType[];
   favoritesOnly: boolean;
 };

@@ -41,43 +41,60 @@ export default function RecipeFilterBar({
       />
 
       <FilterChip
-        label="Vegetarisch"
-        selected={filters.type === "vegetarian"}
+        label="Veggie"
+        selected={filters.type.includes("vegetarian")}
         onPress={() =>
-          setFilters((prev) => ({
-            ...prev,
-            type:
-              prev.type === "vegetarian"
-                ? "all"
-                : "vegetarian",
-          }))
+          setFilters((prev) => {
+            const withoutMeat = prev.type.filter(
+              (t) => t !== "meat"
+            );
+
+            return {
+              ...prev,
+              type: withoutMeat.includes("vegetarian")
+                ? withoutMeat.filter(
+                    (t) => t !== "vegetarian"
+                  )
+                : [...withoutMeat, "vegetarian"],
+            };
+          })
         }
       />
 
       <FilterChip
         label="Vegan"
-        selected={filters.type === "vegan"}
+        selected={filters.type.includes("vegan")}
         onPress={() =>
-          setFilters((prev) => ({
-            ...prev,
-            type:
-              prev.type === "vegan"
-                ? "all"
-                : "vegan",
-          }))
+          setFilters((prev) => {
+            const withoutMeat = prev.type.filter(
+              (t) => t !== "meat"
+            );
+
+            return {
+              ...prev,
+              type: withoutMeat.includes("vegan")
+                ? withoutMeat.filter(
+                    (t) => t !== "vegan"
+                  )
+                : [...withoutMeat, "vegan"],
+            };
+          })
         }
       />
 
       <FilterChip
         label="Fleisch"
-        selected={filters.type === "meat"}
+        selected={filters.type.includes(
+          "meat"
+        )}
         onPress={() =>
           setFilters((prev) => ({
             ...prev,
-            type:
-              prev.type === "meat"
-                ? "all"
-                : "meat",
+            type: prev.type.includes(
+              "meat"
+            )
+              ? []
+              : ["meat"],
           }))
         }
       />

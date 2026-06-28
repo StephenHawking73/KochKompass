@@ -33,7 +33,7 @@ export default function RecipiesScreen() {
   
   const [sortBy, setSortBy] = useState<SortOption>("popular");
   const [filters, setFilters] = useState<FilterState>({
-    type: "all",
+    type: [],
     favoritesOnly: false,
   });
   
@@ -46,7 +46,9 @@ export default function RecipiesScreen() {
     );
 
     const filteredMeals = searched.filter((recipe) => {
-      const matchesType = filters.type === "all" || recipe.attribute === filters.type;
+      const matchesType = filters.type.length === 0 || filters.type.includes(recipe.attribute) || (
+        filters.type.includes("vegetarian") && recipe.attribute === "vegan"
+      );
 
       const matchesFavorite = !filters.favoritesOnly || favorites.favorites.has(recipe.id);
 
