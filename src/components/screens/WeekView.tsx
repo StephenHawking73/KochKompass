@@ -4,12 +4,15 @@ import { Meal } from "@/types/types";
 import { useTheme } from "@/hooks/useTheme";
 import { icons } from "@/assets/icons";
 import { useMemo } from "react";
+import { RefreshControl } from "react-native-gesture-handler";
 
 type MealType = "lunch" | "dinner";
 
 export default function WeekView({
     meals = [],
     weekStart,
+    refreshing,
+    onRefresh,
 }: any) {
 
     const theme = useTheme();
@@ -131,6 +134,9 @@ export default function WeekView({
             style={styles.container}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: Platform.OS === "android" ? 120 : 80 }}
+            refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
+            }
         >
             {/* Header */}
             <View style={styles.header}>

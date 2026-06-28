@@ -29,7 +29,7 @@ export default function RecipiesScreen() {
     { label: "Neu hinzugefügt", value: "new" },
   ];
 
-  const { recipes, loading: loadingRecipes } = useRecipes();  
+  const { recipes, loading: loadingRecipes, refresh } = useRecipes();  
   
   const [sortBy, setSortBy] = useState<SortOption>("popular");
   const [filters, setFilters] = useState<FilterState>({
@@ -112,6 +112,8 @@ export default function RecipiesScreen() {
         data={displayedMeals}
         keyExtractor={(item: any) => item.id}
         numColumns={2}
+        refreshing={loadingRecipes}
+        onRefresh={refresh}
         columnWrapperStyle={{
           gap: 15,
           marginBottom: 20,
