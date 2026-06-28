@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TextInput, ScrollView, Platform, FlatList } from 'react-native'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTheme } from '@/hooks/useTheme';
 import { useMeals } from '@/hooks/useMeals';
@@ -7,20 +7,93 @@ import { icons } from '@/assets/icons';
 import MealCardList from '@/components/mealCardList';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useRecipes } from '@/hooks/useRecipes';
+import { FilterState, SortOption } from '@/types/recipeFilters';
+import RecipeFilterBar from '@/components/Filter/RecipeFilterBar';
+
 
 export default function Ratings() {
   const theme = useTheme();
   const styles = createStyles(theme);
 
-  const { recipes, loading: loadingRecipes } = useRecipes();    
+  const sortOptions = [
+    { label: "Beliebteste", value: "popular" },
+    { label: "A-Z", value: "az" },
+    { label: "Z-A", value: "za" },
+    { label: "Lange nicht gekocht", value: "lastCooked" },
+    { label: "Noch nie gekocht", value: "neverCooked" },
+    { label: "Neu hinzugefügt", value: "new" },
+    { label: "Älteste zuerst", value: "old" },
+  ];
+
+  const { recipes, loading: loadingRecipes } = useRecipes();  
+  
+  const [sortBy, setSortBy] = useState<SortOption>("popular");
+  const [filters, setFilters] = useState<FilterState>({
+    type: "all",
+    favoritesOnly: false,
+  });
   
   const [inputText, setInputText] = useState("");
-
-  const filteredMeals = recipes.filter((recipe) =>
-    recipe.title.toLowerCase().includes(inputText.toLowerCase())
-  );
-
   const favorites = useFavorites();
+
+  const displayedMeals = useMemo(() => {
+    const searched = recipes.filter((recipe) =>
+      recipe.title.toLowerCase().includes(inputText.toLowerCase())
+    );
+
+    const filteredMeals = searched.filter((recipe) => {
+      const matchesType = filters.type === "all" || recipe.attribute === filters.type;
+
+      const matchesFavorite = !filters.favoritesOnly || favorites.favorites.has(recipe.id);
+
+      return matchesType && matchesFavorite;
+    })
+
+    return [...filteredMeals].sort((a, b) => {
+      switch (sortBy) {
+        case "az":
+          return a.title.localeCompare(b.title);
+
+        case "za":
+          return b.title.localeCompare(a.title);
+
+        case "popular":
+          return (b.rating ?? 0) - (a.rating ?? 0);
+
+        case "lastCooked":
+          if (!a.last_cooked_at && !b.last_cooked_at) return 0;
+          if (!a.last_cooked_at) return 1;
+          if (!b.last_cooked_at) return -1;
+
+          return (
+            new Date(a.last_cooked_at).getTime() -
+            new Date(b.last_cooked_at).getTime()
+          );
+
+        case "neverCooked":
+          if (!a.last_cooked_at && b.last_cooked_at) return -1;
+          if (a.last_cooked_at && !b.last_cooked_at) return 1;
+          return 0;
+
+        case "new":
+          return (
+            new Date(b.created_at).getTime() -
+            new Date(a.created_at).getTime()
+          );
+
+        case "old":
+          return (
+            new Date(a.created_at).getTime() -
+            new Date(b.created_at).getTime()
+          );
+
+        default:
+          return 0;
+      }
+    });
+  }, [recipes, inputText, filters, sortBy, favorites.favorites]);
+
+  const count = displayedMeals.length;
 
   return (
     <SafeAreaView style={{flex: 1, paddingHorizontal: 30, backgroundColor: theme.background}}>
@@ -33,17 +106,40 @@ export default function Ratings() {
         <TextInput style={styles.inputField} placeholder='Rezepte suchen...' onChangeText={setInputText} value={inputText}/>  
       </View>
 
-      {/* Liste */}
+      {/* Filter */}
+      <View style={{marginTop: 15, }}>
+        <RecipeFilterBar filters={filters} setFilters={setFilters}/>
+      </View>
+
+      {/* List */}
+      <View style={{marginTop: 20}}/>
       <FlatList
-        data={filteredMeals}
+        data={displayedMeals}
         keyExtractor={(item: any) => item.id}
         numColumns={2}
         columnWrapperStyle={{
           gap: 15,
           marginBottom: 20,
         }}
+        ListHeaderComponent={
+          <>
+            {/* Count */}
+            <Text style={styles.countText}>
+              {count === recipes.length
+                ? `${recipes.length} ${
+                    recipes.length === 1 ? "Gericht" : "Gerichte"
+                  }`
+                : `${count} von ${recipes.length} Gerichten`
+              } 
+            </Text>
+
+            {/* Order */}
+          </>
+        }
+        ListHeaderComponentStyle={{
+          marginBottom: 20,
+        }}
         contentContainerStyle={{
-          paddingTop: 30,
           paddingBottom: 80,
         }}
         renderItem={({ item }) => (
@@ -84,4 +180,10 @@ const createStyles = (theme: any) =>
       marginHorizontal: 10,
       color: theme.text.op,
     },
+
+    countText: {
+      color: theme.text.op,
+      fontSize: 14,
+      fontWeight: 400,
+    }
 })

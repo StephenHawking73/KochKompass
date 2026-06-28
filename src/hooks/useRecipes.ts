@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Recipe } from "@/types/types";
-import { getRecipes } from "@/services/recipedService";
+import { getRecipes } from "@/services/recipeService";
 
 export function useRecipes() {
     const [recipes, setRecipes] = useState<Recipe[]>([]);
