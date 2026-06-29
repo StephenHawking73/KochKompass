@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase";
 
 export async function getMeals(weekStart?: Date | null, weekEnd?: Date | null) {
-    let query = supabase.from("meal_plan").select("id, planned_date, recipes(title, image_url, description, attribute), meal_type, position");
+    let query = supabase.from("meal_plan").select("id, planned_date, recipe_id, recipes(title, image_url, description, attribute), meal_type, position");
 
     if (weekStart && weekEnd) {
         query = query
@@ -28,6 +28,8 @@ export async function getMeals(weekStart?: Date | null, weekEnd?: Date | null) {
         image_url: meal.recipes?.image_url,
         description: meal.recipes?.description,
         attribute: meal.recipes?.attribute,
+
+        recipe_id: meal.recipe_id,
     }));
 }
 

@@ -6,6 +6,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { icons } from "@/assets/icons";
 import { useFavorites } from "@/hooks/useFavorites";
 import { LoadingScreen } from "@/components/loadingScreen";
+import InfoCard from "@/components/infoCard";
 
 export default function RecipeDetail() {
   const { id } = useLocalSearchParams();
@@ -24,7 +25,7 @@ export default function RecipeDetail() {
       const { data: recipeData } = await supabase
         .from("recipes")
         .select("*")
-        .eq("id", id)
+        .eq("id", recipeId)
         .single();
 
       setRecipe(recipeData);
@@ -33,7 +34,14 @@ export default function RecipeDetail() {
     load();
   }, [id]);
 
-  if (!recipe) return null;
+  if (!recipe) return <LoadingScreen />;
+
+  const attribute = recipe.attribute;
+  const attribute_title = attribute === "vegan" ? "Vegan" : attribute === "vegetarian" ? "Veggie" : "Fleisch";
+  const attribue_icon = attribute === "vegan" ? icons.vegan({ color: "darkcyan"}) : attribute === "vegetarian" ? icons.vegetarian({color: "yellowgreen"}) : icons.meat({color: "brown"});
+
+  const duration = recipe.duration;
+  const difficulty = recipe.difficulty;
 
   return (
     <View style={styles.container}>
@@ -42,18 +50,23 @@ export default function RecipeDetail() {
                 {icons.back({ color: theme.text.primary })}
             </Pressable>
 
-            <Pressable 
-              style={styles.iconButton} 
-              onPress={() => {
-                if (recipeId) toggle(recipeId)
-              }
-            }>
-                {isFavorite 
-                    ? icons.heart_filled({color: theme.accent.primary})
-                    : icons.heart({color: theme.text.primary})
+            <View style={{flexDirection: "row", gap: 10}}>
+              <Pressable 
+                style={styles.iconButton} 
+                onPress={() => {
+                  if (recipeId) toggle(recipeId)
                 }
-            </Pressable>
+              }>
+                  {isFavorite 
+                      ? icons.heart_filled({color: theme.accent.primary})
+                      : icons.heart({color: theme.text.primary})
+                  }
+              </Pressable>
 
+              <Pressable style={styles.iconButton}>
+                  {icons.more({color: theme.text.primary})}
+              </Pressable>
+            </View>
         </View>
 
         {/* HERO IMAGE */}
@@ -69,8 +82,15 @@ export default function RecipeDetail() {
         {/* CONTENT */}
         <ScrollView style={styles.contentCard} showsVerticalScrollIndicator={false}>
             <Text style={styles.title}>
-            {recipe.title}
+              {recipe.title}
             </Text>
+
+            {/* Infos */}
+            <ScrollView horizontal showsVerticalScrollIndicator={false} contentContainerStyle={{paddingVertical: 10, gap: 12, alignItems: "flex-start", marginTop: 10,}} style={{overflow: "visible"}}>
+                {attribute && <InfoCard title={attribute_title} icon={attribue_icon}/>}
+                {duration && <InfoCard title={duration + " min"} icon={icons.time(({color: theme.accent.primary}))}/>}
+                {difficulty && <InfoCard title={difficulty} icon={icons.hat(({color: theme.accent.primary}))}/>}
+            </ScrollView>
         </ScrollView>
     </View>
   );
@@ -129,4 +149,13 @@ const createStyles = (theme: any) =>
       fontWeight: "700",
       color: theme.text.primary,
     },
+
+    infosRow: {
+      flexDirection: "row",
+      
+      justifyContent: "space-between",
+      alignItems: "center",
+      
+      marginTop: 15,
+    }
   });

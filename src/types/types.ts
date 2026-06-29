@@ -2,6 +2,7 @@ export type Meal = {
     id: string;
     title: string;
     planned_date: string;
+    recipe_id: string;
     meal_type: "lunch" | "dinner";
     meal_position: number;
     image_url?: string;
@@ -13,6 +14,8 @@ export type Recipe = {
     description?: string;
     image_url?: string;
     attribute: "vegan" | "vegetarian" | "meat";
+    duration: number;
+    difficulty: "Einfach" | "Mittel" | "Schwer";
     rating: number;
     rating_count: number;
     last_cooked_at: string;

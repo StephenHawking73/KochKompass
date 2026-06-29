@@ -5,6 +5,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { icons } from "@/assets/icons";
 import { useMemo } from "react";
 import { RefreshControl } from "react-native-gesture-handler";
+import { router } from "expo-router";
 
 type MealType = "lunch" | "dinner";
 
@@ -110,11 +111,11 @@ export default function WeekView({
                 </View>
 
                 <View style={styles.mealSlot}>
-                    {lunch ? <MealCard title={lunch.title} image_url={lunch.image_url}/> : null}
+                    {lunch ? <MealCard title={lunch.title} image_url={lunch.image_url} onPress={() => router.push({pathname: "/recipe/[id]", params: { id: lunch.recipe_id }})}/> : null}
                 </View>
 
                 <View style={styles.mealSlot}>
-                    {dinner ? <MealCard title={dinner.title} image_url={dinner.image_url}/> : null}
+                    {dinner ? <MealCard title={dinner.title} image_url={dinner.image_url} onPress={() => router.push({pathname: "/recipe/[id]", params: { id: dinner.recipe_id }})}/> : null}
                 </View>
 
                 <View style={styles.plusColumn}>
@@ -238,15 +239,17 @@ const createStyles = (theme: any) =>
         mealSlot: {
             flex: 1,
             minHeight: 80,
+
             backgroundColor: theme.slot.background,
             borderColor: theme.slot.border_op,
             borderWidth: 1,
             borderStyle: "dashed",
             borderRadius: 12,
+
             marginHorizontal: 4,
             justifyContent: "center",
+
             overflow: "visible",
-            position: "relative",
         },
 
         plusColumn: {

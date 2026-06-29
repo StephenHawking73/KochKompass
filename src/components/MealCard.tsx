@@ -1,12 +1,9 @@
 import { useTheme } from "@/hooks/useTheme";
-import { ReactNode } from "react";
 import { StyleSheet, View, Text, Pressable, Image } from "react-native";
 
 type MealCardProps = {
     title: string;
     image_url?: string;
-    subtitle?: string;
-    rightSlot?: ReactNode;
     onPress?: () => void;
     loading?: boolean;
 };
@@ -50,31 +47,21 @@ const createStyles = (theme: any) =>
 
         card: {
             position: "absolute",
-
-            top: -4,
-            bottom: -4,
-            left: -4,
-            right: -4,
+            top: -2,
+            bottom: -2,
+            right: -2,
+            left: -2,
 
             flex: 1,
 
             backgroundColor: theme.card.background,
-            borderRadius: 16,
+            borderRadius: 12,
 
             paddingHorizontal: 12,
             paddingVertical: 10,
 
             borderWidth: 1,
-            borderColor: "rgba(255,255,255,0.06)",
-
-            shadowColor: "#000",
-            shadowOpacity: 0.08,
-            shadowRadius: 10,
-            shadowOffset: { width: 0, height: 4 },
-
-            elevation: 2,
-
-            justifyContent: "center",
+            borderColor: theme.button.border,
         },
 
         content: {
@@ -82,6 +69,8 @@ const createStyles = (theme: any) =>
             alignItems: "center",
             flex: 1,
             gap: 10,
+
+            overflow: "visible",
         },
 
         image: {
