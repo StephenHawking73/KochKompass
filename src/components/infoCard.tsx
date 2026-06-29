@@ -15,7 +15,7 @@ export default function InfoCard({
     const styles = createStyles(theme);
 
     return (
-        <View style={styles.backgroundCard}>
+        <View style={styles.card}>
             {icon && (
                 <View>
                     {icon}
@@ -28,7 +28,7 @@ export default function InfoCard({
 };
 
 const createStyles = (theme: any) => StyleSheet.create({
-    backgroundCard: {
+    card: {
         backgroundColor: theme.card.background,
         flexDirection: "row",
         alignItems: "center",

@@ -1,12 +1,13 @@
 import { View, Text, ScrollView, Image, StyleSheet, Pressable } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useTheme } from "@/hooks/useTheme";
 import { icons } from "@/assets/icons";
 import { useFavorites } from "@/hooks/useFavorites";
 import { LoadingScreen } from "@/components/loadingScreen";
 import InfoCard from "@/components/infoCard";
+import { WebView } from "react-native-webview"
 
 export default function RecipeDetail() {
   const { id } = useLocalSearchParams();
@@ -91,6 +92,26 @@ export default function RecipeDetail() {
                 {duration && <InfoCard title={duration + " min"} icon={icons.time(({color: theme.accent.primary}))}/>}
                 {difficulty && <InfoCard title={difficulty} icon={icons.hat(({color: theme.accent.primary}))}/>}
             </ScrollView>
+
+            {recipe.link && (
+              <View>
+                <Text style={styles.linkHeader}>Rezeptlink</Text>
+                <Pressable
+                  style={styles.linkBox}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/recipe-webview",
+                      params: { url: recipe.link },
+                    })
+                  }
+                >
+                  {icons.link({ color: theme.text.link })}
+                  <Text style={{ color: theme.text.link }}>
+                    Rezept öffnen
+                  </Text>
+                </Pressable>
+              </View>
+            )}
         </ScrollView>
     </View>
   );
@@ -157,5 +178,39 @@ const createStyles = (theme: any) =>
       alignItems: "center",
       
       marginTop: 15,
-    }
+    },
+
+    linkHeader: {
+      fontSize: 18,
+      fontWeight: "600",
+      color: theme.text.primary,
+      
+      marginTop: 20,
+    },
+
+    linkBox: {
+        marginTop: 20,
+
+        backgroundColor: theme.card.background,
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8,
+
+        padding: 14,
+        height: 50,
+        width: "100%",
+
+        alignSelf: "flex-start",
+
+        borderRadius: 13,
+
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowRadius: 4,
+        shadowOpacity: 0.08,
+        elevation: 3,
+    },
   });

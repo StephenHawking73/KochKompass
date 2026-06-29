@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase";
 
 export async function getRecipes() {
-    let query = supabase.from("recipes").select("id, title, image_url, description, attribute, duration, difficulty, created_at, meal_plan(planned_date), recipe_ratings_summary(avg_rating, rating_count)");
+    let query = supabase.from("recipes").select("id, title, image_url, description, attribute, duration, difficulty, created_at, link, meal_plan(planned_date), recipe_ratings_summary(avg_rating, rating_count)");
 
     const { data, error } = await query.order(
         "title",
@@ -27,5 +27,6 @@ export async function getRecipes() {
         attribute: recipe.attribute,
         duration: recipe.duration,
         difficulty: recipe.difficulty,
+        link: recipe.link,
     }));
 }

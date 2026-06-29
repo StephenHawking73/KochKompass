@@ -6,7 +6,7 @@ export const Colors = {
             primary: "#2b3047",
             op: "#6b7280",
             colored: "#4caf50",
-            link: "#5b6cff",
+            link: "#3C49C2",
         },
 
         notification: "#ff4d4d",

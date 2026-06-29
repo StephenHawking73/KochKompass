@@ -16,6 +16,7 @@ export type Recipe = {
     attribute: "vegan" | "vegetarian" | "meat";
     duration: number;
     difficulty: "Einfach" | "Mittel" | "Schwer";
+    link: string;
     rating: number;
     rating_count: number;
     last_cooked_at: string;
