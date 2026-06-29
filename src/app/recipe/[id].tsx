@@ -12,10 +12,10 @@ export default function RecipeDetail() {
   const theme = useTheme();
   const styles = createStyles(theme);
 
-  const { favorites, loading, toggle } = useFavorites();
+  const { favorites, toggle } = useFavorites();
 
   const recipeId = Array.isArray(id) ? id[0] : id;
-  const isFavorite = favorites.has(recipeId);
+  const isFavorite = recipeId != null && favorites.has(recipeId);
 
   const [recipe, setRecipe] = useState<any>(null);
 
@@ -42,7 +42,12 @@ export default function RecipeDetail() {
                 {icons.back({ color: theme.text.primary })}
             </Pressable>
 
-            <Pressable style={styles.iconButton} onPress={() => toggle(recipeId)}>
+            <Pressable 
+              style={styles.iconButton} 
+              onPress={() => {
+                if (recipeId) toggle(recipeId)
+              }
+            }>
                 {isFavorite 
                     ? icons.heart_filled({color: theme.accent.primary})
                     : icons.heart({color: theme.text.primary})
