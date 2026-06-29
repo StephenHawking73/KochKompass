@@ -1,48 +1,47 @@
-import { useCallback, useEffect, useState } from "react";
-import {
-  getFavorites,
-  toggleFavorite,
-} from "@/services/favoritesService";
+import { useEffect } from "react";
+import { getFavorites, toggleFavorite } from "@/services/favoritesService";
+import { useFavoritesStore } from "@/store/favoritesStore";
 
 export function useFavorites() {
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState(true);
+  const favorites = useFavoritesStore(
+    (s) => s.favorites
+  );
 
-  const loadFavorites = useCallback(async () => {
-    try {
-      const data = await getFavorites();
+  const setFavorites = useFavoritesStore(
+    (s) => s.setFavorites
+  );
 
-      setFavorites(new Set(data));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const addFavorite = useFavoritesStore(
+    (s) => s.addFavorite
+  );
+
+  const removeFavorite = useFavoritesStore(
+    (s) => s.removeFavorite
+  );
 
   useEffect(() => {
-    loadFavorites();
-  }, [loadFavorites]);
+    load();
+  }, []);
 
-  async function toggle(mealId: string) {
-    const isFavorite = favorites.has(mealId);
+  async function load() {
+    const data = await getFavorites();
+    setFavorites(data);
+  }
 
-    await toggleFavorite(mealId, isFavorite);
+  async function toggle(id: string) {
+    const isFavorite = favorites.has(id);
 
-    setFavorites((prev) => {
-      const next = new Set(prev);
+    await toggleFavorite(id, isFavorite);
 
-      if (isFavorite) {
-        next.delete(mealId);
-      } else {
-        next.add(mealId);
-      }
-
-      return next;
-    });
+    if (isFavorite) {
+      removeFavorite(id);
+    } else {
+      addFavorite(id);
+    }
   }
 
   return {
     favorites,
-    loading,
     toggle,
   };
 }

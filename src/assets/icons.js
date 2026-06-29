@@ -20,5 +20,5 @@ export const icons = {
     star: (props) => <AntDesign name="star" size={14} {...props}/>,
 
     down: (props) => <FontAwesome6 name="chevron-down" size={14} {...props}/>,
-    back: (props) => <FontAwesome6 name="chevron-left" size={18} {...props}/>
+    back: (props) => <FontAwesome6 name="chevron-left" size={19} {...props}/>
 }
