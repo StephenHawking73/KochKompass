@@ -21,6 +21,7 @@ export type Recipe = {
     rating_count: number;
     last_cooked_at: string;
     created_at: string;
+    distribution: JSON;
 }
 
 export type WeekPlan = {

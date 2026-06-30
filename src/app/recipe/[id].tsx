@@ -7,7 +7,8 @@ import { icons } from "@/assets/icons";
 import { useFavorites } from "@/hooks/useFavorites";
 import { LoadingScreen } from "@/components/loadingScreen";
 import InfoCard from "@/components/infoCard";
-import { WebView } from "react-native-webview"
+import { getRecipeRatings } from "@/services/ratingService";
+import { RatingBars } from "@/components/RatingBars";
 
 export default function RecipeDetail() {
   const { id } = useLocalSearchParams();
@@ -20,6 +21,7 @@ export default function RecipeDetail() {
   const isFavorite = recipeId != null && favorites.has(recipeId);
 
   const [recipe, setRecipe] = useState<any>(null);
+  const [ratings, setRatings] = useState<any>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -28,12 +30,25 @@ export default function RecipeDetail() {
         .select("*")
         .eq("id", recipeId)
         .single();
-
+      
       setRecipe(recipeData);
+
+      const ratings = await getRecipeRatings(recipeId);
+      setRatings(ratings);
     };
 
     load();
-  }, [id]);
+  }, [recipeId]);
+
+  const [expanded, setExpanded] = useState(false);
+  const [hasMoreText, setHasMoreText] = useState(false);
+  const [measured, setMeasured] = useState(false);  
+
+  useEffect(() => {
+    setExpanded(false);
+    setHasMoreText(false);
+    setMeasured(false);
+  }, [recipe?.description]);
 
   if (!recipe) return <LoadingScreen />;
 
@@ -81,21 +96,30 @@ export default function RecipeDetail() {
         />
 
         {/* CONTENT */}
-        <ScrollView style={styles.contentCard} showsVerticalScrollIndicator={false}>
+        <ScrollView style={styles.contentCard} showsVerticalScrollIndicator={false} contentContainerStyle={{paddingBottom: 50}}>
             <Text style={styles.title}>
               {recipe.title}
             </Text>
 
             {/* Infos */}
-            <ScrollView horizontal showsVerticalScrollIndicator={false} contentContainerStyle={{paddingVertical: 10, gap: 12, alignItems: "flex-start", marginTop: 10,}} style={{overflow: "visible"}}>
-                {attribute && <InfoCard title={attribute_title} icon={attribue_icon}/>}
-                {duration && <InfoCard title={duration + " min"} icon={icons.time(({color: theme.accent.primary}))}/>}
-                {difficulty && <InfoCard title={difficulty} icon={icons.hat(({color: theme.accent.primary}))}/>}
-            </ScrollView>
+            { (recipe.attribute || recipe.duration || recipe.difficulty) && (
+              <ScrollView horizontal showsVerticalScrollIndicator={false} contentContainerStyle={{paddingVertical: 10, gap: 12, alignItems: "flex-start", marginTop: 10,}} style={{overflow: "visible"}}>
+                  {attribute && <InfoCard title={attribute_title} icon={attribue_icon}/>}
+                  {difficulty && <InfoCard title={difficulty} icon={icons.hat(({color: theme.accent.primary}))}/>}
+                  {duration && <InfoCard title={duration + " min"} icon={icons.time(({color: theme.accent.primary}))}/>}
+              </ScrollView>
+            )}
 
-            {recipe.link && (
+            {/* Rating */}
+            <View>
+              <Text style={[styles.heading, {marginTop: 20}]}>Bewertung</Text>
+
+            </View>
+          
+            {/* Link */}
+            { recipe.link && (
               <View>
-                <Text style={styles.linkHeader}>Rezeptlink</Text>
+                <Text style={styles.heading}>Rezeptlink</Text>
                 <Pressable
                   style={styles.linkBox}
                   onPress={() =>
@@ -106,10 +130,47 @@ export default function RecipeDetail() {
                   }
                 >
                   {icons.link({ color: theme.text.link })}
-                  <Text style={{ color: theme.text.link }}>
-                    Rezept öffnen
+                  <Text style={{ color: theme.text.link }} numberOfLines={1}>
+                    {recipe.link}
                   </Text>
+                  {icons.right({ color: theme.text.op, size: 15, })}
                 </Pressable>
+              </View>
+            )}
+
+            {/* Description */}
+            { recipe.description && (
+              <View>
+                <Text style={styles.heading}>Beschreibung</Text>
+                <Text
+                  style={styles.description}
+                  numberOfLines={measured && !expanded ? 3 : undefined}
+                  onTextLayout={(e) => {
+                    if (!measured) {
+                      setHasMoreText(e.nativeEvent.lines.length > 3);
+                      setMeasured(true);
+                    }
+                  }}
+                >
+                  {recipe.description}
+                </Text>
+
+                {hasMoreText && (
+                  <Pressable
+                    style={{
+                      flexDirection: "row",
+                      gap: 4,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      marginTop: 7,
+                    }}
+                    onPress={() => setExpanded((v) => !v)}
+                  >
+                    <Text style={styles.more}>
+                      {expanded ? "Weniger anzeigen" : "Mehr anzeigen"}
+                    </Text>
+                  </Pressable>
+                )}
               </View>
             )}
         </ScrollView>
@@ -180,16 +241,16 @@ const createStyles = (theme: any) =>
       marginTop: 15,
     },
 
-    linkHeader: {
+    heading: {
       fontSize: 18,
       fontWeight: "600",
       color: theme.text.primary,
       
-      marginTop: 20,
+      marginTop: 40,
     },
 
     linkBox: {
-        marginTop: 20,
+        marginTop: 15,
 
         backgroundColor: theme.card.background,
         flexDirection: "row",
@@ -212,5 +273,17 @@ const createStyles = (theme: any) =>
         shadowRadius: 4,
         shadowOpacity: 0.08,
         elevation: 3,
+    },
+
+    description: {
+      marginTop: 10,
+
+      fontSize: 14,
+      fontWeight: "500",
+      color: theme.text.op,
+    },
+
+    more: {
+      color: theme.accent.primary,
     },
   });

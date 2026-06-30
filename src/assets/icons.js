@@ -20,7 +20,10 @@ export const icons = {
     time: (props) => <MaterialIcons name="access-time" size={16} {...props}/>,
     hat: (props) => <MaterialCommunityIcons name="chef-hat" size={16} {...props}/>,
 
-    star: (props) => <AntDesign name="star" size={14} {...props}/>,
+    star: (props) => <FontAwesome name="star" size={14} {...props}/>,
+    star_half: (props) => <FontAwesome name="star-half" size={14} {...props}/>,
+    star_o: (props) => <FontAwesome name="star-o" size={14} {...props}/>,
+
 
     down: (props) => <FontAwesome6 name="chevron-down" size={14} {...props}/>,
     back: (props) => <FontAwesome6 name="chevron-left" size={19} {...props}/>,
@@ -29,5 +32,5 @@ export const icons = {
 
     more: (props) => <AntDesign name="more" size={19} {...props}/>,
 
-    link: (props) => <Entypo name="link" size={20} {...props}/>
+    link: (props) => <Entypo name="link" size={20} {...props}/>,
 }

@@ -17,9 +17,22 @@ export async function getRecipeRatings(recipeId: string) {
     return null;
   }
 
+  const distribution = {
+    5: 0,
+    4: 0,
+    3: 0,
+    2: 0,
+    1: 0,
+  };
+
+  ratings.forEach((r) => {
+    distribution[r.rating as keyof typeof distribution]++;
+  })
+
   return {
     ratings,
     avgRating: summary?.avg_rating ?? 0,
     count: summary?.rating_count ?? 0,
+    distribution,
   };
 }
