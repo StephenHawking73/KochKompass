@@ -21,7 +21,7 @@ export default function RecipeDetail() {
   const isFavorite = recipeId != null && favorites.has(recipeId);
 
   const [recipe, setRecipe] = useState<any>(null);
-  const [ratings, setRatings] = useState<any>(null);
+  const [rating, setRatings] = useState<any>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -33,8 +33,8 @@ export default function RecipeDetail() {
       
       setRecipe(recipeData);
 
-      const ratings = await getRecipeRatings(recipeId);
-      setRatings(ratings);
+      const rating = await getRecipeRatings(recipeId) || null;
+      setRatings(rating);
     };
 
     load();
@@ -58,6 +58,14 @@ export default function RecipeDetail() {
 
   const duration = recipe.duration;
   const difficulty = recipe.difficulty;
+
+  const emptyDistribution = {
+    5: 0,
+    4: 0,
+    3: 0,
+    2: 0,
+    1: 0,
+  };
 
   return (
     <View style={styles.container}>
@@ -113,7 +121,18 @@ export default function RecipeDetail() {
             {/* Rating */}
             <View>
               <Text style={[styles.heading, {marginTop: 20}]}>Bewertung</Text>
+              <View style={{justifyContent: "space-between", flexDirection: "row", marginTop: 20}}>
+                {/* ... BARS .... */}
+                <RatingBars distribution={rating?.distribution ?? emptyDistribution} count={rating?.count ?? 0}/>
 
+                <View style={styles.avgRatingContainer}>
+                  <View style={{flexDirection: "row", alignItems: "center", gap: 10, justifyContent: "center"}}>
+                    <Text style={styles.ratingText}>{rating?.avgRating?.toFixed(1) ?? "-"}</Text>
+                    {icons.star({color: theme.text.colored, size: 30})}
+                  </View>
+                  <Text style={{color: theme.text.primary, marginTop: 10, fontWeight: "500", fontSize: 14,}}>Ø Bewertung</Text>
+                </View>
+              </View>
             </View>
           
             {/* Link */}
@@ -286,4 +305,22 @@ const createStyles = (theme: any) =>
     more: {
       color: theme.accent.primary,
     },
+
+    avgRatingContainer: {
+      backgroundColor: theme.ratingContainer.background,
+
+      height: 125,
+      width: 120,
+      borderRadius: 20,
+
+      justifyContent: "center",
+      alignItems: "center",
+    },
+
+    ratingText: {
+      fontSize: 22,
+      fontWeight: "600",
+
+      color: theme.text.primary,
+    }
   });

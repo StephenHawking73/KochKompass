@@ -10,7 +10,7 @@ export async function getRecipeRatings(recipeId: string) {
     .from("recipe_ratings_summary")
     .select("*")
     .eq("recipe_id", recipeId)
-    .single();
+    .maybeSingle();
 
   if (rErr || sErr) {
     console.error(rErr || sErr);

@@ -49,6 +49,10 @@ export const Colors = {
         icons: {
             sun: "#fcb635",
             moon: "#6667bb",
+        },
+
+        ratingContainer: {
+            background: "#e6e8ef",
         }
     },
 
