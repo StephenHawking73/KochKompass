@@ -103,7 +103,7 @@ export default function HomeScreen() {
                         exiting={FadeOut.duration(160)}
                     >
                         {viewMode === "week" ? (
-                            <WeekView meals={meals} loading={loadingMeals} weekStart={weekStart} refreshing={refreshing} onRefresh={onRefresh}/>
+                            <WeekView meals={meals} weekStart={weekStart} refreshing={refreshing} onRefresh={onRefresh} />
                         ) : (
                             <MonthView referenceDate={rangeStart} meals={meals} refreshing={refreshing} onRefresh={onRefresh} onSelectDay={(date) => {
                                 setWeekByDate(date);

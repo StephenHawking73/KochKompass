@@ -1,269 +1,78 @@
-import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
-import MealCard from "@/components/MealCard";
+import { View } from "react-native";
+import WeekViewContainer from "@/components/screens/WeekViewContainer";
+import WeekViewHeader from "@/components/screens/WeekViewHeader";
+import WeekViewDay from "@/components/screens/WeekViewDay";
+import { useWeekData } from "@/hooks/useWeekData";
+import { useMealSelection } from "@/hooks/useMealSelection";
 import { Meal } from "@/types/types";
-import { useTheme } from "@/hooks/useTheme";
-import { icons } from "@/assets/icons";
-import { useMemo } from "react";
-import { RefreshControl } from "react-native-gesture-handler";
-import { router } from "expo-router";
 
-type MealType = "lunch" | "dinner";
-
-export default function WeekView({
-    meals = [],
-    weekStart,
-    refreshing,
-    onRefresh,
-}: any) {
-
-    const theme = useTheme();
-    const styles = createStyles(theme);
-
-    // -----------------------------
-    // Woche erzeugen
-    // -----------------------------
-    const getWeekDays = (startDate: Date) => {
-        const labels = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
-
-        return Array.from({ length: 7 }).map((_, i) => {
-            const d = new Date(startDate);
-            d.setDate(d.getDate() + i);
-
-            return {
-                date: d,
-                label: labels[i],
-            };
-        });
-    };
-
-    const formatDate = (date: Date) => {
-        return (
-            date.getFullYear() +
-            "-" +
-            String(date.getMonth() + 1).padStart(2, "0") +
-            "-" +
-            String(date.getDate()).padStart(2, "0")
-        );
-    };
-
-    const todayKey = useMemo(() => {
-        const now = new Date();
-        return formatDate(now);
-    }, []);
-
-    const weekDays = getWeekDays(weekStart);
-
-    // -----------------------------
-    // Slots: date -> type -> list (stacked slots)
-    // -----------------------------
-    const slots = useMemo(() => {
-        const map = new Map<string, Map<MealType, Meal[]>>();
-
-        for (const meal of meals ?? []) {
-            const dateKey = meal.planned_date;
-            const type = meal.meal_type as MealType;
-
-            if (!map.has(dateKey)) {
-                map.set(dateKey, new Map());
-            }
-
-            const dayMap = map.get(dateKey)!;
-
-            if (!dayMap.has(type)) {
-                dayMap.set(type, []);
-            }
-
-            dayMap.get(type)!.push(meal);
-        }
-
-        // Sortierung innerhalb eines Slots nach position
-        map.forEach((typeMap) => {
-            typeMap.forEach((list) => {
-                list.sort((a, b) => a.meal_position - b.meal_position);
-            });
-        });
-
-        return map;
-    }, [meals]);
-
-    // -----------------------------
-    // Slot Renderer
-    // -----------------------------
-    const renderSlotRow = (
-        dateKey: string,
-        index: number,
-        lunchSlots: Meal[],
-        dinnerSlots: Meal[],
-        label: string,
-        isToday: boolean,
-    ) => {
-        const lunch = lunchSlots[index];
-        const dinner = dinnerSlots[index];
-
-        return (
-            <View key={`${dateKey}-${index}`} style={styles.row}>
-                <View style={styles.dayColumn}>
-                    {index === 0 && (
-                        <Text style={[styles.day, isToday && styles.todayText]}>
-                            {label}
-                        </Text>
-                    )}
-                </View>
-
-                <View style={styles.mealSlot}>
-                    {lunch ? <MealCard title={lunch.title} image_url={lunch.image_url} onPress={() => router.push({pathname: "/recipe/[id]", params: { id: lunch.recipe_id }})}/> : null}
-                </View>
-
-                <View style={styles.mealSlot}>
-                    {dinner ? <MealCard title={dinner.title} image_url={dinner.image_url} onPress={() => router.push({pathname: "/recipe/[id]", params: { id: dinner.recipe_id }})}/> : null}
-                </View>
-
-                <View style={styles.plusColumn}>
-                    {index === 0 && (
-                        <Text style={styles.plus}>+</Text>
-                    )}
-                </View>
-            </View>
-        );
-    };
-
-    // -----------------------------
-    // Render
-    // -----------------------------
-    return (
-        <ScrollView
-            style={styles.container}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: Platform.OS === "android" ? 120 : 80 }}
-            refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
-            }
-        >
-            {/* Header */}
-            <View style={styles.header}>
-                <View style={styles.dayColumn} />
-
-                <View style={styles.headerCenter}>
-                    {icons.sun({ color: theme.icons.sun })}
-                    <Text style={styles.headerText}>Mittagessen</Text>
-                </View>
-
-                <View style={styles.headerCenter}>
-                    {icons.moon({ color: theme.icons.moon })}
-                    <Text style={styles.headerText}>Abendessen</Text>
-                </View>
-
-                <View style={styles.plusColumn} />
-            </View>
-
-            {/* Week */}
-            {weekDays.map(({ date, label }) => {
-                const dateKey = formatDate(date);
-
-                const isToday = dateKey === todayKey;
-
-                const lunchSlots =
-                    slots.get(dateKey)?.get("lunch") ?? [];
-
-                const dinnerSlots =
-                    slots.get(dateKey)?.get("dinner") ?? [];
-
-                const maxRows = Math.max(
-                    lunchSlots.length,
-                    dinnerSlots.length,
-                    1
-                );
-
-                return (
-                    <View key={dateKey}>
-                        {Array.from({ length: maxRows }).map((_, i) =>
-                            renderSlotRow(
-                                dateKey,
-                                i,
-                                lunchSlots,
-                                dinnerSlots,
-                                label,
-                                isToday,
-                            )
-                        )}
-                    </View>
-                );
-            })}
-        </ScrollView>
-    );
+interface WeekViewProps {
+  meals?: Meal[];
+  weekStart: Date;
+  refreshing: boolean;
+  onRefresh: () => void;
 }
 
-const createStyles = (theme: any) =>
-    StyleSheet.create({
-        container: {
-            paddingHorizontal: 6,
-        },
+export default function WeekView({
+  meals = [],
+  weekStart,
+  refreshing,
+  onRefresh,
+}: WeekViewProps) {
+  // Logik-Hooks
+  const { todayKey, weekDays, getMealsForDay, getMaxRowsForDay, formatDate } =
+    useWeekData(meals, weekStart);
 
-        header: {
-            flexDirection: "row",
-            alignItems: "center",
-            marginBottom: 12,
-            marginTop: 30,
-        },
+  const {
+    selectedMealId,
+    isMoveMode,
+    selectMealForMove,
+    toggleMealSelection,
+  } = useMealSelection();
 
-        headerCenter: {
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: 10,
-        },
+  const handleMealLongPress = (mealId: string) => {
+    selectMealForMove(mealId);
+  };
 
-        headerText: {
-            fontWeight: "600",
-            color: theme.text.primary,
-        },
+  const handleMealPress = (mealId: string) => {
+    toggleMealSelection(mealId);
+  };
 
-        row: {
-            flexDirection: "row",
-            alignItems: "center",
-            marginBottom: 10,
-        },
+  return (
+    <WeekViewContainer refreshing={refreshing} onRefresh={onRefresh}>
+      <WeekViewHeader />
 
-        dayColumn: {
-            width: 40,
-            justifyContent: "flex-start",
-        },
+      {/* Rendere die ganze Woche */}
+      {weekDays.map(({ date, label }) => {
+        const dateKey = formatDate(date);
+        const isToday = dateKey === todayKey;
+        const maxRows = getMaxRowsForDay(dateKey);
 
-        day: {
-            fontSize: 18,
-            fontWeight: "600",
-            color: theme.text.primary,
-        },
+        return (
+          <View key={dateKey}>
+            {Array.from({ length: maxRows }).map((_, i) => {
+              const lunchMeal = getMealsForDay(dateKey, "lunch")[i];
+              const dinnerMeal = getMealsForDay(dateKey, "dinner")[i];
 
-        mealSlot: {
-            flex: 1,
-            minHeight: 80,
-
-            backgroundColor: theme.slot.background,
-            borderColor: theme.slot.border_op,
-            borderWidth: 1,
-            borderStyle: "dashed",
-            borderRadius: 12,
-
-            marginHorizontal: 4,
-            justifyContent: "center",
-
-            overflow: "visible",
-        },
-
-        plusColumn: {
-            width: 20,
-            alignItems: "center",
-        },
-
-        plus: {
-            fontSize: 24,
-            color: theme.accent.primary,
-        },
-
-        todayText: {
-            color: theme.text.colored,
-            fontWeight: "700",
-        },
-    });
+              return (
+                <WeekViewDay
+                  key={`${dateKey}-${i}`}
+                  dateKey={dateKey}
+                  label={label}
+                  isToday={isToday}
+                  slotIndex={i}
+                  lunchMeal={lunchMeal}
+                  dinnerMeal={dinnerMeal}
+                  selectedMealId={selectedMealId}
+                  isMoveMode={isMoveMode}
+                  onMealLongPress={handleMealLongPress}
+                  onMealPress={handleMealPress}
+                />
+              );
+            })}
+          </View>
+        );
+      })}
+    </WeekViewContainer>
+  );
+}
