@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { View } from "react-native";
 import WeekViewContainer from "@/components/screens/WeekViewContainer";
 import WeekViewHeader from "@/components/screens/WeekViewHeader";
@@ -5,6 +6,7 @@ import WeekViewDay from "@/components/screens/WeekViewDay";
 import { useWeekData } from "@/hooks/useWeekData";
 import { useMealSelection } from "@/hooks/useMealSelection";
 import { Meal } from "@/types/types";
+import { moveMeal } from "./moveMeal";
 
 interface WeekViewProps {
   meals?: Meal[];
@@ -29,6 +31,7 @@ export default function WeekView({
     selectMealForMove,
     toggleMealSelection,
   } = useMealSelection();
+  const [activeTargetKey, setActiveTargetKey] = useState<string | null>(null);
 
   const handleMealLongPress = (mealId: string) => {
     selectMealForMove(mealId);
@@ -36,6 +39,40 @@ export default function WeekView({
 
   const handleMealPress = (mealId: string) => {
     toggleMealSelection(mealId);
+  };
+
+  const handleTargetPress = async (
+      date: string,
+      mealType: Meal["meal_type"],
+      position: number
+  ) => {
+      if (!selectedMealId)
+          return;
+
+      const targetKey = `${date}-${mealType}-${position}`;
+      setActiveTargetKey(targetKey);
+
+      try {
+        const result = await moveMeal(
+            selectedMealId,
+            date,
+            mealType,
+            position
+        );
+
+        console.log("move target result", result);
+
+        if (result?.error) {
+          throw result.error;
+        }
+
+        toggleMealSelection(selectedMealId);
+        onRefresh();
+      } catch (error) {
+        console.error("move target failed", error);
+      } finally {
+        window.setTimeout(() => setActiveTargetKey(null), 260);
+      }
   };
 
   return (
@@ -65,8 +102,10 @@ export default function WeekView({
                   dinnerMeal={dinnerMeal}
                   selectedMealId={selectedMealId}
                   isMoveMode={isMoveMode}
+                  activeTargetKey={activeTargetKey}
                   onMealLongPress={handleMealLongPress}
                   onMealPress={handleMealPress}
+                  onTargetPress={handleTargetPress}
                 />
               );
             })}

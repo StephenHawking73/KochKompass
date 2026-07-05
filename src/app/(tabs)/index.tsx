@@ -40,11 +40,11 @@ export default function HomeScreen() {
 
     const { meals, loading: loadingMeals, refresh } = useMeals(rangeStart, rangeEnd);
 
-    const onRefresh = () => {
+    const onRefresh = async () => {
         setRefreshing(true);
 
         try {
-            refresh();
+            await refresh();
         } finally {
             setRefreshing(false);
         }

@@ -24,6 +24,7 @@ export async function getMeals(weekStart?: Date | null, weekEnd?: Date | null) {
         planned_date: meal.planned_date,
         title: meal.recipes?.title ?? "->Unknown<-",
         meal_type: meal.meal_type,
+        meal_position: meal.position,
         position: meal.position,
         image_url: meal.recipes?.image_url,
         description: meal.recipes?.description,

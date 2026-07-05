@@ -12,8 +12,10 @@ interface WeekViewDayProps {
   dinnerMeal?: Meal;
   selectedMealId: string | null;
   isMoveMode: boolean;
+  activeTargetKey?: string | null;
   onMealLongPress: (mealId: string) => void;
   onMealPress: (mealId: string) => void;
+  onTargetPress?: (dateKey: string, mealType: "lunch" | "dinner", mealPosition: number) => void;
 }
 
 export default function WeekViewDay({
@@ -25,8 +27,10 @@ export default function WeekViewDay({
   dinnerMeal,
   selectedMealId,
   isMoveMode,
+  activeTargetKey,
   onMealLongPress,
   onMealPress,
+  onTargetPress,
 }: WeekViewDayProps) {
   const theme = useTheme();
   const styles = createStyles(theme);
@@ -43,18 +47,28 @@ export default function WeekViewDay({
 
       <MealSlot
         meal={lunchMeal}
+        dateKey={dateKey}
+        mealType="lunch"
+        mealPosition={slotIndex}
         isSelected={selectedMealId === lunchMeal?.id}
         isMoveMode={isMoveMode}
+        isMoveTarget={activeTargetKey === `${dateKey}-lunch-${slotIndex}`}
         onLongPress={onMealLongPress}
         onPress={onMealPress}
+        onTargetPress={onTargetPress}
       />
 
       <MealSlot
         meal={dinnerMeal}
+        dateKey={dateKey}
+        mealType="dinner"
+        mealPosition={slotIndex}
         isSelected={selectedMealId === dinnerMeal?.id}
         isMoveMode={isMoveMode}
+        isMoveTarget={activeTargetKey === `${dateKey}-dinner-${slotIndex}`}
         onLongPress={onMealLongPress}
         onPress={onMealPress}
+        onTargetPress={onTargetPress}
       />
 
       <View style={styles.plusColumn}>

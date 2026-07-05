@@ -5,6 +5,7 @@ export type Meal = {
     recipe_id: string;
     meal_type: "lunch" | "dinner";
     meal_position: number;
+    position?: number;
     image_url?: string;
 };
 

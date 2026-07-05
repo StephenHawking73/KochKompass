@@ -7,7 +7,7 @@ export function useMeals(weekStart?: Date | null, weekEnd?: Date | null) {
     const [loading, setLoading] = useState(false);
     const [refreshIndex, setRefreshIndex] = useState(0);
 
-    const refresh = useCallback(() => {
+    const refresh = useCallback(async () => {
         setRefreshIndex((v) => v + 1);
     }, []);
 
