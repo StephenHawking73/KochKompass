@@ -1,6 +1,10 @@
 import { supabase } from "@/lib/supabase";
 
 export async function getRecipeRatings(recipeId: string) {
+  const { 
+    data: {user},
+  } = await supabase.auth.getUser();
+
   const { data: ratings, error: rErr } = await supabase
     .from("ratings")
     .select("rating, user_id, profiles(username)")
@@ -29,10 +33,15 @@ export async function getRecipeRatings(recipeId: string) {
     distribution[r.rating as keyof typeof distribution]++;
   })
 
+  const userRating = ratings.find(
+    (r) => r.user_id === user?.id
+  )?.rating ?? null;
+
   return {
     ratings,
     avgRating: summary?.avg_rating ?? 0,
     count: summary?.rating_count ?? 0,
     distribution,
+    userRating,
   };
 }

@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, Image, StyleSheet, Pressable } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useTheme } from "@/hooks/useTheme";
 import { icons } from "@/assets/icons";
@@ -9,6 +9,8 @@ import { LoadingScreen } from "@/components/loadingScreen";
 import InfoCard from "@/components/infoCard";
 import { getRecipeRatings } from "@/services/ratingService";
 import { RatingBars } from "@/components/RatingBars";
+import RatingSheet from "@/components/RatingModal";
+import BasicBottomSheet from "@/components/BasicBottomSheet";
 
 export default function RecipeDetail() {
   const { id } = useLocalSearchParams();
@@ -50,6 +52,16 @@ export default function RecipeDetail() {
     setMeasured(false);
   }, [recipe?.description]);
 
+  const emptyDistribution = {
+    5: 0,
+    4: 0,
+    3: 0,
+    2: 0,
+    1: 0,
+  };
+
+  const [ratingVisible, setRatingVisible] = useState(false);
+
   if (!recipe) return <LoadingScreen />;
 
   const attribute = recipe.attribute;
@@ -58,14 +70,6 @@ export default function RecipeDetail() {
 
   const duration = recipe.duration;
   const difficulty = recipe.difficulty;
-
-  const emptyDistribution = {
-    5: 0,
-    4: 0,
-    3: 0,
-    2: 0,
-    1: 0,
-  };
 
   return (
     <View style={styles.container}>
@@ -120,7 +124,13 @@ export default function RecipeDetail() {
 
             {/* Rating */}
             <View>
-              <Text style={[styles.heading, {marginTop: 20}]}>Bewertung</Text>
+              <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 15}}>
+                <Text style={[styles.heading, {marginTop: 0}]}>Bewertung</Text>
+                <Pressable style={styles.card} onPress={() => setRatingVisible(true)}>
+                    <Text style={styles.rate}>Bewerten</Text>
+                </Pressable>
+              </View>
+            
               <View style={{justifyContent: "space-between", flexDirection: "row", marginTop: 20}}>
                 {/* ... BARS .... */}
                 <RatingBars distribution={rating?.distribution ?? emptyDistribution} count={rating?.count ?? 0}/>
@@ -193,6 +203,22 @@ export default function RecipeDetail() {
               </View>
             )}
         </ScrollView>
+
+        <BasicBottomSheet
+          visible={ratingVisible}
+          onClose={() => setRatingVisible(false)}
+        >
+          <RatingSheet
+            visible={ratingVisible}
+            onClose={() => setRatingVisible(false)}
+            recipeId={recipeId}
+            initialRating={rating?.userRating ?? null}
+            onSaved={async () => {
+              const r = await getRecipeRatings(recipeId);
+              setRatings(r);
+            }}
+          />
+        </BasicBottomSheet>
     </View>
   );
 }
@@ -322,5 +348,35 @@ const createStyles = (theme: any) =>
       fontWeight: "600",
 
       color: theme.text.primary,
-    }
+    },
+
+    rate: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: theme.accent.primary,
+    },
+
+    card: {
+        backgroundColor: theme.card.background,
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8,
+
+        padding: 14,
+        height: 50,
+        width: "auto",
+
+        alignSelf: "flex-start",
+
+        borderRadius: 13,
+
+        shadowColor: theme.accent.primary,
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowRadius: 4,
+        shadowOpacity: 0.08,
+        elevation: 3,
+    },
   });

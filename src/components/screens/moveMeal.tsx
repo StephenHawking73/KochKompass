@@ -33,11 +33,7 @@ export async function moveMeal(
     mealType: Meal["meal_type"],
     mealPosition: number
 ) {
-    console.log("moveMeal request", { mealId, plannedDate, mealType, mealPosition });
-
-    const session = await ensureAuthenticatedSession();
-    console.log("moveMeal session", !!session?.access_token);
-
+    await ensureAuthenticatedSession();
     const result = await supabase
         .from("meal_plan")
         .update({
@@ -47,8 +43,6 @@ export async function moveMeal(
         })
         .eq("id", mealId)
         .select("id");
-
-    console.log("moveMeal result", result);
 
     return result;
 }
