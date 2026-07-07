@@ -57,54 +57,58 @@ export const Colors = {
     },
 
     dark: {
-        background: "#0b0e12",
+        background: "#0F1115",
 
         text: {
-            primary: "#e6e7ea",
-            op: "#8a8f98",
-            colored: "#7bdc5a",
-            link: "#6a74d8",
+            primary: "#F2F2F7",
+            op: "#A1A1AA",
+            colored: "#7ED957",
+            link: "#8B95FF",
         },
 
-        notification: "#ff5a5a",
+        notification: "#FF5B5B",
 
         accent: {
-            primary: "#54993D",
-            op: "#7BDC5A36",
+            primary: "#7ED957",
+            op: "#7ED95726",
         },
 
         slot: {
-            background: "#141A25",
-            border: "#7bdc5a",
-            border_op: "#264421",
+            background: "#171A21",
+            border: "#7ED957",
+            border_op: "#355A2A",
         },
 
         card: {
-            background: "#141922",
+            background: "#171A21",
         },
 
         button: {
-            background: "#141922",
-            border: "#232a36",
+            background: "#171A21",
+            border: "#292E38",
         },
 
         tabBar: {
-            background: "#141922",
-            border: "#232a36",
-            text: "#7c8491",
-            inactive: "#6b7280",
-            activeBg: "#1f2633",
-            shadow: "rgba(0,0,0,0.35)",
+            background: "#15171C",
+            border: "#292E38",
+            text: "#A1A1AA",
+            inactive: "#636872",
+            activeBg: "#202820",
+            shadow: "rgba(0,0,0,0.45)",
         },
-        
+
         searchBar: {
-            background: "#141922",
-            border: "#232a36",
+            background: "#1C1F26",
+            border: "#353A45",
         },
 
         icons: {
-            sun: "#fcb635",
-            moon: "#6667bb",
-        }
+            sun: "#FDBB3A",
+            moon: "#8B8DFF",
+        },
+
+        ratingContainer: {
+            background: "#292E38",
+        },
     }
 }

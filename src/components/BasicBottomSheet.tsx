@@ -49,7 +49,7 @@ export default function BasicBottomSheet({
 
   const translateY = useSharedValue(sheetHeight + 80);
 
-  const styles = createStyles(theme, insets.bottom, currentHeight, sheetHeight, maxSheetHeight);
+  const styles = createStyles(theme, insets.bottom);
 
   useEffect(() => {
     if (visible) {
@@ -178,7 +178,7 @@ export default function BasicBottomSheet({
   );
 }
 
-const createStyles = (theme: any, bottomInset: number, currentHeight: any, sheetHeight: number, maxSheetHeight: number) =>
+const createStyles = (theme: any, bottomInset: number) =>
   StyleSheet.create({
     sheet: {
       position: "absolute",
@@ -189,11 +189,7 @@ const createStyles = (theme: any, bottomInset: number, currentHeight: any, sheet
 
       backgroundColor: theme.card.background,
 
-      borderRadius: interpolate(
-        currentHeight.value,
-        [sheetHeight, maxSheetHeight],
-        [30, 0]
-      ),
+      borderRadius: 30,
       overflow: "hidden",
 
       borderWidth: StyleSheet.hairlineWidth,
