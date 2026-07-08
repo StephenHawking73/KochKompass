@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TextInput, ScrollView, Platform, FlatList } from 'react-native'
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTheme } from '@/hooks/useTheme';
 import { useMeals } from '@/hooks/useMeals';
@@ -10,7 +10,7 @@ import { useRecipes } from '@/hooks/useRecipes';
 import { FilterState, SortOption } from '@/types/recipeFilters';
 import RecipeFilterBar from '@/components/Filter/RecipeFilterBar';
 import SortDropdown from '@/components/SortDropdown';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 
 type Option = {
   label: string;
@@ -30,8 +30,14 @@ export default function RecipiesScreen() {
     { label: "Neu hinzugefügt", value: "new" },
   ];
 
-  const { recipes, loading: loadingRecipes, refresh } = useRecipes();  
+  const { recipes, loading: loadingRecipes, refresh } = useRecipes(); 
   
+  useFocusEffect(
+    useCallback(() => {
+      refresh();
+    }, [refresh])
+  );
+
   const [sortBy, setSortBy] = useState<SortOption>("popular");
   const [filters, setFilters] = useState<FilterState>({
     type: [],
