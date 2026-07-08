@@ -109,7 +109,7 @@ export default function RecipeDetail() {
         />
 
         {/* CONTENT */}
-        <ScrollView style={styles.contentCard} showsVerticalScrollIndicator={false} contentContainerStyle={{paddingBottom: 50}}>
+        <ScrollView style={styles.contentCard} showsVerticalScrollIndicator={false} contentContainerStyle={{paddingBottom: 130}}>
             <Text style={styles.title}>
               {recipe.title}
             </Text>
@@ -329,6 +329,22 @@ export default function RecipeDetail() {
             )}
         </ScrollView>
 
+        <View style={styles.bottomContainer}>
+          <Pressable style={styles.planButton}>
+            {icons.calendar({ color: "white", size: 22 })}
+            <Text style={styles.planText}>
+              Planen
+            </Text>
+          </Pressable>
+
+          <Pressable style={styles.editButton}>
+            {icons.edit({ color: theme.text.primary, size: 22 })}
+            <Text style={styles.editText}>
+              Bearbeiten
+            </Text>
+          </Pressable>
+        </View>
+
         <BasicBottomSheet
           visible={ratingVisible}
           onClose={() => setRatingVisible(false)}
@@ -509,5 +525,83 @@ const createStyles = (theme: any) =>
       fontSize: 14,
       fontWeight: "500",
       color: theme.text.op,
-    }
+    },
+
+    bottomContainer: {
+      position: "absolute",
+
+      bottom: 0,
+      left: 20,
+      right: 20,
+
+      flexDirection: "row",
+      gap: 12,
+
+      height: 100,
+
+      alignItems: "center",
+      justifyContent: "space-between",
+
+      backgroundColor: theme.background,
+    },
+
+    planButton: {
+      flex: 1,
+
+      height: 56,
+
+      borderRadius: 16,
+
+      backgroundColor: theme.accent.primary,
+
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+
+      gap: 10,
+      marginBottom: 20,
+
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 3,
+      },
+      shadowOpacity: 0.15,
+      shadowRadius: 6,
+      elevation: 5,
+    },
+
+    editButton: {
+      flex: 1,
+
+      height: 56,
+
+      borderRadius: 16,
+
+      backgroundColor: theme.card.background,
+
+      borderWidth: 1,
+      borderColor: theme.text.op + "20",
+
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+
+      gap: 10,
+      marginBottom: 20,
+    },
+
+    planText: {
+      color: "white",
+
+      fontSize: 16,
+      fontWeight: "600",
+    },
+
+    editText: {
+      color: theme.text.primary,
+
+      fontSize: 16,
+      fontWeight: "600",
+    },
   });

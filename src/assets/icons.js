@@ -1,4 +1,4 @@
-import { AntDesign, FontAwesome6, Feather, Ionicons, MaterialCommunityIcons, FontAwesome, MaterialIcons, Entypo } from "@expo/vector-icons"
+import { AntDesign, FontAwesome6, Feather, Ionicons, MaterialCommunityIcons, FontAwesome, MaterialIcons, Entypo, Octicons } from "@expo/vector-icons"
 
 export const icons = {
     index: (props) => <AntDesign name="home" size={20} {...props} />,
@@ -34,4 +34,7 @@ export const icons = {
     more: (props) => <AntDesign name="more" size={19} {...props}/>,
 
     link: (props) => <Entypo name="link" size={20} {...props}/>,
+
+    calendar: (props) => <Feather name="calendar" size={24} {...props}/>,
+    edit: (props) => <Octicons name="pencil" size={24} {...props} />
 }

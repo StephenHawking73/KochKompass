@@ -189,7 +189,8 @@ const createStyles = (theme: any, bottomInset: number) =>
 
       backgroundColor: theme.card.background,
 
-      borderRadius: 30,
+      borderTopRightRadius: 30,
+      borderTopLeftRadius: 30,
       overflow: "hidden",
 
       borderWidth: StyleSheet.hairlineWidth,
