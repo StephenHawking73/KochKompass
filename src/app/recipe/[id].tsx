@@ -61,6 +61,7 @@ export default function RecipeDetail() {
   };
 
   const [ratingVisible, setRatingVisible] = useState(false);
+  const [detailRatingVisible, setDetailRatingVisible] = useState(false);
 
   if (!recipe) return <LoadingScreen />;
 
@@ -135,6 +136,7 @@ export default function RecipeDetail() {
                 {/* ... BARS .... */}
                 <RatingBars distribution={rating?.distribution ?? emptyDistribution} count={rating?.count ?? 0}/>
 
+                {/* AVG RATING */}
                 <View style={styles.avgRatingContainer}>
                   <View style={{flexDirection: "row", alignItems: "center", gap: 10, justifyContent: "center"}}>
                     <Text style={styles.ratingText}>{rating?.avgRating?.toFixed(1) ?? "-"}</Text>
@@ -143,6 +145,129 @@ export default function RecipeDetail() {
                   <Text style={{color: theme.text.primary, marginTop: 10, fontWeight: "500", fontSize: 14,}}>Ø Bewertung</Text>
                 </View>
               </View>
+
+              {!detailRatingVisible 
+                ? (
+                    <Pressable style={{flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: 20, gap: 10}} onPress={() => setDetailRatingVisible(true)} hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+                      <Text style={styles.moreText}>Details anzeigen</Text>
+                      {icons.down({color: theme.text.op})}
+                    </Pressable>
+                  ) : (
+                    <View style={{ marginTop: 25 }}>
+                      {rating?.ratings?.map((r: any, index: number) => (
+                        <View
+                          key={`${r.user_id}-${index}`}
+                          style={{
+                            paddingVertical: 14,
+                            borderBottomWidth: 0.5,
+                            borderBottomColor: theme.text.op + "25",
+                          }}
+                        >
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                            }}
+                          >
+                            {/* Avatar */}
+                            <Image
+                              source={{
+                                uri:
+                                  r.profiles?.avatar_url ??
+                                  `https://api.dicebear.com/7.x/initials/png?seed=${encodeURIComponent(
+                                    r.profiles?.username ?? "User"
+                                  )}`,
+                              }}
+                              style={{
+                                width: 42,
+                                height: 42,
+                                borderRadius: 21,
+                                marginRight: 12,
+                                backgroundColor: theme.card.background,
+                              }}
+                            />
+
+                            {/* Username */}
+                            <View style={{ flex: 1 }}>
+                              <Text
+                                style={{
+                                  color: theme.text.primary,
+                                  fontSize: 15,
+                                  fontWeight: "600",
+                                }}
+                              >
+                                {r.profiles.username}
+                              </Text>
+                            </View>
+
+                            {/* Sterne */}
+                            <View
+                              style={{
+                                flexDirection: "row",
+                                alignItems: "center",
+                                gap: 2,
+                              }}
+                            >
+                              <View
+                                style={{
+                                  flexDirection: "row",
+                                  alignItems: "center",
+                                  gap: 2,
+                                }}
+                              >
+                                {[0, 1, 2, 3, 4].map((index) => (
+                                  <React.Fragment key={`${r.id}-star-${index}`}>
+                                    {icons.star({
+                                      size: 15,
+                                      color:
+                                        index < r.rating
+                                          ? theme.text.colored
+                                          : theme.text.op + "40",
+                                    })}
+                                  </React.Fragment>
+                                ))}
+                              </View>
+                            </View>
+                          </View>
+
+                          {/* Kommentar */}
+                          {r.comment && (
+                            <Text
+                              style={{
+                                marginLeft: 54,
+                                color: theme.text.op,
+                                fontSize: 14,
+                                lineHeight: 21,
+                              }}
+                            >
+                              {r.comment}
+                            </Text>
+                          )}
+                        </View>
+                      ))}
+
+                      <Pressable
+                        style={{
+                          flexDirection: "row",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          marginTop: 20,
+                          gap: 10,
+                        }}
+                        onPress={() => setDetailRatingVisible(false)}
+                        hitSlop={{
+                          top: 10,
+                          bottom: 10,
+                          left: 10,
+                          right: 10,
+                        }}
+                      >
+                        <Text style={styles.moreText}>Weniger anzeigen</Text>
+                        {icons.up({ color: theme.text.op })}
+                      </Pressable>
+                    </View>
+                  )
+              }
             </View>
           
             {/* Link */}
@@ -379,4 +504,10 @@ const createStyles = (theme: any) =>
         shadowOpacity: 0.08,
         elevation: 3,
     },
+
+    moreText: {
+      fontSize: 14,
+      fontWeight: "500",
+      color: theme.text.op,
+    }
   });

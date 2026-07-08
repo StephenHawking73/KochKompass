@@ -7,7 +7,7 @@ export async function getRecipeRatings(recipeId: string) {
 
   const { data: ratings, error: rErr } = await supabase
     .from("ratings")
-    .select("rating, user_id, profiles(username)")
+    .select("rating, user_id, profiles(username, avatar_url), comment")
     .eq("recipe_id", recipeId);
 
   const { data: summary, error: sErr } = await supabase
@@ -37,11 +37,16 @@ export async function getRecipeRatings(recipeId: string) {
     (r) => r.user_id === user?.id
   )?.rating ?? null;
 
+  const userComment = ratings.find(
+    (r) => r.user_id === user?.id
+  )?.comment ?? null;
+
   return {
     ratings,
     avgRating: summary?.avg_rating ?? 0,
     count: summary?.rating_count ?? 0,
     distribution,
     userRating,
+    userComment,
   };
 }

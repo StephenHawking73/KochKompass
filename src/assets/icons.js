@@ -26,6 +26,7 @@ export const icons = {
 
 
     down: (props) => <FontAwesome6 name="chevron-down" size={14} {...props}/>,
+    up: (props) => <FontAwesome6 name="chevron-up" size={14} {...props}/>,
     back: (props) => <FontAwesome6 name="chevron-left" size={19} {...props}/>,
     right: (props) => <FontAwesome6 name="chevron-right" size={19} {...props}/>,
     close: (props) => <AntDesign name="close" size={19} {...props}/>,

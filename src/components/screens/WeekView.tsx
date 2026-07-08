@@ -60,8 +60,6 @@ export default function WeekView({
             position
         );
 
-        console.log("move target result", result);
-
         if (result?.error) {
           throw result.error;
         }
