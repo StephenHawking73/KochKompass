@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, Image, StyleSheet, Pressable } from "react-native";
-import { useLocalSearchParams, router } from "expo-router";
+import { useLocalSearchParams, router, useFocusEffect } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useTheme } from "@/hooks/useTheme";
@@ -25,22 +25,26 @@ export default function RecipeDetail() {
   const [recipe, setRecipe] = useState<any>(null);
   const [rating, setRatings] = useState<any>(null);
 
-  useEffect(() => {
-    const load = async () => {
-      const { data: recipeData } = await supabase
-        .from("recipes")
-        .select("*")
-        .eq("id", recipeId)
-        .single();
-      
-      setRecipe(recipeData);
+  const loadRecipe = async () => {
+  if (!recipeId) return;
 
-      const rating = await getRecipeRatings(recipeId) || null;
-      setRatings(rating);
-    };
+  const { data: recipeData } = await supabase
+      .from("recipes")
+      .select("*")
+      .eq("id", recipeId)
+      .single();
 
-    load();
-  }, [recipeId]);
+    setRecipe(recipeData);
+
+    const ratingData = await getRecipeRatings(recipeId) || null;
+    setRatings(ratingData);
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadRecipe();
+    }, [recipeId])
+  );
 
   const [expanded, setExpanded] = useState(false);
   const [hasMoreText, setHasMoreText] = useState(false);
@@ -118,8 +122,19 @@ export default function RecipeDetail() {
             { (recipe.attribute || recipe.duration || recipe.difficulty) && (
               <ScrollView horizontal showsVerticalScrollIndicator={false} contentContainerStyle={{paddingVertical: 10, gap: 12, alignItems: "flex-start", marginTop: 10,}} style={{overflow: "visible"}}>
                   {attribute && <InfoCard title={attribute_title} icon={attribue_icon}/>}
-                  {difficulty && <InfoCard title={difficulty} icon={icons.hat(({color: theme.accent.primary}))}/>}
-                  {duration && <InfoCard title={duration + " min"} icon={icons.time(({color: theme.accent.primary}))}/>}
+                  {difficulty && 
+                      <InfoCard 
+                          title={difficulty} 
+                          icon={icons.hat({color: theme.accent.primary})}
+                      />
+                  }
+
+                  {duration !== null && duration !== undefined && 
+                      <InfoCard 
+                          title={duration + " min"} 
+                          icon={icons.time({color: theme.accent.primary})}
+                      />
+                  }
               </ScrollView>
             )}
 
@@ -349,7 +364,17 @@ export default function RecipeDetail() {
             </Text>
           </Pressable>
 
-          <Pressable style={styles.editButton}>
+          <Pressable 
+            style={styles.editButton}
+            onPress={() => {
+              router.push({
+                pathname: "/recipe/edit",
+                params: {
+                  id: recipeId
+                }
+              });
+            }}
+          >
             {icons.edit({ color: theme.text.primary, size: 22 })}
             <Text style={styles.editText}>
               Bearbeiten

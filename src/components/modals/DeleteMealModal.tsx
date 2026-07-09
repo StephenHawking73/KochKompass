@@ -46,7 +46,7 @@ export default function DeleteMealSheet({
                 </View>
 
                 <Text style={styles.title}>
-                    Mahlzeit löschen?
+                    Gericht löschen?
                 </Text>
 
                 <Text style={styles.description}>

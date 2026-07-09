@@ -39,4 +39,5 @@ export const icons = {
     move: (props) => <Feather name="move" size={20} {...props}/>,
     edit: (props) => <Octicons name="pencil" size={24} {...props} />,
     delete: (props) => <Feather name="trash" size={24} {...props} />,
+    check: (props) => <Entypo name="check" size={24} {...props} />,
 }

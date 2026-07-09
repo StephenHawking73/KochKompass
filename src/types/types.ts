@@ -9,14 +9,25 @@ export type Meal = {
     image_url?: string;
 };
 
+export type Difficulty =
+    | "Einfach"
+    | "Mittel"
+    | "Schwer";
+
+
+export type RecipeAttribute =
+    | "vegan"
+    | "vegetarian"
+    | "meat";
+
 export type Recipe = {
-    id: string;
+    id?: string;
     title: string;
     description?: string;
     image_url?: string;
-    attribute: "vegan" | "vegetarian" | "meat";
+    attribute: RecipeAttribute;
     duration: number;
-    difficulty: "Einfach" | "Mittel" | "Schwer";
+    difficulty: Difficulty;
     link: string;
     rating: number;
     rating_count: number;
@@ -24,6 +35,16 @@ export type Recipe = {
     created_at: string;
     distribution: JSON;
 }
+
+export type RecipeInput = {
+    title: string;
+    description?: string;
+    image_url?: string;
+    attribute: RecipeAttribute;
+    duration: number;
+    difficulty: Difficulty;
+    link: string;
+};
 
 export type WeekPlan = {
     weekId: string | number,
