@@ -10,7 +10,8 @@ import { useTheme } from "@/hooks/useTheme";
 import { icons } from "@/assets/icons";
 import { Meal } from "@/types/types";
 import { moveMeal } from "./moveMeal";
-import { addMealToPlan } from "@/services/mealService";
+import { addMealToPlan, deleteMealFromPlan } from "@/services/mealService";
+import DeleteMealModal from "../DeleteMealModal";
 
 interface WeekViewProps {
   meals?: Meal[];
@@ -149,6 +150,13 @@ export default function WeekView({
     }));
   };
 
+  const [deleteMeal, setDeleteMeal] = useState<Meal | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  
+  const handleDeleteMeal = (meal: Meal) => {
+    setDeleteMeal(meal);
+  }
+
   return (
     <WeekViewContainer refreshing={refreshing} onRefresh={onRefresh}>
       {(isMoveMode || isPlanningMode) && (
@@ -218,12 +226,45 @@ export default function WeekView({
                   onEmptySlotLongPress={handleEmptySlotLongPress}
                   onAddDayPress={handleAddDayPress}
                   showAddButton={i === 0 && isDayFull && extraRows === 0}
+                  onDeletePress={handleDeleteMeal}
                 />
               );
             })}
           </View>
         );
       })}
+
+      <DeleteMealModal
+        visible={deleteMeal !== null}
+        title={deleteMeal?.title ?? ""}
+        loading={deleting}
+        onCancel={() => setDeleteMeal(null)}
+        onDelete={async () => {
+
+            if (!deleteMeal)
+                return;
+
+            setDeleting(true);
+
+            try {
+
+                const { error } = await deleteMealFromPlan(deleteMeal.id);
+
+                if (error)
+                    throw error;
+
+                setDeleteMeal(null);
+
+                onRefresh();
+
+            } finally {
+
+                setDeleting(false);
+
+            }
+
+        }}
+    />
     </WeekViewContainer>
   );
 }

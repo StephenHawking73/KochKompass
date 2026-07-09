@@ -22,6 +22,7 @@ interface MealSlotProps {
   onTargetPress?: (dateKey: string, mealType: "lunch" | "dinner", mealPosition: number) => void;
   onPlanTargetPress?: (dateKey: string, mealType: "lunch" | "dinner", mealPosition: number) => void;
   onEmptySlotLongPress?: (dateKey: string, mealType: "lunch" | "dinner", mealPosition: number) => void;
+  onDeletePress?: (meal: Meal) => void;
 }
 
 export default function MealSlot({
@@ -38,6 +39,7 @@ export default function MealSlot({
   onTargetPress,
   onPlanTargetPress,
   onEmptySlotLongPress,
+  onDeletePress,
 }: MealSlotProps) {
   const theme = useTheme();
   const styles = createStyles(theme);
@@ -131,6 +133,11 @@ export default function MealSlot({
             }
           }}
           onPress={handlePress}
+          onDoublePress={() => {
+            if (!isMoveMode && !isPlanningMode) {
+              onDeletePress?.(meal);
+            }
+          }}
         />
       </View>
     </Animated.View>

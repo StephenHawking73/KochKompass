@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, Pressable } from "react-native";
 import MealSlot from "@/components/screens/MealSlot";
 import { Meal } from "@/types/types";
 import { useTheme } from "@/hooks/useTheme";
+import { useState } from "react";
 
 interface WeekViewDayProps {
   dateKey: string;
@@ -21,6 +22,7 @@ interface WeekViewDayProps {
   onEmptySlotLongPress?: (dateKey: string, mealType: "lunch" | "dinner", mealPosition: number) => void;
   onAddDayPress?: (dateKey: string) => void;
   showAddButton?: boolean;
+  onDeletePress?: (meal: Meal) => void;
 }
 
 export default function WeekViewDay({
@@ -41,6 +43,7 @@ export default function WeekViewDay({
   onEmptySlotLongPress,
   onAddDayPress,
   showAddButton = false,
+  onDeletePress,
 }: WeekViewDayProps) {
   const theme = useTheme();
   const styles = createStyles(theme);
@@ -69,6 +72,7 @@ export default function WeekViewDay({
         onTargetPress={onTargetPress}
         onPlanTargetPress={onPlanTargetPress}
         onEmptySlotLongPress={onEmptySlotLongPress}
+        onDeletePress={onDeletePress}
       />
 
       <MealSlot

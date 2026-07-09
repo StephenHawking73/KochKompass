@@ -9,6 +9,7 @@ type MealCardProps = {
     selected: boolean;
     onPress?: () => void;
     onLongPress?: () => void;
+    onDoublePress?: () => void;
 };
 
 export default function MealCard({
@@ -17,10 +18,13 @@ export default function MealCard({
     selected,
     onPress,
     onLongPress,
+    onDoublePress,
 }: MealCardProps) {
 
     const theme = useTheme();
     const styles = createStyles(theme);
+
+    const lastTap = useRef(0);
 
     const scale = useRef(new Animated.Value(1)).current;
 
@@ -35,7 +39,18 @@ export default function MealCard({
     return (
         <Pressable 
             style = {styles.card}
-            onPress = {onPress}
+            onPress = {() => {
+                const now = Date.now();
+
+                if (now - lastTap.current < 280) {
+                    onDoublePress?.();
+                    lastTap.current = 0;
+                    return;
+                }
+
+                lastTap.current = now;
+                onPress?.();
+            }}
             onLongPress = {async () => {
                 await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 onLongPress?.();

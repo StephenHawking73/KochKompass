@@ -37,5 +37,6 @@ export const icons = {
 
     calendar: (props) => <Feather name="calendar" size={24} {...props}/>,
     move: (props) => <Feather name="move" size={20} {...props}/>,
-    edit: (props) => <Octicons name="pencil" size={24} {...props} />
+    edit: (props) => <Octicons name="pencil" size={24} {...props} />,
+    delete: (props) => <Feather name="trash" size={24} {...props} />,
 }
