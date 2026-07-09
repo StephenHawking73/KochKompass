@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import MealSlot from "@/components/screens/MealSlot";
 import { Meal } from "@/types/types";
 import { useTheme } from "@/hooks/useTheme";
@@ -12,10 +12,15 @@ interface WeekViewDayProps {
   dinnerMeal?: Meal;
   selectedMealId: string | null;
   isMoveMode: boolean;
+  isPlanningMode: boolean;
   activeTargetKey?: string | null;
   onMealLongPress: (mealId: string) => void;
   onMealPress: (mealId: string) => void;
   onTargetPress?: (dateKey: string, mealType: "lunch" | "dinner", mealPosition: number) => void;
+  onPlanTargetPress?: (dateKey: string, mealType: "lunch" | "dinner", mealPosition: number) => void;
+  onEmptySlotLongPress?: (dateKey: string, mealType: "lunch" | "dinner", mealPosition: number) => void;
+  onAddDayPress?: (dateKey: string) => void;
+  showAddButton?: boolean;
 }
 
 export default function WeekViewDay({
@@ -27,10 +32,15 @@ export default function WeekViewDay({
   dinnerMeal,
   selectedMealId,
   isMoveMode,
+  isPlanningMode,
   activeTargetKey,
   onMealLongPress,
   onMealPress,
   onTargetPress,
+  onPlanTargetPress,
+  onEmptySlotLongPress,
+  onAddDayPress,
+  showAddButton = false,
 }: WeekViewDayProps) {
   const theme = useTheme();
   const styles = createStyles(theme);
@@ -52,10 +62,13 @@ export default function WeekViewDay({
         mealPosition={slotIndex}
         isSelected={selectedMealId === lunchMeal?.id}
         isMoveMode={isMoveMode}
+        isPlanningMode={isPlanningMode}
         isMoveTarget={activeTargetKey === `${dateKey}-lunch-${slotIndex}`}
         onLongPress={onMealLongPress}
         onPress={onMealPress}
         onTargetPress={onTargetPress}
+        onPlanTargetPress={onPlanTargetPress}
+        onEmptySlotLongPress={onEmptySlotLongPress}
       />
 
       <MealSlot
@@ -65,15 +78,23 @@ export default function WeekViewDay({
         mealPosition={slotIndex}
         isSelected={selectedMealId === dinnerMeal?.id}
         isMoveMode={isMoveMode}
+        isPlanningMode={isPlanningMode}
         isMoveTarget={activeTargetKey === `${dateKey}-dinner-${slotIndex}`}
         onLongPress={onMealLongPress}
         onPress={onMealPress}
         onTargetPress={onTargetPress}
+        onPlanTargetPress={onPlanTargetPress}
+        onEmptySlotLongPress={onEmptySlotLongPress}
       />
 
       <View style={styles.plusColumn}>
-        {slotIndex === 0 && (
-          <Text style={styles.plus}>+</Text>
+        {showAddButton && (
+          <Pressable
+            onPress={() => onAddDayPress?.(dateKey)}
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          >
+            <Text style={styles.plus}>+</Text>
+          </Pressable>
         )}
       </View>
     </View>

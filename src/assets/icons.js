@@ -36,5 +36,6 @@ export const icons = {
     link: (props) => <Entypo name="link" size={20} {...props}/>,
 
     calendar: (props) => <Feather name="calendar" size={24} {...props}/>,
+    move: (props) => <Feather name="move" size={20} {...props}/>,
     edit: (props) => <Octicons name="pencil" size={24} {...props} />
 }

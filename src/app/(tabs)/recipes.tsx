@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TextInput, ScrollView, Platform, FlatList } from 'react-native'
+import { View, Text, StyleSheet, TextInput, ScrollView, Platform, FlatList, Pressable } from 'react-native'
 import React, { useCallback, useMemo, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTheme } from '@/hooks/useTheme';
@@ -10,7 +10,9 @@ import { useRecipes } from '@/hooks/useRecipes';
 import { FilterState, SortOption } from '@/types/recipeFilters';
 import RecipeFilterBar from '@/components/Filter/RecipeFilterBar';
 import SortDropdown from '@/components/SortDropdown';
-import { router, useFocusEffect } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { addMealToPlan } from '@/services/mealService';
+import { Meal } from '@/types/types';
 
 type Option = {
   label: string;
@@ -20,6 +22,18 @@ type Option = {
 export default function RecipiesScreen() {
   const theme = useTheme();
   const styles = createStyles(theme);
+  const params = useLocalSearchParams<{
+    planningDate?: string;
+    planningMealType?: Meal["meal_type"];
+    planningPosition?: string;
+  }>();
+  const planningDate = getParam(params.planningDate);
+  const planningMealType = getParam(params.planningMealType);
+  const planningPosition = getParam(params.planningPosition);
+  const isPlanningMode =
+    Boolean(planningDate) &&
+    (planningMealType === "lunch" || planningMealType === "dinner") &&
+    planningPosition != null;
 
   const sortOptions: Option[] = [
     { label: "Beliebteste", value: "popular" },
@@ -99,10 +113,67 @@ export default function RecipiesScreen() {
 
   const count = displayedMeals.length;
 
+  const handleExitPlanningMode = () => {
+    router.replace("/recipes");
+  };
+
+  const handleRecipePress = async (recipeId: string) => {
+    if (!isPlanningMode || !planningDate || !planningMealType || planningPosition == null) {
+      router.push({pathname: "/recipe/[id]", params: { id: recipeId }});
+      return;
+    }
+
+    try {
+      const result = await addMealToPlan(
+        recipeId,
+        planningDate,
+        planningMealType,
+        Number(planningPosition)
+      );
+
+      if (result?.error) {
+        throw result.error;
+      }
+
+      router.replace("/recipes");
+      requestAnimationFrame(() => {
+        router.replace({
+          pathname: "/",
+          params: {
+            focusDate: planningDate,
+            plannedAt: String(Date.now()),
+          },
+        });
+      });
+    } catch (error) {
+      console.error("recipe planning failed", error);
+    }
+  };
+
   return (
     <SafeAreaView style={{flex: 1, paddingHorizontal: 30, backgroundColor: theme.background}}>
       {/* Title */}
       <Text style={styles.title}>Rezepte</Text>
+
+      {isPlanningMode && (
+        <View style={styles.modeBanner}>
+          <View style={styles.modeHeader}>
+            <View style={styles.modeTitleRow}>
+              {icons.calendar({ color: theme.accent.primary, size: 17 })}
+              <Text style={styles.modeTitle}>Rezept für den Slot auswählen</Text>
+            </View>
+
+            <Pressable
+              style={styles.closeButton}
+              onPress={handleExitPlanningMode}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              {icons.close({ color: theme.text.op, size: 15 })}
+            </Pressable>
+          </View>
+          <Text style={styles.modeText}>Die Auswahl wird direkt in den Speiseplan eingetragen.</Text>
+        </View>
+      )}
 
       {/* Search */}
       <View style={styles.searchBar}>
@@ -152,7 +223,7 @@ export default function RecipiesScreen() {
           paddingBottom: 80,
         }}
         renderItem={({ item }) => (
-          <MealCardList recipe={item} favorites={favorites.favorites} toggleFavorite={favorites.toggle} onPress={() => router.push({pathname: "/recipe/[id]", params: { id: item.id }})}/>
+          <MealCardList recipe={item} favorites={favorites.favorites} toggleFavorite={favorites.toggle} onPress={() => handleRecipePress(item.id)}/>
         )}
         showsVerticalScrollIndicator={false}
       />    
@@ -194,5 +265,55 @@ const createStyles = (theme: any) =>
       color: theme.text.op,
       fontSize: 14,
       fontWeight: 400,
-    }
+    },
+
+    modeBanner: {
+      marginTop: 22,
+      borderRadius: 14,
+      borderWidth: 1,
+      borderColor: theme.accent.primary + "55",
+      backgroundColor: theme.accent.op,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+    },
+
+    modeHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 12,
+    },
+
+    modeTitle: {
+      color: theme.text.primary,
+      fontSize: 15,
+      fontWeight: "700",
+    },
+
+    modeTitleRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      flexShrink: 1,
+    },
+
+    closeButton: {
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: theme.card.background,
+    },
+
+    modeText: {
+      color: theme.text.op,
+      fontSize: 13,
+      fontWeight: "500",
+      marginTop: 3,
+    },
 })
+
+function getParam(value?: string | string[]) {
+  return Array.isArray(value) ? value[0] : value;
+}

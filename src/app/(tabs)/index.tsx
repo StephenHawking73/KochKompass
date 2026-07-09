@@ -3,6 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { FadeIn, FadeOut, runOnJS } from "react-native-reanimated";
+import { useLocalSearchParams } from "expo-router";
 
 import WeekView from "@/components/screens/WeekView";
 import MonthView from "@/components/screens/MonthView";
@@ -15,6 +16,14 @@ import { supabase } from "@/lib/supabase";
 export default function HomeScreen() {
     const theme = useTheme();
     const styles = createStyles(theme);
+    const params = useLocalSearchParams<{
+        planningRecipeId?: string;
+        focusDate?: string;
+        plannedAt?: string;
+    }>();
+    const planningRecipeId = getParam(params.planningRecipeId);
+    const focusDate = getParam(params.focusDate);
+    const plannedAt = getParam(params.plannedAt);
 
     const [viewMode, setViewMode] = useState<"week" | "month">("week");
     const [refreshing, setRefreshing] = useState(false);
@@ -39,6 +48,21 @@ export default function HomeScreen() {
     const rangeEnd = viewMode === "week" ? weekEnd : monthEnd;
 
     const { meals, loading: loadingMeals, refresh } = useMeals(rangeStart, rangeEnd);
+
+    useEffect(() => {
+        if (!focusDate) {
+            return;
+        }
+
+        setWeekByDate(parseLocalDate(focusDate));
+        setViewMode("week");
+    }, [focusDate]);
+
+    useEffect(() => {
+        if (plannedAt) {
+            refresh();
+        }
+    }, [plannedAt]);
 
     const onRefresh = async () => {
         setRefreshing(true);
@@ -103,7 +127,13 @@ export default function HomeScreen() {
                         exiting={FadeOut.duration(160)}
                     >
                         {viewMode === "week" ? (
-                            <WeekView meals={meals} weekStart={weekStart} refreshing={refreshing} onRefresh={onRefresh} />
+                            <WeekView
+                                meals={meals}
+                                weekStart={weekStart}
+                                refreshing={refreshing}
+                                onRefresh={onRefresh}
+                                planningRecipeId={planningRecipeId}
+                            />
                         ) : (
                             <MonthView referenceDate={rangeStart} meals={meals} refreshing={refreshing} onRefresh={onRefresh} onSelectDay={(date) => {
                                 setWeekByDate(date);
@@ -117,6 +147,15 @@ export default function HomeScreen() {
             </GestureDetector>
         </SafeAreaView>
     );
+}
+
+function getParam(value?: string | string[]) {
+    return Array.isArray(value) ? value[0] : value;
+}
+
+function parseLocalDate(value: string) {
+    const [year, month, day] = value.split("-").map(Number);
+    return new Date(year, month - 1, day);
 }
 
 const createStyles = (theme: any) =>

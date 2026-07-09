@@ -330,7 +330,19 @@ export default function RecipeDetail() {
         </ScrollView>
 
         <View style={styles.bottomContainer}>
-          <Pressable style={styles.planButton}>
+          <Pressable
+            style={styles.planButton}
+            onPress={() => {
+              if (!recipeId) {
+                return;
+              }
+
+              router.push({
+                pathname: "/",
+                params: { planningRecipeId: recipeId },
+              });
+            }}
+          >
             {icons.calendar({ color: "white", size: 22 })}
             <Text style={styles.planText}>
               Planen

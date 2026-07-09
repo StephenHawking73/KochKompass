@@ -4,6 +4,7 @@ import { Meal } from "@/types/types";
 import { useTheme } from "@/hooks/useTheme";
 import { router } from "expo-router";
 import { useEffect, useRef } from "react";
+import * as Haptics from "expo-haptics";
 
 interface MealSlotProps {
   meal?: Meal;
@@ -14,10 +15,13 @@ interface MealSlotProps {
 
   isSelected: boolean;
   isMoveMode: boolean;
+  isPlanningMode: boolean;
   isMoveTarget?: boolean;
   onLongPress: (mealId: string) => void;
   onPress: (mealId: string) => void;
   onTargetPress?: (dateKey: string, mealType: "lunch" | "dinner", mealPosition: number) => void;
+  onPlanTargetPress?: (dateKey: string, mealType: "lunch" | "dinner", mealPosition: number) => void;
+  onEmptySlotLongPress?: (dateKey: string, mealType: "lunch" | "dinner", mealPosition: number) => void;
 }
 
 export default function MealSlot({
@@ -27,14 +31,18 @@ export default function MealSlot({
   mealPosition,
   isSelected,
   isMoveMode,
+  isPlanningMode,
   isMoveTarget = false,
   onLongPress,
   onPress,
   onTargetPress,
+  onPlanTargetPress,
+  onEmptySlotLongPress,
 }: MealSlotProps) {
   const theme = useTheme();
   const styles = createStyles(theme);
   const pulse = useRef(new Animated.Value(1)).current;
+  const isTargetMode = isMoveMode || isPlanningMode;
 
   useEffect(() => {
     if (!isMoveTarget) {
@@ -64,12 +72,25 @@ export default function MealSlot({
     return (
       <Animated.View style={[styles.slotWrapper, isMoveTarget && styles.movePulse, { transform: [{ scale: pulse }] }]}> 
         <Pressable
-            style={[styles.slot, isMoveMode && styles.targetSlot]}
+            style={[styles.slot, isTargetMode && styles.targetSlot]}
             onPress={() => {
                 if (isMoveMode) {
                     onTargetPress?.(dateKey, mealType, mealPosition);
                 }
+
+                if (isPlanningMode) {
+                    onPlanTargetPress?.(dateKey, mealType, mealPosition);
+                }
             }}
+            onLongPress={async () => {
+                if (isTargetMode) {
+                    return;
+                }
+
+                await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                onEmptySlotLongPress?.(dateKey, mealType, mealPosition);
+            }}
+            delayLongPress={180}
         />
       </Animated.View>
     );
@@ -86,6 +107,10 @@ export default function MealSlot({
       return;
     }
 
+    if (isPlanningMode) {
+      return;
+    }
+
     // Navigiere zur Rezept-Seite
     router.push({
       pathname: "/recipe/[id]",
@@ -95,12 +120,16 @@ export default function MealSlot({
 
   return (
     <Animated.View style={[styles.slotWrapper, isMoveTarget && styles.movePulse, { transform: [{ scale: pulse }] }]}> 
-      <View style={[styles.slot, isMoveMode && styles.targetSlot]}>
+      <View style={[styles.slot, isTargetMode && styles.targetSlot]}>
         <MealCard
           title={meal.title}
           image_url={meal.image_url}
           selected={isSelected}
-          onLongPress={() => onLongPress(meal.id)}
+          onLongPress={() => {
+            if (!isPlanningMode) {
+              onLongPress(meal.id);
+            }
+          }}
           onPress={handlePress}
         />
       </View>
