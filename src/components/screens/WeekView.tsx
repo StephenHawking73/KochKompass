@@ -11,7 +11,7 @@ import { icons } from "@/assets/icons";
 import { Meal } from "@/types/types";
 import { moveMeal } from "./moveMeal";
 import { addMealToPlan, deleteMealFromPlan } from "@/services/mealService";
-import DeleteMealModal from "../DeleteMealModal";
+import DeleteMealModal from "../modals/DeleteMealModal";
 
 interface WeekViewProps {
   meals?: Meal[];
@@ -236,9 +236,9 @@ export default function WeekView({
 
       <DeleteMealModal
         visible={deleteMeal !== null}
-        title={deleteMeal?.title ?? ""}
+        mealTitle={deleteMeal?.title ?? ""}
         loading={deleting}
-        onCancel={() => setDeleteMeal(null)}
+        onClose={() => setDeleteMeal(null)}
         onDelete={async () => {
 
             if (!deleteMeal)

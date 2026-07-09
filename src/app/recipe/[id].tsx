@@ -9,7 +9,7 @@ import { LoadingScreen } from "@/components/loadingScreen";
 import InfoCard from "@/components/infoCard";
 import { getRecipeRatings } from "@/services/ratingService";
 import { RatingBars } from "@/components/RatingBars";
-import RatingSheet from "@/components/RatingModal";
+import RatingSheet from "@/components/modals/RatingModal";
 import BasicBottomSheet from "@/components/BasicBottomSheet";
 
 export default function RecipeDetail() {

@@ -89,6 +89,7 @@ export default function WeekViewDay({
         onTargetPress={onTargetPress}
         onPlanTargetPress={onPlanTargetPress}
         onEmptySlotLongPress={onEmptySlotLongPress}
+        onDeletePress={onDeletePress}
       />
 
       <View style={styles.plusColumn}>

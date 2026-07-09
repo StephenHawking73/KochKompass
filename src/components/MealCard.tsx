@@ -25,6 +25,7 @@ export default function MealCard({
     const styles = createStyles(theme);
 
     const lastTap = useRef(0);
+    const tapTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const scale = useRef(new Animated.Value(1)).current;
 
@@ -43,13 +44,21 @@ export default function MealCard({
                 const now = Date.now();
 
                 if (now - lastTap.current < 280) {
-                    onDoublePress?.();
+                    if (tapTimeout.current) {
+                        clearTimeout(tapTimeout.current);
+                        tapTimeout.current = null;
+                    }
+
                     lastTap.current = 0;
+                    onDoublePress?.();
                     return;
                 }
 
                 lastTap.current = now;
-                onPress?.();
+
+                tapTimeout.current = setTimeout(() => {
+                    onPress?.();
+                }, 280);
             }}
             onLongPress = {async () => {
                 await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
