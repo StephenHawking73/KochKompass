@@ -189,7 +189,7 @@ export default function RecipeImagePicker({
                     style={styles.option}
                     onPress={async () => {
                         try {
-                            await deleteRecipeImage(value);
+                            await deleteRecipeImage(value, value[1]);
 
                             onChange("");
                             setPickerOpen(false);

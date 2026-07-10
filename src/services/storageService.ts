@@ -30,19 +30,33 @@ export async function uploadRecipeImage(uri: string) {
 }
 
 
-export async function deleteRecipeImage(url: string) {
+export async function deleteRecipeImage(url: string, imageUrl?: string) {
 
     if (!url) return;
 
     const fileName = url.split("/").pop();
-
     if (!fileName) return;
 
-    const { error } = await supabase.storage
-        .from("recipe-images")
-        .remove([fileName]);
+    if (url) {
+        const { error } = await supabase.storage
+            .from("recipe-images")
+            .remove([fileName]);
 
-    if (error) {
-        throw error;
+        if (error) {
+            throw error;
+        }
+    }
+    
+    if (imageUrl) {
+        const { error } = await supabase
+            .from("recipes")
+            .update({
+                image_url: null
+            })
+            .eq("image_url", imageUrl);
+
+        if (error) {
+            throw error;
+        }
     }
 }
