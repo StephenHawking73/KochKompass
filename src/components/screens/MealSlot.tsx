@@ -125,7 +125,7 @@ export default function MealSlot({
       <View style={[styles.slot, isTargetMode && styles.targetSlot]}>
         <MealCard
           title={meal.title}
-          image_url={meal.image_url}
+          attribute={meal.attribute}
           selected={isSelected}
           onLongPress={() => {
             if (!isPlanningMode) {

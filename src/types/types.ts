@@ -7,6 +7,7 @@ export type Meal = {
     meal_position: number;
     position?: number;
     image_url?: string;
+    attribute?: string;
 };
 
 export type Difficulty =

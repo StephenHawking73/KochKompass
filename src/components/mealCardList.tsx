@@ -62,17 +62,22 @@ export default function MealCardList({ recipe, onPress, favorites, toggleFavorit
           <View style={styles.attributeContainer}>
             {recipe.attribute === "meat" && (
               <>
-                {icons.meat({color: "brown"})}
+                {icons.meat({color: theme.meat})}
               </>
             )}
             {recipe.attribute === "vegetarian" && (
               <>
-                {icons.vegetarian({color: "yellowgreen"})}
+                {icons.vegetarian({color: theme.veggie})}
               </>
             )}
             {recipe.attribute === "vegan" && (
               <>
-                {icons.vegan({color: "darkcyan"})}
+                {icons.vegan({color: theme.vegan})}
+              </>
+            )}
+            {recipe.attribute === "dessert" && (
+              <>
+                {icons.dessert({color: theme.dessert})}
               </>
             )}
           </View>

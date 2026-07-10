@@ -3,7 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, Text, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { FadeIn, FadeOut, runOnJS } from "react-native-reanimated";
-import { useLocalSearchParams } from "expo-router";
+import { useFocusEffect, useLocalSearchParams } from "expo-router";
 
 import WeekView from "@/components/screens/WeekView";
 import MonthView from "@/components/screens/MonthView";
@@ -12,6 +12,7 @@ import { useMeals } from "@/hooks/useMeals";
 import { useTheme } from "@/hooks/useTheme";
 import { useWeekNavigation } from "@/hooks/useWeekNavigation";
 import { supabase } from "@/lib/supabase";
+import React from "react";
 
 export default function HomeScreen() {
     const theme = useTheme();
@@ -48,6 +49,11 @@ export default function HomeScreen() {
     const rangeEnd = viewMode === "week" ? weekEnd : monthEnd;
 
     const { meals, loading: loadingMeals, refresh } = useMeals(rangeStart, rangeEnd);
+    useFocusEffect(
+        React.useCallback(() => {
+            refresh()
+        }, [])
+    );
 
     useEffect(() => {
         if (!focusDate) {

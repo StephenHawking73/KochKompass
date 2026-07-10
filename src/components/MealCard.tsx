@@ -5,7 +5,7 @@ import * as Haptics from "expo-haptics";
 
 type MealCardProps = {
     title: string;
-    image_url?: string;
+    attribute?: string;
     selected: boolean;
     onPress?: () => void;
     onLongPress?: () => void;
@@ -14,7 +14,7 @@ type MealCardProps = {
 
 export default function MealCard({
     title,
-    image_url,
+    attribute,
     selected,
     onPress,
     onLongPress,
@@ -22,7 +22,7 @@ export default function MealCard({
 }: MealCardProps) {
 
     const theme = useTheme();
-    const styles = createStyles(theme);
+    const styles = createStyles(theme, attribute);
 
     const lastTap = useRef(0);
     const tapTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -69,16 +69,10 @@ export default function MealCard({
             <Animated.View style={[styles.animatedCard, selected && styles.dragging, { transform: [{ scale }] }]}>
                 <View style={styles.content}>
 
-                    {/* IMAGE */}
-                    {image_url ? (
-                        <Image
-                            source={{ uri: image_url }}
-                            style={styles.image}
-                            resizeMode="cover"
-                        />
-                    ) : (
-                        <Text style={styles.placeholderText}>🍽️</Text>
-                    )}
+                    {/* DOT */}
+                    <View style={styles.dot}>
+                        
+                    </View>
 
                     {/* TEXT */}
                     <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">
@@ -91,7 +85,7 @@ export default function MealCard({
     );
 }
 
-const createStyles = (theme: any) =>
+const createStyles = (theme: any, attribute: string | undefined) =>
     StyleSheet.create({
 
         card: {
@@ -136,11 +130,13 @@ const createStyles = (theme: any) =>
             overflow: "visible",
         },
 
-        image: {
-            width: 50,
-            height: 50,
-            borderRadius: 10,
+        dot: {
+            width: 3,
+            height: 40,
+            borderRadius: 5,
             flexShrink: 0,
+
+            backgroundColor: attribute === "vegan" ? theme.vegan : attribute === "vegetarian" ? theme.veggie : attribute === "meat" ? theme.meat : attribute === "dessert" ? theme.dessert : theme.accent.primary,
         },
 
         placeholder: {

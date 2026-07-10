@@ -57,7 +57,7 @@ const createStyles = (theme: any) =>
     headerOverlay: {
       position: "absolute",
       top: 60,
-      left: 0,
+      left: 5,
       right: 0,
 
       flexDirection: "row",
@@ -73,6 +73,8 @@ const createStyles = (theme: any) =>
       borderRadius: 21,
 
       backgroundColor: theme.button.background,
+      borderColor: theme.accent.primary,
+      borderWidth: 2,
 
       justifyContent: "center",
       alignItems: "center",

@@ -39,8 +39,8 @@ export default function RecipeEdit(){
     const [title,setTitle] = useState("");
     const [description,setDescription] = useState("");
     const [duration,setDuration] = useState("");
-    const [difficulty,setDifficulty] = useState<Difficulty>("Einfach");
-    const [attribute,setAttribute] = useState<RecipeAttribute>("meat");
+    const [difficulty,setDifficulty] = useState<Difficulty | null>(null);
+    const [attribute,setAttribute] = useState<RecipeAttribute | null>(null);
     const [link,setLink] = useState("");
     const [image,setImage] = useState("");
 
@@ -54,15 +54,13 @@ export default function RecipeEdit(){
                 setTitle(recipe.title);
                 setDescription(recipe.description ?? "");
                 setDuration(recipe.duration ? String(recipe.duration) : "");
-                setDifficulty(recipe.difficulty);
-                setAttribute(recipe.attribute);
+                setDifficulty(recipe.difficulty ?? null);
+                setAttribute(recipe.attribute ?? null);
                 setLink(recipe.link ?? "");
                 setImage(recipe.image_url ?? "");
 
             }
-
         }
-
         load();
     },[recipeId]);
 
@@ -70,9 +68,11 @@ export default function RecipeEdit(){
         const data = {
             title,
             description,
-            duration:Number(duration),
-            difficulty,
-            attribute,
+            duration: duration.trim() === ""
+                ? null
+                : Number(duration),
+            difficulty: difficulty ?? null,
+            attribute: attribute ?? null,
             link,
             image_url:image
         };
@@ -91,11 +91,8 @@ export default function RecipeEdit(){
 
     return (
         <SafeAreaView style={styles.container}>
-
-
             {/* HEADER */}
             <View style={styles.header}>
-
                 <Pressable
                     style={styles.iconButton}
                     onPress={()=>router.back()}
@@ -105,20 +102,14 @@ export default function RecipeEdit(){
                     })}
                 </Pressable>
 
-
                 <Text style={styles.headerTitle}>
                     {editing
                         ? "Rezept bearbeiten"
                         : "Neues Rezept"
                     }
                 </Text>
-
-
                 <View style={{width:42}}/>
-
             </View>
-
-
 
             <ScrollView
                 showsVerticalScrollIndicator={false}
@@ -127,17 +118,11 @@ export default function RecipeEdit(){
                     paddingBottom:120
                 }}
             >
-
-
                 {/* BASISDATEN */}
                 <View style={styles.card}>
-
-
                     <Text style={styles.sectionTitle}>
                         Allgemein
                     </Text>
-
-
                     <TextInput
                         style={styles.input}
                         placeholder="Rezeptname"
@@ -145,8 +130,6 @@ export default function RecipeEdit(){
                         value={title}
                         onChangeText={setTitle}
                     />
-
-
                     <TextInput
                         style={[
                             styles.input,
@@ -158,29 +141,19 @@ export default function RecipeEdit(){
                         onChangeText={setDescription}
                         multiline
                     />
-
                 </View>
-
-
-
-
 
                 {/* DETAILS */}
                 <View style={styles.card}>
-
-
                     <Text style={styles.sectionTitle}>
                         Details
                     </Text>
-
 
                     <Text style={styles.label}>
                         Kategorie
                     </Text>
 
-
                     <View style={styles.chipRow}>
-
                         {[
                             {
                                 value:"vegan",
@@ -193,15 +166,19 @@ export default function RecipeEdit(){
                             {
                                 value:"meat",
                                 title:"Fleisch"
+                            },
+                            {
+                                value:"dessert",
+                                title:"Dessert",
                             }
-
                         ].map(item=>(
-
                             <Pressable
                                 key={item.value}
                                 onPress={()=>
-                                    setAttribute(
-                                        item.value as RecipeAttribute
+                                    setAttribute(prev =>
+                                        prev === item.value
+                                            ? null
+                                            : (item.value as RecipeAttribute)
                                     )
                                 }
                                 style={[
@@ -210,7 +187,6 @@ export default function RecipeEdit(){
                                     styles.activeChip
                                 ]}
                             >
-
                                 <Text
                                     style={[
                                         styles.chipText,
@@ -220,12 +196,8 @@ export default function RecipeEdit(){
                                 >
                                     {item.title}
                                 </Text>
-
                             </Pressable>
-
                         ))}
-
-
                     </View>
 
 
@@ -249,8 +221,10 @@ export default function RecipeEdit(){
                             <Pressable
                                 key={item}
                                 onPress={()=>
-                                    setDifficulty(
-                                        item as Difficulty
+                                    setDifficulty(prev =>
+                                        prev === item
+                                            ? null
+                                            : (item as Difficulty)
                                     )
                                 }
 
@@ -382,9 +356,7 @@ StyleSheet.create({
         padding:18,
 
         marginBottom:18,
-
     },
-
 
     sectionTitle:{
         fontSize:18,
@@ -394,7 +366,6 @@ StyleSheet.create({
 
         marginBottom:15,
     },
-
 
     label:{
         fontSize:14,
@@ -406,23 +377,16 @@ StyleSheet.create({
         marginTop:8,
     },
 
-
     input:{
-
         height:52,
-
         borderRadius:14,
-
         backgroundColor:theme.background,
 
         paddingHorizontal:16,
-
         color:theme.text.primary,
-
         fontSize:15,
 
         marginBottom:12,
-
     },
 
 
@@ -442,21 +406,17 @@ StyleSheet.create({
 
 
     chip:{
-
         paddingHorizontal:15,
         paddingVertical:10,
 
         borderRadius:20,
 
         backgroundColor:theme.background,
-
     },
 
 
     activeChip:{
-
         backgroundColor:theme.accent.primary,
-
     },
 
 
@@ -505,15 +465,11 @@ StyleSheet.create({
 
     },
 
-
     saveText:{
-
         color:"white",
 
         fontSize:16,
 
         fontWeight:"700",
-
     },
-
 });
