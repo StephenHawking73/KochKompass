@@ -10,6 +10,10 @@ import { useTheme } from "@/hooks/useTheme";
 import { icons } from "@/assets/icons";
 import UnsplashPicker from "./UnsplashPicker";
 
+import * as ImagePicker from "expo-image-picker";
+import { uploadRecipeImage } from "@/services/storageService";
+import BasicBottomSheet from "./BasicBottomSheet";
+
 interface Props{
     value:string;
     onChange:(url:string)=>void;
@@ -23,7 +27,40 @@ export default function RecipeImagePicker({
     const theme = useTheme();
     const styles=createStyles(theme);
 
-    const [open,setOpen]=useState(false);
+    const [open, setOpen]=useState(false);
+
+    const [pickerOpen, setPickerOpen] = useState(false);
+    const [unsplashOpen, setUnsplashOpen] = useState(false);
+
+    const pickFromGallery = async () => {
+
+    const permission =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+        return;
+    }
+
+    const result =
+        await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ["images"],
+            allowsEditing: true,
+            aspect: [16, 9],
+            quality: 0.85,
+        });
+
+        if (result.canceled) {
+            return;
+        }
+
+        setPickerOpen(false);
+
+        const url = await uploadRecipeImage(
+            result.assets[0].uri
+        );
+
+        onChange(url);
+    };
 
     return(
         <>
@@ -51,7 +88,7 @@ export default function RecipeImagePicker({
 
                 <Pressable
                     style={styles.button}
-                    onPress={()=>setOpen(true)}
+                    onPress={() => setPickerOpen(true)}
                 >
                     {icons.edit({
                         color:"white",
@@ -71,6 +108,88 @@ export default function RecipeImagePicker({
                     setOpen(false);
                 }}
             />
+
+            <BasicBottomSheet
+                visible={pickerOpen}
+                onClose={() => setPickerOpen(false)}
+            >
+                <Pressable
+                    style={styles.option}
+                    onPress={pickFromGallery}
+                >
+                    {icons.image({
+                        size:22,
+                        color:theme.text.primary,
+                    })}
+
+                    <Text style={styles.optionText}>
+                        Aus Galerie wählen
+                    </Text>
+                </Pressable>
+
+                <Pressable
+                    style={styles.option}
+                    onPress={()=>{
+                        setPickerOpen(false);
+                        setUnsplashOpen(true);
+                    }}
+                >
+                    {icons.unsplash({
+                        size:22,
+                        color:theme.text.primary,
+                    })}
+
+                    <Text style={styles.optionText}>
+                        Unsplash durchsuchen
+                    </Text>
+                </Pressable>
+
+                <Pressable
+                    style={styles.option}
+                >
+                    {icons.camera({
+                        size:22,
+                        color:theme.text.primary,
+                    })}
+
+                    <Text style={styles.optionText}>
+                        Foto aufnehmen
+                    </Text>
+                </Pressable>
+
+                <View style={styles.separator}/>
+
+                <Pressable
+                    style={styles.option}
+                    onPress={()=>{
+                        onChange("");
+                        setPickerOpen(false);
+                    }}
+                >
+                    {icons.delete({
+                        size:22,
+                        color: theme.notification,
+                    })}
+
+                    <Text
+                        style={[
+                            styles.optionText,
+                            { color: theme.notification }
+                        ]}
+                    >
+                        Bild entfernen
+                    </Text>
+                </Pressable>
+
+                <Pressable
+                    style={styles.cancelButton}
+                    onPress={() => setPickerOpen(false)}
+                >
+                    <Text style={styles.cancelText}>
+                        Abbrechen
+                    </Text>
+                </Pressable>
+            </BasicBottomSheet>
         </>
     );
 }
@@ -107,5 +226,34 @@ const createStyles=(theme:any)=>StyleSheet.create({
         backgroundColor:theme.accent.primary,
         justifyContent:"center",
         alignItems:"center",
+    },
+    option: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 16,
+        paddingVertical: 18,
+    },
+
+    optionText: {
+        fontSize: 17,
+        fontWeight: "500",
+        color: theme.text.primary,
+    },
+
+    separator: {
+        height: StyleSheet.hairlineWidth,
+        backgroundColor: theme.text.op,
+        marginVertical: 6,
+    },
+
+    cancelButton: {
+        alignItems: "center",
+        paddingVertical: 10,
+    },
+
+    cancelText: {
+        fontSize: 17,
+        fontWeight: "600",
+        color: theme.accent.primary,
     },
 });

@@ -40,5 +40,8 @@ export const icons = {
     edit: (props) => <Octicons name="pencil" size={24} {...props} />,
     delete: (props) => <Feather name="trash" size={24} {...props} />,
     check: (props) => <Entypo name="check" size={24} {...props} />,
+    
     camera: (props) => <Feather name="camera" size={30} {...props} />,
+    unsplash: (props) => <FontAwesome6 name="unsplash" size={30} {...props}/>,
+    image: (props) => <FontAwesome6 name="image" size={30} {...props}/>
 }
