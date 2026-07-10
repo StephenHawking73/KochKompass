@@ -27,9 +27,9 @@ export type Recipe = {
     title: string;
     description?: string;
     image_url?: string;
-    attribute?: RecipeAttribute | null;
-    duration?: number | null;
-    difficulty?: Difficulty | null;
+    attribute?: RecipeAttribute | null | undefined;
+    duration?: number | null | undefined;
+    difficulty?: Difficulty | null | undefined;
     link: string;
     rating: number;
     rating_count: number;

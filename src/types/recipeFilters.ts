@@ -10,7 +10,9 @@ type RecipeType =
   | "vegetarian"
   | "vegan"
   | "meat"
-  | "dessert";
+  | "dessert"
+  | null
+  | undefined;
 
 export type FilterState = {
   type: RecipeType[];

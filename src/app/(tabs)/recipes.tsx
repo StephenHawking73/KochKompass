@@ -152,8 +152,24 @@ export default function RecipiesScreen() {
 
   return (
     <SafeAreaView style={{flex: 1, paddingHorizontal: 30, backgroundColor: theme.background}}>
+      {/* Add button */}
       {/* Title */}
-      <Text style={styles.title}>Rezepte</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>Rezepte</Text>
+
+        <Pressable 
+          style={styles.addButton}
+          onPress={() => {
+            router.push({
+              pathname: "/recipe/edit",
+              params: {}
+            });
+          }}
+        >
+          <Text style={styles.addPlus}>+</Text>
+        </Pressable>
+      </View>
+      
 
       {isPlanningMode && (
         <View style={styles.modeBanner}>
@@ -240,6 +256,12 @@ const createStyles = (theme: any) =>
       marginTop: 20,
     },
 
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+
     searchBar: {
       height: 45,
       marginTop: 20,
@@ -312,6 +334,23 @@ const createStyles = (theme: any) =>
       fontWeight: "500",
       marginTop: 3,
     },
+
+    addButton: {
+      backgroundColor: theme.accent.primary,
+      width: 42,
+      height: 42,
+      borderRadius: 21,
+
+      alignItems: "center",
+      justifyContent: "center",
+    },
+
+    addPlus: {
+      color: "white",
+      fontSize: 28,
+      fontWeight: "500",
+      marginTop: -2,
+    }
 })
 
 function getParam(value?: string | string[]) {
