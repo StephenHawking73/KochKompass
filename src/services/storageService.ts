@@ -1,19 +1,26 @@
 import { supabase } from "@/lib/supabase";
 
 export async function uploadRecipeImage(uri: string) {
+
     const response = await fetch(uri);
-    const blob = await response.blob();
+
+    const arrayBuffer = await response.arrayBuffer();
+
+    const extension = uri.split(".").pop() || "jpg";
 
     const fileName =
-        `${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`;
+        `${Date.now()}-${Math.random().toString(36).slice(2)}.${extension}`;
 
     const { error } = await supabase.storage
         .from("recipe-images")
-        .upload(fileName, blob, {
+        .upload(fileName, arrayBuffer, {
             contentType: "image/jpeg",
+            upsert: false,
         });
 
-    if (error) throw error;
+    if (error) {
+        throw error;
+    }
 
     const { data } = supabase.storage
         .from("recipe-images")

@@ -27,31 +27,28 @@ export default function RecipeImagePicker({
     const theme = useTheme();
     const styles=createStyles(theme);
 
-    const [open, setOpen]=useState(false);
-
     const [pickerOpen, setPickerOpen] = useState(false);
     const [unsplashOpen, setUnsplashOpen] = useState(false);
 
     const pickFromGallery = async () => {
+        const permission =
+            await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-    const permission =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (!permission.granted) {
-        return;
-    }
-
-    const result =
-        await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ["images"],
-            allowsEditing: true,
-            aspect: [16, 9],
-            quality: 0.85,
-        });
-
-        if (result.canceled) {
+        if (!permission.granted) {
             return;
         }
+
+        const result =
+            await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ["images"],
+                allowsEditing: true,
+                aspect: [16, 9],
+                quality: 0.85,
+            });
+
+            if (result.canceled) {
+                return;
+            }
 
         setPickerOpen(false);
 
@@ -59,6 +56,7 @@ export default function RecipeImagePicker({
             result.assets[0].uri
         );
 
+        console.log(result.assets[0])
         onChange(url);
     };
 
@@ -99,13 +97,13 @@ export default function RecipeImagePicker({
             </View>
 
             <UnsplashPicker
-                visible={open}
+                visible={unsplashOpen}
                 onClose={()=>{
-                    setOpen(false);
+                    setUnsplashOpen(false);
                 }}
                 onSelect={(url: any)=>{
                     onChange(url);
-                    setOpen(false);
+                    setUnsplashOpen(false);
                 }}
             />
 
