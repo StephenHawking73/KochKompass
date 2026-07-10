@@ -16,6 +16,7 @@ export const icons = {
     vegan: (props) => <Ionicons name="leaf" size={16} {...props}/>,
     vegetarian: (props) => <MaterialCommunityIcons name="food-apple-outline" size={16} {...props}/>,
     meat: (props) => <MaterialCommunityIcons name="food-drumstick-outline" size={16} {...props}/>,
+    dessert: (props) => <MaterialCommunityIcons name="cupcake" size={16} {...props} />,
 
     time: (props) => <MaterialIcons name="access-time" size={16} {...props}/>,
     hat: (props) => <MaterialCommunityIcons name="chef-hat" size={16} {...props}/>,

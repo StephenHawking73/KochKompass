@@ -4,12 +4,13 @@ export type SortOption =
   | "za"
   | "lastCooked"
   | "neverCooked"
-  | "new"
+  | "new";
 
 type RecipeType =
   | "vegetarian"
   | "vegan"
   | "meat"
+  | "dessert";
 
 export type FilterState = {
   type: RecipeType[];

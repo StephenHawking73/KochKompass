@@ -53,7 +53,12 @@ export const Colors = {
 
         ratingContainer: {
             background: "#e6e8ef",
-        }
+        },
+
+        veggie: "#9ACD32",
+        vegan: "#008B8B",
+        meat: "#A52A2A",
+        dessert: "#F59E0B",
     },
 
     dark: {
@@ -110,5 +115,10 @@ export const Colors = {
         ratingContainer: {
             background: "#292E38",
         },
+
+        veggie: "#9ACD32",
+        vegan: "#008B8B",
+        meat: "#A52A2A",
+        dessert: "#F59E0B",
     }
 }

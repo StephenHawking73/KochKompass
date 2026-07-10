@@ -18,31 +18,32 @@ export type Difficulty =
 export type RecipeAttribute =
     | "vegan"
     | "vegetarian"
-    | "meat";
+    | "meat"
+    | "dessert";
 
 export type Recipe = {
     id?: string;
     title: string;
     description?: string;
     image_url?: string;
-    attribute: RecipeAttribute;
-    duration: number;
-    difficulty: Difficulty;
+    attribute?: RecipeAttribute | null;
+    duration?: number | null;
+    difficulty?: Difficulty | null;
     link: string;
     rating: number;
     rating_count: number;
     last_cooked_at: string;
     created_at: string;
     distribution: JSON;
-}
+};
 
 export type RecipeInput = {
     title: string;
     description?: string;
     image_url?: string;
-    attribute: RecipeAttribute;
-    duration: number;
-    difficulty: Difficulty;
+    attribute?: RecipeAttribute | null;
+    duration?: number | null;
+    difficulty?: Difficulty | null;
     link: string;
 };
 

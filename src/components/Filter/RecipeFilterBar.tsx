@@ -46,7 +46,7 @@ export default function RecipeFilterBar({
         onPress={() =>
           setFilters((prev) => {
             const withoutMeat = prev.type.filter(
-              (t) => t !== "meat"
+              (t) => t !== "meat" && t !== "dessert"
             );
 
             return {
@@ -67,7 +67,7 @@ export default function RecipeFilterBar({
         onPress={() =>
           setFilters((prev) => {
             const withoutMeat = prev.type.filter(
-              (t) => t !== "meat"
+              (t) => t !== "meat" && t !== "dessert"
             );
 
             return {
@@ -95,6 +95,23 @@ export default function RecipeFilterBar({
             )
               ? []
               : ["meat"],
+          }))
+        }
+      />
+
+      <FilterChip
+        label="Dessert"
+        selected={filters.type.includes(
+          "dessert"
+        )}
+        onPress={() =>
+          setFilters((prev) => ({
+            ...prev,
+            type: prev.type.includes(
+              "dessert"
+            )
+              ? []
+              : ["dessert"],
           }))
         }
       />

@@ -70,8 +70,8 @@ export default function RecipeDetail() {
   if (!recipe) return <LoadingScreen />;
 
   const attribute = recipe.attribute;
-  const attribute_title = attribute === "vegan" ? "Vegan" : attribute === "vegetarian" ? "Veggie" : "Fleisch";
-  const attribue_icon = attribute === "vegan" ? icons.vegan({ color: "darkcyan"}) : attribute === "vegetarian" ? icons.vegetarian({color: "yellowgreen"}) : icons.meat({color: "brown"});
+  const attribute_title = attribute === "vegan" ? "Vegan" : attribute === "vegetarian" ? "Veggie" : attribute === "meat" ? "Fleisch" : "Dessert";
+  const attribue_icon = attribute === "vegan" ? icons.vegan({ color: theme.vegan}) : attribute === "vegetarian" ? icons.vegetarian({color: theme.veggie}) : attribute === "meat" ? icons.meat({color: theme.meat}) : icons.dessert({color: theme.dessert});
 
   const duration = recipe.duration;
   const difficulty = recipe.difficulty;
