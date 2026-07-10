@@ -11,7 +11,7 @@ import { icons } from "@/assets/icons";
 import UnsplashPicker from "./UnsplashPicker";
 
 import * as ImagePicker from "expo-image-picker";
-import { uploadRecipeImage } from "@/services/storageService";
+import { deleteRecipeImage, uploadRecipeImage } from "@/services/storageService";
 import BasicBottomSheet from "./BasicBottomSheet";
 
 interface Props{
@@ -56,7 +56,34 @@ export default function RecipeImagePicker({
             result.assets[0].uri
         );
 
-        console.log(result.assets[0])
+        onChange(url);
+    };
+
+    const takePhoto = async () => {
+        const permission =
+            await ImagePicker.requestCameraPermissionsAsync();
+
+        if (!permission.granted) {
+            return;
+        }
+
+        const result =
+            await ImagePicker.launchCameraAsync({
+                allowsEditing: true,
+                aspect: [16, 9],
+                quality: 0.85,
+            });
+
+        if (result.canceled) {
+            return;
+        }
+
+        setPickerOpen(false);
+
+        const url = await uploadRecipeImage(
+            result.assets[0].uri
+        );
+
         onChange(url);
     };
 
@@ -144,6 +171,7 @@ export default function RecipeImagePicker({
 
                 <Pressable
                     style={styles.option}
+                    onPress={takePhoto}
                 >
                     {icons.camera({
                         size:22,
@@ -159,9 +187,15 @@ export default function RecipeImagePicker({
 
                 <Pressable
                     style={styles.option}
-                    onPress={()=>{
-                        onChange("");
-                        setPickerOpen(false);
+                    onPress={async () => {
+                        try {
+                            await deleteRecipeImage(value);
+
+                            onChange("");
+                            setPickerOpen(false);
+                        } catch (err) {
+                            console.log("Fehler beim Löschen des Bildes: ", err)
+                        }
                     }}
                 >
                     {icons.delete({

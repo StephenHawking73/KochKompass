@@ -28,3 +28,21 @@ export async function uploadRecipeImage(uri: string) {
 
     return data.publicUrl;
 }
+
+
+export async function deleteRecipeImage(url: string) {
+
+    if (!url) return;
+
+    const fileName = url.split("/").pop();
+
+    if (!fileName) return;
+
+    const { error } = await supabase.storage
+        .from("recipe-images")
+        .remove([fileName]);
+
+    if (error) {
+        throw error;
+    }
+}
