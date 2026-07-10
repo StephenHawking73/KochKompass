@@ -49,6 +49,8 @@ export default function RecipeEdit(){
     const [link,setLink] = useState("");
     const [image,setImage] = useState("");
 
+    const canSave = title.trim().length > 0;
+
     useEffect(()=>{
         if(!recipeId) return;
 
@@ -70,8 +72,13 @@ export default function RecipeEdit(){
     },[recipeId]);
 
     async function save(){
+
+        if(title.trim() === ""){
+            return;
+        }
+
         const data = {
-            title,
+            title: title.trim(),
             description,
             duration: duration.trim() === ""
                 ? null
@@ -136,7 +143,7 @@ export default function RecipeEdit(){
                         </Text>
                         <TextInput
                             style={styles.input}
-                            placeholder="Rezeptname"
+                            placeholder="Rezeptname*"
                             placeholderTextColor={theme.text.op}
                             value={title}
                             onChangeText={setTitle}
@@ -283,8 +290,9 @@ export default function RecipeEdit(){
                 {/* SAVE BUTTON */}
                 <View style={styles.bottom}>
                     <Pressable
-                        style={styles.saveButton}
+                        style={[styles.saveButton, !canSave && styles.disabledButton]}
                         onPress={save}
+                        disabled={!canSave}
                     >
 
                         {icons.check({
@@ -426,18 +434,12 @@ StyleSheet.create({
 
 
     bottom:{
-        position:"absolute",
-
-        bottom:-10,
-        left:20,
-        right:20,
-
+        paddingHorizontal: 20,
         height:80,
 
         justifyContent:"center",
 
         backgroundColor:theme.background,
-
     },
 
 
@@ -456,6 +458,10 @@ StyleSheet.create({
 
         gap:10,
 
+    },
+
+    disabledButton: {
+        opacity: 0.5,
     },
 
     saveText:{
