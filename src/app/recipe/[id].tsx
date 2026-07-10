@@ -299,7 +299,7 @@ export default function RecipeDetail() {
                   }
                 >
                   {icons.link({ color: theme.text.link })}
-                  <Text style={{ color: theme.text.link }} numberOfLines={1}>
+                  <Text style={{ color: theme.text.link, flex: 1 }} numberOfLines={1}>
                     {recipe.link}
                   </Text>
                   {icons.right({ color: theme.text.op, size: 15, })}
@@ -483,8 +483,6 @@ const createStyles = (theme: any) =>
         padding: 14,
         height: 50,
         width: "100%",
-
-        alignSelf: "flex-start",
 
         borderRadius: 13,
 

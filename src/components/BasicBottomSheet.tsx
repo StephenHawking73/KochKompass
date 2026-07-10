@@ -28,19 +28,27 @@ type Props = {
   onClose: () => void;
   children: React.ReactNode;
   heightFactor?: number;
+  fullScreen?: boolean;
 };
 
 export default function BasicBottomSheet({
   visible,
   onClose,
   children,
-  heightFactor = 0.55,
+  heightFactor = 0.9,
+  fullScreen = false,
 }: Props) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
 
-  const sheetHeight = 340;
-  const maxSheetHeight = height * 0.9;
+  const topInset = insets.top;
+  
+  const sheetHeight = fullScreen 
+                        ? height - topInset
+                        : 340;
+  const maxSheetHeight = fullScreen 
+                        ? height - topInset
+                        : height * heightFactor;
 
   const currentHeight = useSharedValue(sheetHeight);
   const heightStyle = useAnimatedStyle(() => ({

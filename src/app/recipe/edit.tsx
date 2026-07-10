@@ -5,6 +5,9 @@ import {
     Pressable,
     ScrollView,
     StyleSheet,
+    KeyboardAvoidingView,
+    Platform,
+    Image,
 } from "react-native";
 
 import { useLocalSearchParams, router } from "expo-router";
@@ -20,6 +23,8 @@ import { Difficulty, RecipeAttribute } from "@/types/types";
 import { useTheme } from "@/hooks/useTheme";
 import { icons } from "@/assets/icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { selectImage } from "@/lib/selectImage";
+import RecipeImagePicker from "@/components/RecipeImagePicker";
 
 
 export default function RecipeEdit(){
@@ -91,226 +96,214 @@ export default function RecipeEdit(){
 
     return (
         <SafeAreaView style={styles.container}>
-            {/* HEADER */}
-            <View style={styles.header}>
-                <Pressable
-                    style={styles.iconButton}
-                    onPress={()=>router.back()}
-                >
-                    {icons.back({
-                        color: theme.text.primary
-                    })}
-                </Pressable>
+            <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={Platform.OS === "ios" ? 20: 0}>
+                {/* HEADER */}
+                <View style={styles.header}>
+                    <Pressable
+                        style={styles.iconButton}
+                        onPress={()=>router.back()}
+                    >
+                        {icons.back({
+                            color: theme.text.primary
+                        })}
+                    </Pressable>
 
-                <Text style={styles.headerTitle}>
-                    {editing
-                        ? "Rezept bearbeiten"
-                        : "Neues Rezept"
-                    }
-                </Text>
-                <View style={{width:42}}/>
-            </View>
-
-            <ScrollView
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{
-                    padding:20,
-                    paddingBottom:120
-                }}
-            >
-                {/* BASISDATEN */}
-                <View style={styles.card}>
-                    <Text style={styles.sectionTitle}>
-                        Allgemein
+                    <Text style={styles.headerTitle}>
+                        {editing
+                            ? "Rezept bearbeiten"
+                            : "Neues Rezept"
+                        }
                     </Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Rezeptname"
-                        placeholderTextColor={theme.text.op}
-                        value={title}
-                        onChangeText={setTitle}
-                    />
-                    <TextInput
-                        style={[
-                            styles.input,
-                            styles.descriptionInput
-                        ]}
-                        placeholder="Beschreibung"
-                        placeholderTextColor={theme.text.op}
-                        value={description}
-                        onChangeText={setDescription}
-                        multiline
-                    />
+                    <View style={{width:42}}/>
                 </View>
 
-                {/* DETAILS */}
-                <View style={styles.card}>
-                    <Text style={styles.sectionTitle}>
-                        Details
-                    </Text>
+                <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                    contentContainerStyle={{
+                        padding:20,
+                        paddingBottom:120
+                    }}
+                >
+                    <View style={styles.imageContainer}>
+                        <RecipeImagePicker value={image} onChange={setImage}/>
 
-                    <Text style={styles.label}>
-                        Kategorie
-                    </Text>
+                    </View>
+                    {/* BASISDATEN */}
+                    <View style={styles.card}>
+                        <Text style={styles.sectionTitle}>
+                            Allgemein
+                        </Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Rezeptname"
+                            placeholderTextColor={theme.text.op}
+                            value={title}
+                            onChangeText={setTitle}
+                        />
+                        <TextInput
+                            style={[
+                                styles.input,
+                                styles.descriptionInput
+                            ]}
+                            placeholder="Beschreibung"
+                            placeholderTextColor={theme.text.op}
+                            value={description}
+                            onChangeText={setDescription}
+                            multiline
+                        />
+                    </View>
 
-                    <View style={styles.chipRow}>
-                        {[
-                            {
-                                value:"vegan",
-                                title:"Vegan"
-                            },
-                            {
-                                value:"vegetarian",
-                                title:"Vegetarisch"
-                            },
-                            {
-                                value:"meat",
-                                title:"Fleisch"
-                            },
-                            {
-                                value:"dessert",
-                                title:"Dessert",
-                            }
-                        ].map(item=>(
-                            <Pressable
-                                key={item.value}
-                                onPress={()=>
-                                    setAttribute(prev =>
-                                        prev === item.value
-                                            ? null
-                                            : (item.value as RecipeAttribute)
-                                    )
+                    {/* DETAILS */}
+                    <View style={styles.card}>
+                        <Text style={styles.sectionTitle}>
+                            Details
+                        </Text>
+
+                        <Text style={styles.label}>
+                            Kategorie
+                        </Text>
+
+                        <View style={styles.chipRow}>
+                            {[
+                                {
+                                    value:"vegan",
+                                    title:"Vegan"
+                                },
+                                {
+                                    value:"vegetarian",
+                                    title:"Vegetarisch"
+                                },
+                                {
+                                    value:"meat",
+                                    title:"Fleisch"
+                                },
+                                {
+                                    value:"dessert",
+                                    title:"Dessert",
                                 }
-                                style={[
-                                    styles.chip,
-                                    attribute === item.value &&
-                                    styles.activeChip
-                                ]}
-                            >
-                                <Text
+                            ].map(item=>(
+                                <Pressable
+                                    key={item.value}
+                                    onPress={()=>
+                                        setAttribute(prev =>
+                                            prev === item.value
+                                                ? null
+                                                : (item.value as RecipeAttribute)
+                                        )
+                                    }
                                     style={[
-                                        styles.chipText,
+                                        styles.chip,
                                         attribute === item.value &&
-                                        styles.activeChipText
+                                        styles.activeChip
                                     ]}
                                 >
-                                    {item.title}
-                                </Text>
-                            </Pressable>
-                        ))}
-                    </View>
+                                    <Text
+                                        style={[
+                                            styles.chipText,
+                                            attribute === item.value &&
+                                            styles.activeChipText
+                                        ]}
+                                    >
+                                        {item.title}
+                                    </Text>
+                                </Pressable>
+                            ))}
+                        </View>
 
 
+                        <Text style={styles.label}>
+                            Schwierigkeit
+                        </Text>
 
+                        <View style={styles.chipRow}>
+                            {[
+                                "Einfach",
+                                "Mittel",
+                                "Schwer"
 
-                    <Text style={styles.label}>
-                        Schwierigkeit
-                    </Text>
+                            ].map(item=>(
 
+                                <Pressable
+                                    key={item}
+                                    onPress={()=>
+                                        setDifficulty(prev =>
+                                            prev === item
+                                                ? null
+                                                : (item as Difficulty)
+                                        )
+                                    }
 
-                    <View style={styles.chipRow}>
-
-
-                        {[
-                            "Einfach",
-                            "Mittel",
-                            "Schwer"
-
-                        ].map(item=>(
-
-                            <Pressable
-                                key={item}
-                                onPress={()=>
-                                    setDifficulty(prev =>
-                                        prev === item
-                                            ? null
-                                            : (item as Difficulty)
-                                    )
-                                }
-
-                                style={[
-                                    styles.chip,
-                                    difficulty === item &&
-                                    styles.activeChip
-                                ]}
-                            >
-
-                                <Text
                                     style={[
-                                        styles.chipText,
+                                        styles.chip,
                                         difficulty === item &&
-                                        styles.activeChipText
+                                        styles.activeChip
                                     ]}
                                 >
-                                    {item}
-                                </Text>
-                            </Pressable>
-                        ))}
+                                    <Text
+                                        style={[
+                                            styles.chipText,
+                                            difficulty === item &&
+                                            styles.activeChipText
+                                        ]}
+                                    >
+                                        {item}
+                                    </Text>
+                                </Pressable>
+                            ))}
+                        </View>
+
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Dauer in Minuten"
+                            placeholderTextColor={theme.text.op}
+                            value={duration}
+                            onChangeText={setDuration}
+                            keyboardType="numeric"
+                        />
                     </View>
 
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Dauer in Minuten"
-                        placeholderTextColor={theme.text.op}
-                        value={duration}
-                        onChangeText={setDuration}
-                        keyboardType="numeric"
-                    />
+                    {/* LINKS */}
+                    <View style={styles.card}>
+
+                        <Text style={styles.sectionTitle}>
+                            Verknüpfungen
+                        </Text>
+
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Rezept Link"
+                            placeholderTextColor={theme.text.op}
+                            value={link}
+                            onChangeText={setLink}
+                        />
+                    </View>
+                </ScrollView>
+
+                {/* SAVE BUTTON */}
+                <View style={styles.bottom}>
+                    <Pressable
+                        style={styles.saveButton}
+                        onPress={save}
+                    >
+
+                        {icons.check({
+                            color:"white",
+                            size:22
+                        })}
+
+                        <Text style={styles.saveText}>
+                            Speichern
+                        </Text>
+
+                    </Pressable>
                 </View>
-
-                {/* LINKS */}
-                <View style={styles.card}>
-
-                    <Text style={styles.sectionTitle}>
-                        Verknüpfungen
-                    </Text>
-
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Bild URL"
-                        placeholderTextColor={theme.text.op}
-                        value={image}
-                        onChangeText={setImage}
-                    />
-
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Rezept Link"
-                        placeholderTextColor={theme.text.op}
-                        value={link}
-                        onChangeText={setLink}
-                    />
-                </View>
-            </ScrollView>
-
-            {/* SAVE BUTTON */}
-            <View style={styles.bottom}>
-                <Pressable
-                    style={styles.saveButton}
-                    onPress={save}
-                >
-
-                    {icons.check({
-                        color:"white",
-                        size:22
-                    })}
-
-                    <Text style={styles.saveText}>
-                        Speichern
-                    </Text>
-
-                </Pressable>
-            </View>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
 
-
-
-
-
-const createStyles = (theme:any)=>
-
+const createStyles = (theme:any) =>
 StyleSheet.create({
     container:{
         flex:1,
@@ -435,7 +428,7 @@ StyleSheet.create({
     bottom:{
         position:"absolute",
 
-        bottom:20,
+        bottom:-10,
         left:20,
         right:20,
 
@@ -467,9 +460,57 @@ StyleSheet.create({
 
     saveText:{
         color:"white",
-
         fontSize:16,
-
         fontWeight:"700",
+    },
+
+    imageContainer:{
+        height:220,
+        borderRadius:20,
+        overflow:"hidden",
+        marginBottom:15,
+        backgroundColor:theme.background,
+        position:"relative",
+    },
+
+    recipeImage:{
+        width: "100%",
+        height: "100%",
+    },
+
+    imagePlaceholder:{
+        flex:1,
+
+        justifyContent:"center",
+        alignItems:"center",
+
+        gap:10,
+    },
+
+    placeholderText:{
+        color:theme.text.op,
+        fontSize:14,
+        fontWeight:"600",
+    },
+
+    editImageButton:{
+        position:"absolute",
+
+        right:12,
+        bottom:12,
+
+        width:40,
+        height:40,
+
+        borderRadius:20,
+
+        backgroundColor:theme.accent.primary,
+
+        justifyContent:"center",
+        alignItems:"center",
+
+        shadowOpacity:0.2,
+        shadowRadius:5,
+        elevation:3,
     },
 });

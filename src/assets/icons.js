@@ -25,7 +25,6 @@ export const icons = {
     star_half: (props) => <FontAwesome name="star-half" size={14} {...props}/>,
     star_o: (props) => <FontAwesome name="star-o" size={14} {...props}/>,
 
-
     down: (props) => <FontAwesome6 name="chevron-down" size={14} {...props}/>,
     up: (props) => <FontAwesome6 name="chevron-up" size={14} {...props}/>,
     back: (props) => <FontAwesome6 name="chevron-left" size={19} {...props}/>,
@@ -41,4 +40,5 @@ export const icons = {
     edit: (props) => <Octicons name="pencil" size={24} {...props} />,
     delete: (props) => <Feather name="trash" size={24} {...props} />,
     check: (props) => <Entypo name="check" size={24} {...props} />,
+    camera: (props) => <Feather name="camera" size={30} {...props} />,
 }
