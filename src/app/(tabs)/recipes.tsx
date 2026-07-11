@@ -87,6 +87,21 @@ export default function RecipiesScreen() {
         !filters.quickOnly ||
         (recipe.duration ?? Infinity) < 30;
 
+      const matchesDifficulty =
+        [
+          filters.simple && "Einfach",
+          filters.middle && "Mittel",
+          filters.hard && "Schwer",
+        ]
+          .filter(Boolean)
+          .length === 0 ||
+        [
+          filters.simple && "Einfach",
+          filters.middle && "Mittel",
+          filters.hard && "Schwer",
+        ]
+          .includes(recipe.difficulty);
+
       const matchesNeverCooked =
         sortBy !== "neverCooked" ||
         recipe.last_cooked_at === null;
@@ -95,6 +110,7 @@ export default function RecipiesScreen() {
         matchesType &&
         matchesFavorite &&
         matchesQuick &&
+        matchesDifficulty &&
         matchesNeverCooked
       );
     });

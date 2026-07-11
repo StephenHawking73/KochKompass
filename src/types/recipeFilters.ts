@@ -19,4 +19,7 @@ export type FilterState = {
   type: RecipeType[];
   favoritesOnly: boolean;
   quickOnly: boolean;
+  simple: boolean;
+  middle: boolean;
+  hard: boolean;
 };

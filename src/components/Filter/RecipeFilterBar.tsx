@@ -127,6 +127,42 @@ export default function RecipeFilterBar({
           }))
         }
       />
+
+      <FilterChip
+        label="Einfach"
+        selected={filters.simple}
+        onPress={() =>
+          setFilters((prev) => ({
+            ...prev,
+            simple:
+              !prev.simple,
+          }))
+        }
+      />
+
+      <FilterChip
+        label="Mittel"
+        selected={filters.middle}
+        onPress={() =>
+          setFilters((prev) => ({
+            ...prev,
+            middle:
+              !prev.middle,
+          }))
+        }
+      />
+
+      <FilterChip
+        label="Schwer"
+        selected={filters.hard}
+        onPress={() =>
+          setFilters((prev) => ({
+            ...prev,
+            hard:
+              !prev.hard,
+          }))
+        }
+      />
     </ScrollView>
   );
 }

@@ -246,7 +246,7 @@ export default function RecipeDetail() {
 
             {/* Infos */}
             { (recipe.attribute || recipe.duration || recipe.difficulty) && (
-              <ScrollView horizontal showsVerticalScrollIndicator={false} contentContainerStyle={{paddingVertical: 10, gap: 12, alignItems: "flex-start", marginTop: 10,}} style={{overflow: "visible"}}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} contentContainerStyle={{paddingVertical: 10, gap: 12, alignItems: "flex-start", marginTop: 10,}} style={{overflow: "visible"}}>
                   {attribute && <InfoCard title={attribute_title} icon={attribue_icon}/>}
                   {difficulty && 
                       <InfoCard 
