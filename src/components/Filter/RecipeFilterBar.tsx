@@ -115,6 +115,18 @@ export default function RecipeFilterBar({
           }))
         }
       />
+
+      <FilterChip
+        label="< 30min"
+        selected={filters.quickOnly}
+        onPress={() =>
+          setFilters((prev) => ({
+            ...prev,
+            quickOnly:
+              !prev.quickOnly,
+          }))
+        }
+      />
     </ScrollView>
   );
 }

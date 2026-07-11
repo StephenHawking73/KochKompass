@@ -39,6 +39,7 @@ export default function RecipiesScreen() {
 
   const sortOptions: Option[] = [
     { label: "Beliebteste", value: "popular" },
+    { label: "Schnellste", value: "fastest"},
     { label: "A-Z", value: "az" },
     { label: "Z-A", value: "za" },
     { label: "Lange nicht gekocht", value: "lastCooked" },
@@ -58,6 +59,7 @@ export default function RecipiesScreen() {
   const [filters, setFilters] = useState<FilterState>({
     type: [],
     favoritesOnly: false,
+    quickOnly: false,
   });
   
   const [inputText, setInputText] = useState("");
@@ -69,16 +71,33 @@ export default function RecipiesScreen() {
     );
 
     const filteredMeals = searched.filter((recipe) => {
-      const matchesType = filters.type.length === 0 || filters.type.includes(recipe.attribute) || (
-        filters.type.includes("vegetarian") && recipe.attribute === "vegan"
+      const matchesType =
+        filters.type.length === 0 ||
+        filters.type.includes(recipe.attribute) ||
+        (
+          filters.type.includes("vegetarian") &&
+          recipe.attribute === "vegan"
+        );
+
+      const matchesFavorite =
+        !filters.favoritesOnly ||
+        favorites.favorites.has(recipe.id);
+
+      const matchesQuick =
+        !filters.quickOnly ||
+        (recipe.duration ?? Infinity) < 30;
+
+      const matchesNeverCooked =
+        sortBy !== "neverCooked" ||
+        recipe.last_cooked_at === null;
+
+      return (
+        matchesType &&
+        matchesFavorite &&
+        matchesQuick &&
+        matchesNeverCooked
       );
-
-      const matchesFavorite = !filters.favoritesOnly || favorites.favorites.has(recipe.id);
-
-      const matchesNeverCooked = sortBy !== "neverCooked" || recipe.last_cooked_at === null;
-
-      return matchesType && matchesFavorite && matchesNeverCooked;
-    })
+    });
 
     return [...filteredMeals].sort((a, b) => {
       switch (sortBy) {
@@ -106,6 +125,9 @@ export default function RecipiesScreen() {
             new Date(b.created_at).getTime() -
             new Date(a.created_at).getTime()
           );
+
+        case "fastest":
+          return (a.duration ?? Infinity) - (b.duration ?? Infinity);
 
         default:
           return 0;

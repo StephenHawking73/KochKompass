@@ -4,7 +4,8 @@ export type SortOption =
   | "za"
   | "lastCooked"
   | "neverCooked"
-  | "new";
+  | "new"
+  | "fastest";
 
 type RecipeType =
   | "vegetarian"
@@ -17,4 +18,5 @@ type RecipeType =
 export type FilterState = {
   type: RecipeType[];
   favoritesOnly: boolean;
+  quickOnly: boolean;
 };
