@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { Recipe, RecipeInput } from "@/types/types";
+import { deleteRecipeImage } from "./storageService";
 
 export async function getRecipes() {
     let query = supabase.from("recipes").select("id, title, image_url, description, attribute, duration, difficulty, created_at, link, meal_plan(planned_date), recipe_ratings_summary(avg_rating, rating_count)");
@@ -75,6 +76,34 @@ export async function updateRecipe(
     recipe: Partial<RecipeInput>
 ) {
 
+    // Aktuelles Rezept laden
+    const { data: currentRecipe, error: currentError } = await supabase
+        .from("recipes")
+        .select("image_url")
+        .eq("id", id)
+        .single();
+
+    if (currentError) {
+        console.error(currentError);
+        throw currentError;
+    }
+
+    // Hat sich das Bild geändert?
+    const oldImage = currentRecipe.image_url;
+    const newImage = recipe.image_url;
+
+    if (
+        oldImage &&
+        oldImage !== newImage
+    ) {
+        try {
+            await deleteRecipeImage(oldImage);
+        } catch (error) {
+            console.error("Altes Bild konnte nicht gelöscht werden:", error);
+        }
+    }
+
+    // Rezept aktualisieren
     const { data, error } = await supabase
         .from("recipes")
         .update({
@@ -90,12 +119,47 @@ export async function updateRecipe(
         .select()
         .single();
 
-
     if (error) {
         console.error(error);
         throw error;
     }
 
+    return data;
+}
+
+export async function deleteRecipe(id: string) {
+
+    // Bild-URL holen
+    const { data: recipe, error: recipeError } = await supabase
+        .from("recipes")
+        .select("image_url")
+        .eq("id", id)
+        .single();
+
+    if (recipeError) {
+        console.error(recipeError);
+        throw recipeError;
+    }
+
+    // Bild löschen (falls eigenes)
+    try {
+        await deleteRecipeImage(recipe.image_url);
+    } catch (error) {
+        console.error("Fehler beim Löschen des Bildes:", error);
+    }
+
+    // Rezept löschen
+    const { data, error } = await supabase
+        .from("recipes")
+        .delete()
+        .eq("id", id)
+        .select()
+        .single();
+
+    if (error) {
+        console.error(error);
+        throw error;
+    }
 
     return data;
 }

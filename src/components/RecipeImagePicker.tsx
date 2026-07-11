@@ -17,11 +17,13 @@ import BasicBottomSheet from "./BasicBottomSheet";
 interface Props{
     value:string;
     onChange:(url:string)=>void;
+    onUpload?: (url: string) => void;
 }
 
 export default function RecipeImagePicker({
     value,
-    onChange
+    onChange,
+    onUpload,
 }:Props){
 
     const theme = useTheme();
@@ -57,6 +59,7 @@ export default function RecipeImagePicker({
         );
 
         onChange(url);
+        onUpload?.(url);
     };
 
     const takePhoto = async () => {
@@ -85,6 +88,7 @@ export default function RecipeImagePicker({
         );
 
         onChange(url);
+        onUpload?.(url);
     };
 
     return(
@@ -137,6 +141,7 @@ export default function RecipeImagePicker({
             <BasicBottomSheet
                 visible={pickerOpen}
                 onClose={() => setPickerOpen(false)}
+                heightFactor={0}
             >
                 <Pressable
                     style={styles.option}

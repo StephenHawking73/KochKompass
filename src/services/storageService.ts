@@ -6,7 +6,15 @@ export async function uploadRecipeImage(uri: string) {
 
     const arrayBuffer = await response.arrayBuffer();
 
-    const extension = uri.split(".").pop() || "jpg";
+    const extension = uri.split(".").pop()?.toLowerCase() || "jpg";
+
+    const mimeType: Record<string, string> = {
+        jpg: "image/jpeg",
+        jpeg: "image/jpeg",
+        png: "image/png",
+        webp: "image/webp",
+    }
+    const contentType = mimeType[extension] ?? "image/jpeg";
 
     const fileName =
         `${Date.now()}-${Math.random().toString(36).slice(2)}.${extension}`;
@@ -14,7 +22,7 @@ export async function uploadRecipeImage(uri: string) {
     const { error } = await supabase.storage
         .from("recipe-images")
         .upload(fileName, arrayBuffer, {
-            contentType: "image/jpeg",
+            contentType,
             upsert: false,
         });
 

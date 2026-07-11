@@ -25,6 +25,7 @@ import { icons } from "@/assets/icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { selectImage } from "@/lib/selectImage";
 import RecipeImagePicker from "@/components/RecipeImagePicker";
+import { deleteRecipeImage } from "@/services/storageService";
 
 
 export default function RecipeEdit(){
@@ -50,6 +51,8 @@ export default function RecipeEdit(){
     const [image,setImage] = useState("");
 
     const canSave = title.trim().length > 0;
+
+    const [uploadedImage, setUploadedImage] = useState<string | null>(null);
 
     useEffect(()=>{
         if(!recipeId) return;
@@ -94,8 +97,10 @@ export default function RecipeEdit(){
                 recipeId!,
                 data
             );
+            setUploadedImage(null);
         } else{
             await createRecipe(data);
+            setUploadedImage(null);
         }
 
         router.back();
@@ -108,7 +113,13 @@ export default function RecipeEdit(){
                 <View style={styles.header}>
                     <Pressable
                         style={styles.iconButton}
-                        onPress={()=>router.back()}
+                        onPress={async () => {
+                            if (uploadedImage) {
+                                await deleteRecipeImage(uploadedImage);
+                            }
+
+                            router.back()
+                        }}
                     >
                         {icons.back({
                             color: theme.text.primary
@@ -133,7 +144,7 @@ export default function RecipeEdit(){
                     }}
                 >
                     <View style={styles.imageContainer}>
-                        <RecipeImagePicker value={image} onChange={setImage}/>
+                        <RecipeImagePicker value={image} onChange={setImage} onUpload={setUploadedImage}/>
 
                     </View>
                     {/* BASISDATEN */}

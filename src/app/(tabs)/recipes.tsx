@@ -12,7 +12,9 @@ import RecipeFilterBar from '@/components/Filter/RecipeFilterBar';
 import SortDropdown from '@/components/SortDropdown';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { addMealToPlan } from '@/services/mealService';
-import { Meal } from '@/types/types';
+import { Meal, Recipe } from '@/types/types';
+import DeleteMealSheet from '@/components/modals/DeleteMealModal';
+import { deleteRecipe } from '@/services/recipeService';
 
 type Option = {
   label: string;
@@ -150,6 +152,9 @@ export default function RecipiesScreen() {
     }
   };
 
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
   return (
     <SafeAreaView style={{flex: 1, paddingHorizontal: 30, backgroundColor: theme.background}}>
       {/* Add button */}
@@ -239,10 +244,44 @@ export default function RecipiesScreen() {
           paddingBottom: 80,
         }}
         renderItem={({ item }) => (
-          <MealCardList recipe={item} favorites={favorites.favorites} toggleFavorite={favorites.toggle} onPress={() => handleRecipePress(item.id)}/>
+          <MealCardList recipe={item} favorites={favorites.favorites} toggleFavorite={favorites.toggle} onPress={() => handleRecipePress(item.id)} onLongPress={() => setSelectedRecipe(item)}/>
         )}
         showsVerticalScrollIndicator={false}
       />    
+
+      <DeleteMealSheet
+        visible={selectedRecipe !== null}
+        mealTitle={selectedRecipe?.title ?? ""}
+        loading={deleting}
+        onClose={() => setSelectedRecipe(null)}
+        onDelete={async () => {
+
+          if (!selectedRecipe)
+            return;
+
+          setDeleting(true);
+
+          try {
+
+            // deine delete Funktion
+            const { error } = await deleteRecipe(selectedRecipe.id);
+
+            if (error)
+              throw error;
+
+
+            setSelectedRecipe(null);
+
+            refresh();
+
+          } finally {
+
+            setDeleting(false);
+
+          }
+
+        }}
+      />
     </SafeAreaView>
   )
 }

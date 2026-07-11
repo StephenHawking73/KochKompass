@@ -45,7 +45,7 @@ export default function BasicBottomSheet({
   
   const sheetHeight = fullScreen 
                         ? height - topInset
-                        : 340;
+                        : 370;
   const maxSheetHeight = fullScreen 
                         ? height - topInset
                         : height * heightFactor;

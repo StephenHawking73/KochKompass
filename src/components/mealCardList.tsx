@@ -14,9 +14,10 @@ type Props = {
   favorites: Set<string>;
   toggleFavorite: (id: string) => any;
   onPress?: () => void;
+  onLongPress?: () => void;
 };
 
-export default function MealCardList({ recipe, onPress, favorites, toggleFavorite }: Props) {
+export default function MealCardList({ recipe, onPress, favorites, toggleFavorite, onLongPress }: Props) {
   const theme = useTheme();
   const styles = createStyles(theme);
 
@@ -27,7 +28,7 @@ export default function MealCardList({ recipe, onPress, favorites, toggleFavorit
   };
 
   return (
-    <Pressable style={styles.card} onPress={onPress}>
+    <Pressable style={styles.card} onPress={onPress} onLongPress={onLongPress} delayLongPress={500}>
       <View style={styles.imageContainer}>
         <Image
           source={
