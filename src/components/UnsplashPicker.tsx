@@ -12,6 +12,7 @@ import { useState } from "react";
 import { useTheme } from "@/hooks/useTheme";
 import BasicBottomSheet from "@/components/BasicBottomSheet";
 import { icons } from "@/assets/icons";
+import { images as img} from "@/assets/images";
 
 interface Props{
     visible:boolean;
@@ -116,27 +117,57 @@ export default function UnsplashPicker({
 
                 </View>
 
-                <FlatList
-                    data={images}
-                    numColumns={2}
-                    showsVerticalScrollIndicator={false}
-                    keyExtractor={(item)=>item.id}
-                    columnWrapperStyle={styles.row}
-                    contentContainerStyle={styles.list}
-                    renderItem={({item})=>(
-                        <Pressable
-                            style={styles.imageCard}
-                            onPress={()=>selectImage(item.urls.regular)}
-                        >
-                            <Image
-                                source={{
-                                    uri:item.urls.small
-                                }}
-                                style={styles.image}
-                            />
-                        </Pressable>
-                    )}
-                />
+                {loading ? (
+                    <View style={styles.stateContainer}>
+                        <ActivityIndicator
+                            size="large"
+                            color={theme.accent.primary}
+                        />
+                        <Text style={styles.stateText}>
+                            Bilder werden gesucht...
+                        </Text>
+                    </View>
+                ) : images.length === 0 ? (
+                    <View style={styles.stateContainer}>
+                        <Image
+                            source={img.notFound}
+                            style={styles.stateImage}
+                            resizeMode="contain"
+                        />
+                        <Text style={styles.stateText}>
+                            Keine Bilder gefunden.
+                        </Text>
+                    </View>
+                ) : (
+                    <FlatList
+                        data={images}
+                        numColumns={2}
+                        showsVerticalScrollIndicator={false}
+                        keyExtractor={(item) => item.id}
+                        columnWrapperStyle={styles.row}
+                        contentContainerStyle={styles.list}
+                        renderItem={({ item }) => (
+                            <Pressable
+                                style={styles.imageCard}
+                                onPress={() => selectImage(item.urls.regular)}
+                            >
+                                <Image
+                                    source={{ uri: item.urls.small }}
+                                    style={styles.image}
+                                />
+                            </Pressable>
+                        )}
+                    />
+                )}
+
+                <Pressable
+                    style={styles.cancelButton}
+                    onPress={close}
+                >
+                    <Text style={styles.cancelButtonText}>
+                        Abbrechen
+                    </Text>
+                </Pressable>
 
             </View>
         </BasicBottomSheet>
@@ -198,5 +229,44 @@ const createStyles=(theme:any)=>StyleSheet.create({
     image:{
         width:"100%",
         height:"100%",
+    },
+
+    cancelButton: {
+        height: 50,
+        borderRadius: 15,
+        marginTop: 12,
+        marginBottom: 8,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: theme.card.background,
+        borderWidth: 1,
+        borderColor: theme.card.border,
+    },
+
+    cancelButtonText: {
+        color: theme.text.primary,
+        fontSize: 16,
+        fontWeight: "700",
+    },
+
+    stateContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        paddingHorizontal: 30,
+    },
+
+    stateImage: {
+        width: 180,
+        height: 180,
+        marginBottom: 20,
+    },
+
+    stateText: {
+        fontSize: 16,
+        color: theme.text.secondary,
+        textAlign: "center",
+
+        marginTop: 10,
     },
 });

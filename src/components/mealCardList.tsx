@@ -1,5 +1,6 @@
 import {
   Image,
+  ImageBackground,
   Pressable,
   StyleSheet,
   Text,
@@ -8,6 +9,7 @@ import {
 import { useTheme } from "@/hooks/useTheme";
 import { Recipe } from "@/types/types";
 import { icons } from "@/assets/icons";
+import { images } from "@/assets/images";
 
 type Props = {
   recipe: Recipe;
@@ -34,8 +36,9 @@ export default function MealCardList({ recipe, onPress, favorites, toggleFavorit
           source={
             recipe.image_url
               ? { uri: recipe.image_url }
-              : { uri: "https://www.gesundfit.de/wp-content/uploads/2023/09/hirse-kochen-wuerzen-adobe-scaled.jpeg" }
+              : images.placeholder
           }
+          resizeMode= "cover"
           style={styles.image}
         />
 
@@ -123,6 +126,7 @@ const createStyles = (theme: any) =>
     image: {
       width: "100%",
       aspectRatio: 1,
+      height: undefined,
       borderRadius: 13,
     },
 
