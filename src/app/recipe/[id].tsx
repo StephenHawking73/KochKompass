@@ -11,6 +11,9 @@ import { getRecipeRatings } from "@/services/ratingService";
 import { RatingBars } from "@/components/RatingBars";
 import RatingSheet from "@/components/modals/RatingModal";
 import BasicBottomSheet from "@/components/BasicBottomSheet";
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
+import { deleteRecipe } from "@/services/recipeService";
+import DeleteMealSheet from "@/components/modals/DeleteMealModal";
 
 export default function RecipeDetail() {
   const { id } = useLocalSearchParams();
@@ -67,6 +70,26 @@ export default function RecipeDetail() {
   const [ratingVisible, setRatingVisible] = useState(false);
   const [detailRatingVisible, setDetailRatingVisible] = useState(false);
 
+  const [showMenu, setShowMenu] = useState(false);
+
+  const menuAnimation = useSharedValue(0);
+
+  const menuAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          scale: 0.9 + menuAnimation.value * 0.1
+        },
+        {
+          translateY: (1 - menuAnimation.value) * -10
+        }
+      ],
+    }
+  })
+
+  const [deleteVisible, setDeleteVisible] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   if (!recipe) return <LoadingScreen />;
 
   const attribute = recipe.attribute;
@@ -75,6 +98,45 @@ export default function RecipeDetail() {
 
   const duration = recipe.duration;
   const difficulty = recipe.difficulty;
+
+  function toggleMenu() {
+    if (showMenu) {
+      menuAnimation.value = withTiming(0, {
+        duration: 150,
+      });
+
+      setTimeout(() => {
+        setShowMenu(false);
+      }, 150);
+    } else {
+      setShowMenu(true);
+
+      menuAnimation.value = withSpring(1);
+    }
+  }
+
+  const handleDeleteRecipe = async () => {
+    if (!recipeId) return;
+
+    setDeleting(true);
+
+    try {
+      const { error } = await deleteRecipe(recipeId);
+
+      if (error) {
+        throw error;
+      }
+
+      setDeleteVisible(false);
+
+      router.back();
+
+    } catch (error) {
+      console.error("Recipe delete failed:", error);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -96,11 +158,75 @@ export default function RecipeDetail() {
                   }
               </Pressable>
 
-              <Pressable style={styles.iconButton}>
+              <Pressable style={styles.iconButton} onPress={toggleMenu}>
                   {icons.more({color: theme.text.primary})}
               </Pressable>
             </View>
         </View>
+
+        {showMenu && (
+            <Pressable
+                style={styles.menuOverlay}
+                onPress={toggleMenu}
+            >
+                <Animated.View
+                    style={[styles.menu, menuAnimatedStyle]}
+                >
+
+                    <Pressable
+                        style={styles.menuItem}
+                        onPress={() => {
+                            setShowMenu(false);
+
+                            router.push({
+                                pathname: "/recipe/edit",
+                                params: {
+                                    id: recipeId
+                                }
+                            });
+                        }}
+                    >
+                        {icons.edit({
+                            color: theme.text.primary,
+                            size: 20
+                        })}
+
+                        <Text style={styles.menuText}>
+                            Bearbeiten
+                        </Text>
+                    </Pressable>
+
+
+                    <View style={styles.divider}/>
+
+
+                    <Pressable
+                        style={styles.menuItem}
+                        onPress={() => {
+                            setShowMenu(false);
+                            setDeleteVisible(true);
+                            
+                        }}
+                    >
+                        {icons.delete({
+                            color: theme.notification,
+                            size: 20
+                        })}
+
+                        <Text style={[
+                            styles.menuText,
+                            {
+                                color: theme.notification
+                            }
+                        ]}>
+                            Löschen
+                        </Text>
+
+                    </Pressable>
+
+                </Animated.View>
+            </Pressable>
+        )}
 
         {/* HERO IMAGE */}
         <Image
@@ -397,6 +523,14 @@ export default function RecipeDetail() {
             }}
           />
         </BasicBottomSheet>
+
+        <DeleteMealSheet
+          visible={deleteVisible}
+          mealTitle={recipe.title}
+          loading={deleting}
+          onClose={() => setDeleteVisible(false)}
+          onDelete={handleDeleteRecipe}
+        />
     </View>
   );
 }
@@ -639,4 +773,75 @@ const createStyles = (theme: any) =>
       fontSize: 16,
       fontWeight: "600",
     },
-  });
+
+    menuOverlay:{
+        position:"absolute",
+
+        top:0,
+        left:0,
+        right:0,
+        bottom:0,
+
+        zIndex:50,
+    },
+
+
+    menu:{
+        position:"absolute",
+
+        top:115,
+        right:20,
+
+        width:190,
+
+        backgroundColor:theme.card.background,
+
+        borderRadius:20,
+
+        paddingVertical:8,
+
+        shadowColor:"#000",
+        shadowOffset:{
+            width:0,
+            height:8,
+        },
+
+        shadowOpacity:0.18,
+
+        shadowRadius:16,
+
+        elevation:12,
+
+        overflow:"hidden",
+    },
+
+
+    menuItem:{
+        height:50,
+
+        paddingHorizontal:18,
+
+        flexDirection:"row",
+        alignItems:"center",
+
+        gap:12,
+    },
+
+
+    menuText:{
+        fontSize:16,
+
+        fontWeight:"600",
+
+        color:theme.text.primary,
+    },
+
+
+    divider:{
+        height:1,
+
+        marginHorizontal:15,
+
+        backgroundColor:theme.text.op + "20",
+    },
+});
