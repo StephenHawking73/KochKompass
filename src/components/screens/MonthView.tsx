@@ -73,7 +73,7 @@ export default function MonthView({
             {/* Kalender */}
 
             <View style={styles.grid}>
-                {days.map((day: DayItem, index) => {
+                {days.map((day: DayItem) => {
                     const key =
                         day.date.getFullYear() +
                         "-" +
@@ -153,8 +153,11 @@ export default function MonthView({
                                         >
                                             <View
                                                 style={
-                                                    styles.mealDot
-                                                }
+                                                    [styles.mealDot,
+                                                    {
+                                                        backgroundColor: getAttributeColor(meal.attribute, theme)
+                                                    },
+                                                ]}
                                             />
 
                                             <Text
@@ -332,7 +335,6 @@ const createStyles = (theme: any) =>
             width: 5,
             height: 5,
             borderRadius: 999,
-            backgroundColor: theme.accent.primary,
             marginRight: 5,
             marginTop: 4,
             flexShrink: 0,
@@ -362,6 +364,28 @@ const createStyles = (theme: any) =>
         },
     });
 
+
+function getAttributeColor(
+    attribute: Meal["attribute"],
+    theme: any
+) {
+    switch (attribute) {
+        case "vegan":
+            return theme.vegan;
+
+        case "vegetarian":
+            return theme.veggie;
+
+        case "meat":
+            return theme.meat;
+
+        case "dessert":
+            return theme.dessert;
+
+        default:
+            return theme.text.op;
+    }
+}
 
 function normalizeDate(d: Date) {
     return new Date(d.getFullYear(), d.getMonth(), d.getDate());
