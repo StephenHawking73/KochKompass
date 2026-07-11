@@ -81,7 +81,7 @@ export default function RecipeEdit(){
         }
 
         const data = {
-            title: title.trim(),
+            title: title.trim().replace(/\s+/g, " "),
             description,
             duration: duration.trim() === ""
                 ? null
@@ -92,15 +92,21 @@ export default function RecipeEdit(){
             image_url:image
         };
 
-        if(editing){
-            await updateRecipe(
-                recipeId!,
-                data
-            );
-            setUploadedImage(null);
-        } else{
-            await createRecipe(data);
-            setUploadedImage(null);
+        try{
+            if(editing){
+                await updateRecipe(
+                    recipeId!,
+                    data
+                );
+                setUploadedImage(null);
+            } else{
+                await createRecipe(data);
+                setUploadedImage(null);
+            }
+        } catch (err: any) {
+            alert(
+                err.message ?? "Rezept konnte nicht gespeichert werden..."
+            )
         }
 
         router.back();

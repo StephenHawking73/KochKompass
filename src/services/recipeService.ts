@@ -49,6 +49,22 @@ export async function getRecipe(id: string) {
 }
 
 export async function createRecipe(recipe: RecipeInput) {
+
+    const { data: existing, error: checkError } = await supabase
+        .from("recipes")
+        .select("id")
+        .ilike("title", recipe.title.trim())
+        .maybeSingle();
+
+    if (checkError) {
+        console.log(checkError);
+        throw checkError;
+    }
+
+    if (existing) {
+        throw new Error("Dieses Rezept exisiert bereits!");
+    }
+
     const { data, error } = await supabase
         .from("recipes")
         .insert({
