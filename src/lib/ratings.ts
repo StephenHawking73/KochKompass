@@ -2,7 +2,8 @@ import { supabase } from "@/lib/supabase";
 
 export async function rateRecipe(
   recipeId: string,
-  rating: number | null
+  rating: number | null,
+  comment?: string,
 ) {
   const {
     data: { user },
@@ -34,6 +35,7 @@ export async function rateRecipe(
       recipe_id: recipeId,
       user_id: user.id,
       rating,
+      comment,
     });
 
 

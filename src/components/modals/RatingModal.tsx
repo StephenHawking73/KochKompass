@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet, TextInput } from "react-native";
 
 import Animated, {
   useAnimatedStyle,
@@ -22,6 +22,7 @@ type Props = {
   recipeId: string;
   initialRating?: number | null;
   onSaved?: () => void;
+  initialComment?: string | null;
 };
 
 type StarProps = {
@@ -96,6 +97,7 @@ export default function RatingSheet({
   recipeId,
   initialRating = null,
   onSaved,
+  initialComment,
 }: Props) {
   const theme = useTheme();
   const styles = createStyles(theme);
@@ -108,13 +110,14 @@ export default function RatingSheet({
 
   useEffect(() => {
     setRating(initialRating);
-  }, [initialRating, visible]);
+    setComment(initialComment ?? "");
+  }, [initialRating, initialComment, visible]);
 
   const save = async () => {
     setLoading(true);
 
     try {
-      await rateRecipe(recipeId, rating);
+      await rateRecipe(recipeId, rating, comment.trim() || undefined);
 
       onSaved?.();
       onClose();
@@ -122,6 +125,11 @@ export default function RatingSheet({
       setLoading(false);
     }
   };
+
+  const [focused, setFocused] = useState(false);
+  const [comment, setComment] = useState(initialComment ?? "");
+
+  const [characters, setCharacter] = useState(0);
 
   return (
     <View style={styles.container}>
@@ -153,6 +161,33 @@ export default function RatingSheet({
             }
           />
         ))}
+      </View>
+
+      <View style={[styles.commentContainer, focused && {
+        borderColor: theme.accent.op,
+        borderWidth: 2,
+      }]}>
+        <Text style={styles.commentLabel}>
+          Kommentar (optional)
+        </Text>
+
+        <TextInput
+          placeholder="Was hat dir besonders gefallen?"
+          placeholderTextColor={theme.text.op}
+          style={styles.commentInput}
+          multiline
+          textAlignVertical="top"
+          maxLength={500}
+          blurOnSubmit={true}
+          onChangeText={setComment}
+          value={comment}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+        />
+
+        <Text style={styles.characterCount}>
+          {characters} / 500
+        </Text>
       </View>
 
 
@@ -318,4 +353,53 @@ const createStyles = (theme: any) =>
     pressed: {
       opacity: 0.8,
     },
+
+    commentContainer: {
+      marginTop: 20,
+      padding: 16,
+      borderRadius: 18,
+
+      backgroundColor: theme.card.background, 
+
+      borderWidth: 2,
+      borderColor: "transparent",
+
+      shadowColor: "#000",
+      shadowOpacity: 0.05,
+      shadowRadius: 8,
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+
+      elevation: 2,
+    },
+
+    commentLabel: {
+      fontSize: 15,
+      fontWeight: "600",
+
+      color: theme.text.primary,
+      marginBottom: 10,
+    },
+
+    commentInput: {
+      minHeight: 110,
+
+      fontSize: 15,
+      lineHeight: 22,
+
+      color: theme.text.primary,
+
+      textAlignVertical: "top",
+    },
+
+    characterCount: {
+      marginTop: 10,
+
+      alignSelf: "flex-end",
+      fontSize: 12,
+
+      color: theme.text.op,
+    }
   });

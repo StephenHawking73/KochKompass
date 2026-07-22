@@ -511,6 +511,7 @@ export default function RecipeDetail() {
         <BasicBottomSheet
           visible={ratingVisible}
           onClose={() => setRatingVisible(false)}
+          initialHeight={550}          
         >
           <RatingSheet
             visible={ratingVisible}
@@ -521,6 +522,7 @@ export default function RecipeDetail() {
               const r = await getRecipeRatings(recipeId);
               setRatings(r);
             }}
+            initialComment={rating?.userComment}
           />
         </BasicBottomSheet>
 

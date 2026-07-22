@@ -83,7 +83,7 @@ export default function HomeScreen() {
     {/* DEBUG */}
     useEffect(() => {
         async function login() {
-            const { data, error } =
+            const { error } =
                 await supabase.auth.signInWithPassword({
                     email: "dev@dev.com",
                     password: "KochKompass",

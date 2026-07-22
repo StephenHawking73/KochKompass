@@ -1,9 +1,11 @@
 import React, { useEffect } from "react";
 import {
   Dimensions,
+  Keyboard,
   Modal,
   Pressable,
   StyleSheet,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { BlurView } from "expo-blur";
@@ -29,6 +31,7 @@ type Props = {
   children: React.ReactNode;
   heightFactor?: number;
   fullScreen?: boolean;
+  initialHeight?: number;
 };
 
 export default function BasicBottomSheet({
@@ -37,6 +40,7 @@ export default function BasicBottomSheet({
   children,
   heightFactor = 0.9,
   fullScreen = false,
+  initialHeight = 370,
 }: Props) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
@@ -45,7 +49,7 @@ export default function BasicBottomSheet({
   
   const sheetHeight = fullScreen 
                         ? height - topInset
-                        : 370;
+                        : initialHeight;
   const maxSheetHeight = fullScreen 
                         ? height - topInset
                         : height * heightFactor;
@@ -74,6 +78,33 @@ export default function BasicBottomSheet({
       });
     }
   }, [visible]);
+
+  useEffect(() => {
+    const show = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        currentHeight.value = withSpring(maxSheetHeight, {
+          damping: 24,
+          stiffness: 240,
+        });
+      }
+    );
+
+    const hide = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        currentHeight.value = withSpring(sheetHeight, {
+          damping: 24,
+          stiffness: 240,
+        });
+      }
+    );
+
+    return () => {
+      show.remove();
+      hide.remove();
+    };
+  }, [sheetHeight, maxSheetHeight]);
 
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
@@ -163,7 +194,10 @@ export default function BasicBottomSheet({
 
         <Pressable
           style={StyleSheet.absoluteFill}
-          onPress={onClose}
+          onPress={() => {
+            Keyboard.dismiss();
+            onClose();
+          }}
         />
       </Animated.View>
 
@@ -178,7 +212,11 @@ export default function BasicBottomSheet({
           <View style={styles.handle} />
 
           <View style={styles.content}>
-            {children}
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+              <View style={{flex: 1}}>
+                {children}
+              </View>
+            </TouchableWithoutFeedback>
           </View>
         </Animated.View>
       </GestureDetector>
