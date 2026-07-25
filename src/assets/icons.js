@@ -1,4 +1,5 @@
-import { AntDesign, FontAwesome6, Feather, Ionicons, MaterialCommunityIcons, FontAwesome, MaterialIcons, Entypo, Octicons } from "@expo/vector-icons"
+import { AntDesign, FontAwesome6, Feather, Ionicons, MaterialCommunityIcons, FontAwesome, MaterialIcons, Entypo, Octicons, EvilIcons } from "@expo/vector-icons";
+import { Image } from "react-native";
 
 export const icons = {
     index: (props) => <AntDesign name="home" size={20} {...props} />,
@@ -48,4 +49,12 @@ export const icons = {
     globe: (props) => <Feather name="globe" size={20} {...props}/>,
     bell: (props) => <Feather name="bell" size={20} {...props}/>,
     exit: (props) => <Ionicons name="exit-outline" size={20} {...props}/>,
+
+    mail: (props) => <Feather name="mail" {...props}/>,
+    password: (props) => <Feather name="lock" {...props}/>,
+    eye: (props) => <AntDesign name="eye" {...props}/>,
+    eyeOff: (props) => <AntDesign name="eye-invisible" {...props}/>,
+
+    google: (props) => <Image source={{uri: "https://logos-world.net/wp-content/uploads/2020/09/Google-Symbol.png"}} style={{width: 22, height: 22}} {...props}/>,
+    apple: (props) => <AntDesign name="apple" {...props}/>,
 }

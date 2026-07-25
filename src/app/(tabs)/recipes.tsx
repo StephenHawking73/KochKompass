@@ -60,6 +60,9 @@ export default function RecipiesScreen() {
     type: [],
     favoritesOnly: false,
     quickOnly: false,
+    simple: false,
+    middle: false,
+    hard: false,
   });
   
   const [inputText, setInputText] = useState("");

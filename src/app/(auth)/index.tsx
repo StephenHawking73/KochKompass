@@ -3,16 +3,14 @@ import { StyleSheet, View, Text, Image, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { images } from "@/assets/images";
 import { supabase } from "@/lib/supabase";
+import { router } from "expo-router";
 
 async function login() {
     const { data, error } =
         await supabase.auth.signInWithPassword({
             email: "dev@dev.com",
             password: "KochKompass",
-        });
-    
-        console.log("Session:", data.session);
-        console.log("Error:", error);
+        });    
     }
 
 export default function LandingPage(){
@@ -46,7 +44,7 @@ export default function LandingPage(){
                     <View style={styles.buttonContainer}>
                         <Pressable
                             style={styles.primaryButton}
-                            onPress={() => {}}
+                            onPress={() => router.push("/login")}
                         >    
                             <Text style={styles.primaryButtonText}>
                                 Anmelden
@@ -55,17 +53,13 @@ export default function LandingPage(){
 
                         <Pressable
                             style={styles.secondaryButton}
-                            onPress={() => {}}
+                            onPress={() => router.push("/register")}
                         >
                             <Text style={styles.secondaryButtonText}>
                                 Registrieren
                             </Text>
                         </Pressable>
                     </View>
-
-                    <Pressable onPress={login} style={styles.devButton}>
-                        <Text style={{}}>DEV LOGIN</Text>
-                    </Pressable>
                 </View>
             </View>
         </SafeAreaView>
@@ -81,6 +75,7 @@ const createStyles = (theme: any) => StyleSheet.create({
     content: {
         paddingTop: 30,
         paddingBottom: 40,
+        paddingHorizontal: 10,
     },
 
     header: {
@@ -113,7 +108,6 @@ const createStyles = (theme: any) => StyleSheet.create({
         lineHeight: 26,
         textAlign: "center",
         color: theme.text.op,
-        paddingHorizontal: 18,
     },
 
     buttonContainer: {
@@ -162,14 +156,5 @@ const createStyles = (theme: any) => StyleSheet.create({
         color: theme.text.primary,
         fontSize: 20,
         fontWeight: "600",
-    },
-
-    devButton: {
-        marginTop: 20,
-        alignSelf: "center",
-        paddingHorizontal: 18,
-        paddingVertical: 10,
-        borderRadius: 999,
-        backgroundColor: theme.slot.background
     },
 })
