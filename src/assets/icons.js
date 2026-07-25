@@ -43,5 +43,9 @@ export const icons = {
     
     camera: (props) => <Feather name="camera" size={30} {...props} />,
     unsplash: (props) => <FontAwesome6 name="unsplash" size={30} {...props}/>,
-    image: (props) => <FontAwesome6 name="image" size={30} {...props}/>
+    image: (props) => <FontAwesome6 name="image" size={30} {...props}/>,
+
+    globe: (props) => <Feather name="globe" size={20} {...props}/>,
+    bell: (props) => <Feather name="bell" size={20} {...props}/>,
+    exit: (props) => <Ionicons name="exit-outline" size={20} {...props}/>,
 }

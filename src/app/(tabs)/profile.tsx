@@ -2,97 +2,76 @@ import { View, Text, StyleSheet, Image, Pressable } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTheme } from '@/hooks/useTheme'
+import { getProfile } from '@/services/profileService';
+import ProfileCard from '@/components/profile/ProfileCard';
+import { icons } from '@/assets/icons';
+import { ProfileType } from '@/types/profile';
+import ProfileMenuSection from '@/components/profile/profileMenuSection';
+import { useThemeMode } from '@/hooks/useThemeMode';
 import { supabase } from '@/lib/supabase';
-
-type Profile = {
-  id: string;
-  username: string;
-  avatar_url: string | null;
-}
-
-
 
 export default function Profile() {
   const theme = useTheme();
   const styles = createStyles(theme);
 
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const {isDark} = useThemeMode();
+
+  const [profile, setProfile] = useState<ProfileType | null>(null);
 
   useEffect(() => {
-    loadProfile()
-  }, [])
-
-  async function loadProfile() {
-    setLoading(true);
-    
-    // fetch Auth User
-    const { data: userData, error: userError } = await supabase.auth.getUser();
-    
-    if (userError || !userData.user) {
-      console.log("Auth error:", userError);
-      setLoading(false);
-      return;
-    }
-
-    const userId = userData.user.id;
-
-    // Profile Table
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("id, username, avatar_url")
-      .eq("id", userId)
-      .single()
-
-    if (error) {
-      console.log("Profile error:", error)
-    } else {
+    const loadProfile = async () => {
+      const data = await getProfile()
       setProfile(data)
     }
 
-    setLoading(false)
-  }
+    loadProfile()
+  }, [])
 
-  async function handleLogout() {
+  const handleLogout = async() => {
     const { error } = await supabase.auth.signOut();
 
     if (error) {
-      console.error(error);
+      throw error;
     }
-
-    console.log("LOGOUT pressed!")
   }
+
+  const settings = [
+    {
+      title: "Design",
+      subtitle: isDark ? "Dunkel" : "Hell",
+      icon: isDark ? icons.moon({color: theme.text.primary, size: 20}): icons.sun({color: theme.text.primary, size: 20}),
+      onPress: () => {}
+    },
+    {
+      title: "Sprache",
+      icon: icons.globe({color: theme.text.primary, size: 20}),
+      onPress: () => {}
+    },
+    {
+      title: "Benachrichtigungen",
+      icon: icons.bell({color: theme.text.primary, size: 20}),
+
+    }
+  ]
+
+  const dangerZone = [
+    {
+      title: "Ausloggen",
+      icon: icons.exit({color: theme.notification, size: 20}),
+      onPress: handleLogout,
+    }
+  ]
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Profile</Text>
+      <Text style={styles.title}>Profil</Text>
 
-      {loading ? (
-        <Text>Loading</Text>
-      ) : profile ? (
-        <View style={styles.topRow}>
-          <Image 
-            source={
-              profile.avatar_url
-              ? { uri: profile.avatar_url }
-              : { uri: "https://avatar.imagik.app/_next/image?url=%2Fimages%2Favatar.webp&w=3840&q=75" }
-            }
-            style={styles.avatar}
-          />
+      {profile &&
+        <ProfileCard username={profile.username} avatar={profile.avatar_url} email={profile.email}/>
+      }
 
-          <Text style={styles.username}>
-            {profile.username}
-          </Text>
-
-          <Pressable onPress={handleLogout} style={styles.logout}>
-            <Text>Abmelden</Text>
-          </Pressable>
-        </View>
-        ) : (
-          <View style={styles.topRow}>
-            <Text style={{fontStyle: "italic", fontSize: 16, color: theme.text.primary}}>Kein Profil gefunden</Text>
-          </View>
-        )}
+      <ProfileMenuSection title="Einstellungen" items={settings}/>
+      <ProfileMenuSection title="Danger Zone" items={dangerZone}/>
     </SafeAreaView>
   )
 }
@@ -101,7 +80,7 @@ const createStyles = (theme : any) => StyleSheet.create({
   container: {
     backgroundColor: theme.background,
     flex: 1,
-    paddingHorizontal: 30,
+    padding: 20,
   },
 
   title: {

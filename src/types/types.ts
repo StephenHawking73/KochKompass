@@ -58,4 +58,3 @@ export type MealSlot = {
     date: string;
     type: "lunch" | "dinner";
 }
-
