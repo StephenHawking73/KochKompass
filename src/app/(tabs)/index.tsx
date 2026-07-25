@@ -80,22 +80,6 @@ export default function HomeScreen() {
         }
     }
 
-    {/* DEBUG */}
-    useEffect(() => {
-        async function login() {
-            const { error } =
-                await supabase.auth.signInWithPassword({
-                    email: "dev@dev.com",
-                    password: "KochKompass",
-                });
-
-            if (error) {
-                console.log(error);
-            } 
-        }
-        login();
-    }, []);
-
     const gesture = Gesture.Pan()
         .activeOffsetX([-20, 20])
         .failOffsetY([-10, 10])

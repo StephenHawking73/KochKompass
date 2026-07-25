@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image } from 'react-native'
+import { View, Text, StyleSheet, Image, Pressable } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTheme } from '@/hooks/useTheme'
@@ -53,6 +53,16 @@ export default function Profile() {
     setLoading(false)
   }
 
+  async function handleLogout() {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error(error);
+    }
+
+    console.log("LOGOUT pressed!")
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Profile</Text>
@@ -73,9 +83,15 @@ export default function Profile() {
           <Text style={styles.username}>
             {profile.username}
           </Text>
+
+          <Pressable onPress={handleLogout} style={styles.logout}>
+            <Text>Abmelden</Text>
+          </Pressable>
         </View>
         ) : (
-          <Text>Kein Profil gefunden</Text>
+          <View style={styles.topRow}>
+            <Text style={{fontStyle: "italic", fontSize: 16, color: theme.text.primary}}>Kein Profil gefunden</Text>
+          </View>
         )}
     </SafeAreaView>
   )
