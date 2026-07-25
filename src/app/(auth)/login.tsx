@@ -117,7 +117,7 @@ export default function login() {
           </Pressable>
 
           <Pressable style={styles.socialButton}>
-            {icons.apple({ size: 20 })}
+            {icons.apple({ size: 20, color: theme.text.primary })}
             <Text style={styles.socialText}>Apple</Text>
           </Pressable>
         </View>
@@ -187,6 +187,7 @@ const createStyles = (theme: any) => StyleSheet.create({
     flex: 1,
     marginLeft: 12,
     fontSize: 16,
+    color: theme.text.primary,
   },
 
   forgot: {
@@ -259,6 +260,7 @@ const createStyles = (theme: any) => StyleSheet.create({
     marginLeft: 10,
     fontSize: 15,
     fontWeight: "600",
+    color: theme.text.primary,
   },
 
   footer: {
@@ -274,7 +276,7 @@ const createStyles = (theme: any) => StyleSheet.create({
 
   register: {
     marginLeft: 5,
-    color: "#55B233",
+    color: theme.text.colored,
     fontWeight: "700",
     fontSize: 15,
   },

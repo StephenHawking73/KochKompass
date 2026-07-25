@@ -4,6 +4,7 @@ import { StyleSheet, View, Image, Text } from "react-native";
 
 type Props = {
     username: string;
+    fullName?: string | null;
     avatar: string | null;
     email: string;
 };
@@ -11,6 +12,7 @@ type Props = {
 
 export default function ProfileCard({
     username,
+    fullName,
     avatar,
     email,
 }: Props) {
@@ -38,7 +40,7 @@ export default function ProfileCard({
             <View>
 
                 <Text style={styles.name}>
-                    {username}
+                    {username} {fullName}
                 </Text>
 
 

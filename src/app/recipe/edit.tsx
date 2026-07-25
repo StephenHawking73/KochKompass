@@ -196,7 +196,7 @@ export default function RecipeEdit(){
                                 },
                                 {
                                     value:"vegetarian",
-                                    title:"Vegetarisch"
+                                    title:"Veggie"
                                 },
                                 {
                                     value:"meat",

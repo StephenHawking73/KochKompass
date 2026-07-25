@@ -479,7 +479,7 @@ export default function RecipeDetail() {
               }
 
               router.push({
-                pathname: "/",
+                pathname: "/(tabs)",
                 params: { planningRecipeId: recipeId },
               });
             }}

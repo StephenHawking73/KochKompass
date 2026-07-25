@@ -54,6 +54,7 @@ export const icons = {
     password: (props) => <Feather name="lock" {...props}/>,
     eye: (props) => <AntDesign name="eye" {...props}/>,
     eyeOff: (props) => <AntDesign name="eye-invisible" {...props}/>,
+    person: (props) => <Feather name="user" {...props}/>,
 
     google: (props) => <Image source={{uri: "https://logos-world.net/wp-content/uploads/2020/09/Google-Symbol.png"}} style={{width: 22, height: 22}} {...props}/>,
     apple: (props) => <AntDesign name="apple" {...props}/>,

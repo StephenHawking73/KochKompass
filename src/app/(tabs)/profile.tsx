@@ -62,12 +62,14 @@ export default function Profile() {
     }
   ]
 
+  console.log(profile)
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Profil</Text>
 
       {profile &&
-        <ProfileCard username={profile.username} avatar={profile.avatar_url} email={profile.email}/>
+        <ProfileCard username={profile.username} fullName={profile.full_name} avatar={profile.avatar_url} email={profile.email}/>
       }
 
       <ProfileMenuSection title="Einstellungen" items={settings}/>

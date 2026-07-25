@@ -4,6 +4,6 @@ export type ProfileType = {
     avatar_url: string | null;
     email: string;
     
-    family_name?: string;
+    full_name?: string | null;
     bio?: string;
 }

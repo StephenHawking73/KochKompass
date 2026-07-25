@@ -16,6 +16,7 @@ export async function getProfile(): Promise<ProfileType | null> {
         .select(`
             id,
             username,
+            full_name,
             avatar_url,
             email
         `)
