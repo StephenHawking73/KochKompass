@@ -21,14 +21,52 @@ export default function LandingPage(){
 
     return (
         <SafeAreaView style={styles.container}> 
-            <View style={styles.header}>
-                <Image source={images.appIcon} style={styles.appIcon}/>
-                <Text style={styles.headerText}>Koch<Text style={{color: theme.accent.primary}}>Kompass</Text></Text>
-                <Image source={images.landing} style={styles.picture}/>
+            <View style={styles.content}>
+                <View style={styles.header}>
+                    <Image 
+                        source={images.appIcon} 
+                        style={styles.appIcon}
+                    />
 
-                <Pressable onPress={login}>
-                    <Text style={{marginTop: 100}}>DEV LOGIN</Text>
-                </Pressable>
+                    <Text style={styles.headerText}>
+                        Koch
+                        <Text style={{color: theme.accent.primary}}>
+                            Kompass
+                        </Text>
+                    </Text>
+
+                    <Image source={images.landing} style={styles.picture} resizeMode="cover"/>
+
+                    <Text style={styles.subtitle}>
+                        Der smarte Speiseplan für Familien.
+                        {"\n"}
+                        Gemeinsam planen, kochen und genießen.
+                    </Text>
+
+                    <View style={styles.buttonContainer}>
+                        <Pressable
+                            style={styles.primaryButton}
+                            onPress={() => {}}
+                        >    
+                            <Text style={styles.primaryButtonText}>
+                                Anmelden
+                            </Text>
+                        </Pressable>
+
+                        <Pressable
+                            style={styles.secondaryButton}
+                            onPress={() => {}}
+                        >
+                            <Text style={styles.secondaryButtonText}>
+                                Registrieren
+                            </Text>
+                        </Pressable>
+                    </View>
+
+                    <Pressable onPress={login} style={styles.devButton}>
+                        <Text style={{}}>DEV LOGIN</Text>
+                    </Pressable>
+                </View>
             </View>
         </SafeAreaView>
     )
@@ -37,33 +75,101 @@ export default function LandingPage(){
 const createStyles = (theme: any) => StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: theme.card.background, 
+    },
+
+    content: {
+        paddingTop: 30,
+        paddingBottom: 40,
     },
 
     header: {
         alignItems: "center",
-        justifyContent: "center",
-        marginTop: 30,
     },
 
     appIcon: {
-        width: 100,
-        height: 100,
-    },
-
-    picture: {
-        marginTop: 30,
-        borderRadius: 40,
-
-        width: 100,
-        height: 200,
+        width: 82,
+        height: 82,
     },
 
     headerText: {
+        marginTop: 12,
+        fontSize: 34,
         fontWeight: "700",
-        fontSize: 35,
         color: theme.text.primary,
-        letterSpacing: 1,
-        
+        letterSpacing: 0.5,
+    },
+
+    picture: {
+        width: "100%",
+        height: 240,
+        marginTop: 25,
+        borderRadius: 20,
+    },
+
+    subtitle: {
         marginTop: 20,
+        fontSize: 17,
+        lineHeight: 26,
+        textAlign: "center",
+        color: theme.text.op,
+        paddingHorizontal: 18,
+    },
+
+    buttonContainer: {
+        width: "100%",
+        marginTop: 46,
+        gap: 14,
+
+        paddingHorizontal: 20
+    },
+
+    primaryButton: {
+        height: 58,
+        borderRadius: 16,
+        backgroundColor: theme.accent.primary,
+        justifyContent: "center",
+        alignItems: "center",
+
+        shadowColor: "#000",
+        shadowOpacity: 0.12,
+        shadowRadius: 10,
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        elevation: 4,
+    },
+
+    primaryButtonText: {
+        color: "#fff",
+        fontSize: 20,
+        fontWeight: "600",
+    },
+
+    secondaryButton: {
+        height: 58,
+        borderRadius: 16,
+        backgroundColor: theme.card.background,
+        borderWidth: 2,
+        borderColor: theme.button.border,
+
+        justifyContent: "center",
+        alignItems: "center",
+    },
+
+    secondaryButtonText: {
+        color: theme.text.primary,
+        fontSize: 20,
+        fontWeight: "600",
+    },
+
+    devButton: {
+        marginTop: 20,
+        alignSelf: "center",
+        paddingHorizontal: 18,
+        paddingVertical: 10,
+        borderRadius: 999,
+        backgroundColor: theme.slot.background
     },
 })

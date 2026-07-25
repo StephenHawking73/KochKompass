@@ -5,20 +5,20 @@ export const Colors = {
         text: {
             primary: "#2b3047",
             op: "#6b7280",
-            colored: "#4caf50",
+            colored: "#82C05C",
             link: "#3C49C2",
         },
 
         notification: "#ff4d4d",
 
         accent: {
-            primary: "#4caf50",
+            primary: "#82C05C",
             op: "#eaf6ea",
         },
 
         slot: {
             background: "#F5F5F5",
-            border: "#4caf50",
+            border: "#82C05C",
             border_op: "#AFCDAF",
         },
 
