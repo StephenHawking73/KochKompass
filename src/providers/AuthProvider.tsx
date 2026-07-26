@@ -47,7 +47,6 @@ export function AuthProvider({
 
 
                 setSession(data.session);
-                console.log("SESSION (Auth Provider)", data.session)
 
             } catch (err) {
 

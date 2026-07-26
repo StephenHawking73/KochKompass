@@ -49,6 +49,7 @@ export const icons = {
     globe: (props) => <Feather name="globe" size={20} {...props}/>,
     bell: (props) => <Feather name="bell" size={20} {...props}/>,
     exit: (props) => <Ionicons name="exit-outline" size={20} {...props}/>,
+    warning: (props) => <AntDesign name="warning" size={20} {...props}/>,
 
     mail: (props) => <Feather name="mail" {...props}/>,
     password: (props) => <Feather name="lock" {...props}/>,

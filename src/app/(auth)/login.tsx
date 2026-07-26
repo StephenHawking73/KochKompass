@@ -5,33 +5,83 @@ import { supabase } from '@/lib/supabase';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { icons } from '@/assets/icons';
+import * as WebBrowser from "expo-web-browser";
+import * as AuthSession from "expo-auth-session";
+import DevelopmentNotice from '@/components/DevelopmentNotice';
+import { getDevelopmentMessage } from '@/assets/messages';
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function login() {
+  const message = getDevelopmentMessage("auth");
+
   const theme = useTheme();
   const styles = createStyles(theme);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string>("");
 
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+
+  const [showDev, setShowDev] = useState(false);
 
   async function handleLogin() {
-    const {data, error: err} = await supabase.auth.signInWithPassword({
+    const { error: err} = await supabase.auth.signInWithPassword({
       email,
       password
     });
-    
-    console.log("ERR:", err)
-    console.log("SESSION:", data.session)
-    console.log(email, password);
 
-    if (err){
-      setError(err.message);
+    if (err) {
+      switch (err.message) {
+        case "Invalid login credentials":
+          setError("E-Mail oder Passwort ist falsch.");
+          break;
+
+        case "Email not confirmed":
+          setError("Bitte bestätige zuerst deine E-Mail-Adresse.");
+          break;
+
+        case "missing email or phone":
+          setError("Bitte fülle alle Felder aus.");
+          break;
+
+        default:
+          setError("Beim Anmelden ist ein Fehler aufgetreten: " + err.message);
+      }
+
       return;
     }
 
     router.replace("/(tabs)");
+  }
+
+  async function signInWithGoogle() {
+    const redirectTo = AuthSession.makeRedirectUri();
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo,
+        skipBrowserRedirect: true,
+      },
+    });
+
+    if (error) {
+      setError(error.message);
+      return;
+    }
+
+    const result = await WebBrowser.openAuthSessionAsync(
+      data.url,
+      redirectTo
+    );
+
+    if (result.type === "success") {
+      const url = result.url;
+
+      await supabase.auth.exchangeCodeForSession(url);
+    }
   }
 
   return (
@@ -50,7 +100,12 @@ export default function login() {
         </Text>
 
         <View style={styles.form}>
-          <View style={styles.inputContainer}>
+          <View
+            style={[
+              styles.inputContainer,
+              error && styles.inputError,
+            ]}
+          >
             {icons.mail({size: 18, color: theme.text.op})}
             <TextInput
               placeholder='E-Mail'
@@ -64,7 +119,12 @@ export default function login() {
           </View>
           
 
-          <View style={styles.inputContainer}>
+          <View
+            style={[
+              styles.inputContainer,
+              error && styles.inputError,
+            ]}
+          >
             {icons.password({ size: 18, color: theme.text.op })}
             <TextInput
               placeholder="Passwort"
@@ -89,12 +149,17 @@ export default function login() {
           </Pressable>
         </View>
 
-        {
-          !!error &&
-          <Text style={styles.error}>
-            {error}
-          </Text>
-        }
+        {!!error && (
+          <View style={styles.errorContainer}>
+            {icons.warning?.({
+              size: 18,
+              color: theme.notification,
+            })}
+            <Text style={styles.errorText}>
+              {error}
+            </Text>
+          </View>
+        )}
 
         <Pressable style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>
@@ -111,12 +176,12 @@ export default function login() {
         </View>
 
         <View style={styles.socials}>
-          <Pressable style={styles.socialButton}>
+          <Pressable style={styles.socialButton} onPress={() => setShowDev(true)}>
             {icons.google({ size: 20 })}
             <Text style={styles.socialText}>Google</Text>
           </Pressable>
 
-          <Pressable style={styles.socialButton}>
+          <Pressable style={styles.socialButton} onPress={() => setShowDev(true)}>
             {icons.apple({ size: 20, color: theme.text.primary })}
             <Text style={styles.socialText}>Apple</Text>
           </Pressable>
@@ -134,6 +199,13 @@ export default function login() {
           </Pressable>
         </View>
       </View>
+
+      <DevelopmentNotice
+        visible={showDev}
+        title={message.title}
+        message={message.message}
+        onClose={() => setShowDev(false)}
+      />
     </SafeAreaView>
   )
 }
@@ -286,4 +358,27 @@ const createStyles = (theme: any) => StyleSheet.create({
     marginTop: 12,
     fontSize: 14,
   },
+
+  errorContainer: {
+    marginTop: 20,
+    padding: 14,
+    borderRadius: 12,
+    backgroundColor: `${theme.notification}15`, // leicht transparent
+    borderWidth: 1,
+    borderColor: theme.notification,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  errorText: {
+    flex: 1,
+    marginLeft: 10,
+    color: theme.notification,
+    fontSize: 14,
+    fontWeight: "500",
+  },
+
+  inputError: {
+    borderColor: theme.notification,
+  }
 })

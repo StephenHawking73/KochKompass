@@ -5,8 +5,16 @@ import { supabase } from "@/lib/supabase";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { icons } from "@/assets/icons";
+import * as WebBrowser from "expo-web-browser";
+import * as AuthSession from "expo-auth-session";
+import DevelopmentNotice from "@/components/DevelopmentNotice";
+import { getDevelopmentMessage } from "@/assets/messages";
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function Register() {
+  const message = getDevelopmentMessage("auth");
+
   const theme = useTheme();
   const styles = createStyles(theme);
 
@@ -22,6 +30,8 @@ export default function Register() {
 
   const [error, setError] = useState("");
 
+  const [showDev, setShowDev] = useState(false);
+
   async function handleRegister() {
     setError("");
 
@@ -36,7 +46,8 @@ export default function Register() {
     }
 
     if (!firstName.trim()) {
-      setError("Bitte gib deinen Vornamen ein!")
+      setError("Bitte gib deinen Vornamen ein!");
+      return;
     }
 
     const { error: err } = await supabase.auth.signUp({
@@ -56,6 +67,65 @@ export default function Register() {
     }
 
     router.replace("/(tabs)");
+  }
+
+  async function handleGoogleRegister() {
+    setError("");
+
+    const redirectTo = AuthSession.makeRedirectUri();
+
+    const { data, error: err } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo,
+        skipBrowserRedirect: true,
+      },
+    });
+
+
+    if (err) {
+      setError("Google Anmeldung fehlgeschlagen.");
+      return;
+    }
+
+
+    const result = await WebBrowser.openAuthSessionAsync(
+      data.url,
+      redirectTo
+    );
+
+
+    if (result.type === "success") {
+      const { data: sessionData, error: sessionError } =
+        await supabase.auth.exchangeCodeForSession(
+          result.url
+        );
+
+
+      if (sessionError) {
+        setError(sessionError.message);
+        return;
+      }
+
+
+      const user = sessionData.user;
+
+
+      // Profil erstellen
+      await supabase
+        .from("profiles")
+        .upsert({
+          id: user.id,
+          username:
+            user.user_metadata.full_name?.split(" ")[0] ?? "",
+          last_name:
+            user.user_metadata.full_name?.split(" ").slice(1).join(" ") ?? "",
+          email: user.email,
+        });
+
+
+      router.replace("/(tabs)");
+    }
   }
 
   return (
@@ -154,7 +224,17 @@ export default function Register() {
               </View>
             </View>
 
-            {!!error && <Text style={styles.error}>{error}</Text>}
+            {!!error && (
+              <View style={styles.errorContainer}>
+                {icons.warning?.({
+                  size: 18,
+                  color: theme.notification,
+                })}
+                <Text style={styles.errorText}>
+                  {error}
+                </Text>
+              </View>
+            )}
 
             <Pressable style={styles.button} onPress={handleRegister}>
               <Text style={styles.buttonText}>Registrieren</Text>
@@ -167,12 +247,12 @@ export default function Register() {
             </View>
 
             <View style={styles.socials}>
-              <Pressable style={styles.socialButton}>
+              <Pressable style={styles.socialButton} onPress={() => setShowDev(true)}>
                 {icons.google({ size: 20 })}
                 <Text style={styles.socialText}>Google</Text>
               </Pressable>
 
-              <Pressable style={styles.socialButton}>
+              <Pressable style={styles.socialButton} onPress={() => setShowDev(true)}>
                 {icons.apple({ size: 20, color: theme.text.primary })}
                 <Text style={styles.socialText}>Apple</Text>
               </Pressable>
@@ -188,6 +268,13 @@ export default function Register() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <DevelopmentNotice
+        visible = {showDev}
+        title = {message.title}
+        message= {message.message}
+        onClose={() => setShowDev(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -327,4 +414,27 @@ const createStyles = (theme: any) =>
       marginTop: 12,
       fontSize: 14,
     },
+
+    errorContainer: {
+      marginTop: 20,
+      padding: 14,
+      borderRadius: 12,
+      backgroundColor: `${theme.notification}15`, // leicht transparent
+      borderWidth: 1,
+      borderColor: theme.notification,
+      flexDirection: "row",
+      alignItems: "center",
+    },
+
+    errorText: {
+      flex: 1,
+      marginLeft: 10,
+      color: theme.notification,
+      fontSize: 14,
+      fontWeight: "500",
+    },
+
+    inputError: {
+      borderColor: theme.notification,
+    }
   });
