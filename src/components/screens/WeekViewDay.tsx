@@ -22,6 +22,8 @@ interface WeekViewDayProps {
   onEmptySlotLongPress?: (dateKey: string, mealType: "lunch" | "dinner", mealPosition: number) => void;
   onAddDayPress?: (dateKey: string) => void;
   showAddButton?: boolean;
+  showRemoveButton?: boolean;
+  onRemoveRow?: () => void;
   onDeletePress?: (meal: Meal) => void;
 }
 
@@ -43,6 +45,8 @@ export default function WeekViewDay({
   onEmptySlotLongPress,
   onAddDayPress,
   showAddButton = false,
+  showRemoveButton,
+  onRemoveRow,
   onDeletePress,
 }: WeekViewDayProps) {
   const theme = useTheme();
@@ -93,15 +97,33 @@ export default function WeekViewDay({
       />
 
       <View style={styles.plusColumn}>
-        {showAddButton && (
-          <Pressable
-            onPress={() => onAddDayPress?.(dateKey)}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          >
-            <Text style={styles.plus}>+</Text>
-          </Pressable>
-        )}
-      </View>
+        {showRemoveButton ? (
+            <Pressable
+                onPress={onRemoveRow}
+                hitSlop={{
+                    top: 12,
+                    bottom: 12,
+                    left: 12,
+                    right: 12,
+                }}
+            >
+                <Text style={styles.minus}>−</Text>
+            </Pressable>
+        ) : showAddButton ? (
+            <Pressable
+                onPress={() => onAddDayPress?.(dateKey)}
+                hitSlop={{
+                    top: 12,
+                    bottom: 12,
+                    left: 12,
+                    right: 12,
+                }}
+            >
+                <Text style={styles.plus}>+</Text>
+            </Pressable>
+        ) : null}
+
+    </View>
     </View>
   );
 }
@@ -134,5 +156,10 @@ const createStyles = (theme: any) =>
       fontSize: 24,
       color: theme.accent.primary,
       marginLeft: 5,
+    },
+    minus: {
+        fontSize: 24,
+        color: theme.notification,
+        marginLeft: 5,
     },
   });

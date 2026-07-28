@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState } from "react";
 type WeekLayoutContextType = {
     extraRowsByDate: Record<string, number>;
     addExtraRow: (date: string) => void;
+    removeExtraRow: (date: string) => void;
 };
 
 
@@ -29,12 +30,20 @@ export function WeekLayoutProvider({
         }));
     }
 
+    function removeExtraRow(date: string) {
+        setExtraRowsByDate((current) => ({
+            ...current,
+            [date]: Math.max((current[date] ?? 0) - 1, 0),
+        }));
+    }
+
 
     return (
         <WeekLayoutContext.Provider
             value={{
                 extraRowsByDate,
                 addExtraRow,
+                removeExtraRow,
             }}
         >
             {children}

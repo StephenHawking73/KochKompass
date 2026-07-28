@@ -35,6 +35,7 @@ export default function WeekView({
   const {
     extraRowsByDate,
     addExtraRow,
+    removeExtraRow,
   } = useWeekLayout();
 
   // Logik-Hooks
@@ -209,6 +210,16 @@ export default function WeekView({
 
         const rowsToRender = Math.max(mealRows,1+ extraRows);
 
+        const lastRowIndex = rowsToRender - 1;
+
+        const lastRowEmpty =
+            !lunchMeals[lastRowIndex] &&
+            !dinnerMeals[lastRowIndex];
+
+        const showRemove =
+            extraRows > 0 &&
+            lastRowEmpty;
+
         const lunchFull = getMealsForDay(dateKey, "lunch").length >= rowsToRender;
         const dinnerFull = getMealsForDay(dateKey, "dinner").length >= rowsToRender;
 
@@ -240,6 +251,8 @@ export default function WeekView({
                   onEmptySlotLongPress={handleEmptySlotLongPress}
                   onAddDayPress={handleAddDayPress}
                   showAddButton={i === rowsToRender - 1 && showPlus}
+                  showRemoveButton={i === rowsToRender - 1 && showRemove}
+                  onRemoveRow={() => removeExtraRow(dateKey)}
                   onDeletePress={handleDeleteMeal}
                 />
               );
