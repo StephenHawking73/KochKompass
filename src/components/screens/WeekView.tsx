@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { router } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import WeekViewContainer from "@/components/screens/WeekViewContainer";
@@ -12,6 +12,7 @@ import { Meal } from "@/types/types";
 import { moveMeal } from "./moveMeal";
 import { addMealToPlan, deleteMealFromPlan } from "@/services/mealService";
 import DeleteMealModal from "../modals/DeleteMealModal";
+import { useWeekLayout } from "@/hooks/useWeekLayout";
 
 interface WeekViewProps {
   meals?: Meal[];
@@ -31,6 +32,11 @@ export default function WeekView({
   const theme = useTheme();
   const styles = createStyles(theme);
 
+  const {
+    extraRowsByDate,
+    addExtraRow,
+  } = useWeekLayout();
+
   // Logik-Hooks
   const { todayKey, weekDays, getMealsForDay, getMaxRowsForDay, formatDate } =
     useWeekData(meals, weekStart);
@@ -43,7 +49,6 @@ export default function WeekView({
     toggleMealSelection,
   } = useMealSelection();
   const [activeTargetKey, setActiveTargetKey] = useState<string | null>(null);
-  const [extraRowsByDate, setExtraRowsByDate] = useState<Record<string, number>>({});
   const isPlanningMode = Boolean(planningRecipeId);
 
   const handleMealLongPress = (mealId: string) => {
@@ -144,10 +149,7 @@ export default function WeekView({
   };
 
   const handleAddDayPress = (date: string) => {
-    setExtraRowsByDate((current) => ({
-      ...current,
-      [date]: Math.max(current[date] ?? 0, 1),
-    }));
+      addExtraRow(date);
   };
 
   const [deleteMeal, setDeleteMeal] = useState<Meal | null>(null);
@@ -193,9 +195,20 @@ export default function WeekView({
       {weekDays.map(({ date, label }) => {
         const dateKey = formatDate(date);
         const isToday = dateKey === todayKey;
-        const maxRows = getMaxRowsForDay(dateKey);
+        
+        const lunchMeals = getMealsForDay(dateKey, "lunch");
+        const dinnerMeals = getMealsForDay(dateKey, "dinner");
+
+        const mealRows = Math.max(
+            lunchMeals.length,
+            dinnerMeals.length,
+            1
+        );
+
         const extraRows = extraRowsByDate[dateKey] ?? 0;
-        const rowsToRender = maxRows + extraRows;
+
+        const rowsToRender = Math.max(mealRows,1+ extraRows);
+
         const lunchFull = getMealsForDay(dateKey, "lunch").length >= rowsToRender;
         const dinnerFull = getMealsForDay(dateKey, "dinner").length >= rowsToRender;
 

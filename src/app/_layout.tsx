@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from "@/providers/AuthProvider";
 import { LoadingScreen } from "@/components/loadingScreen";
 
 import { View, Text } from "react-native";
+import { WeekLayoutProvider } from "@/hooks/useWeekLayout";
 
 
 function RootNavigator() {
@@ -61,7 +62,9 @@ export default function RootLayout() {
             <GestureHandlerRootView style={{flex:1}}>
                 <ThemeProvider>
                     <AuthProvider>
-                        <RootNavigator />
+                        <WeekLayoutProvider>
+                            <RootNavigator />
+                        </WeekLayoutProvider>
                     </AuthProvider>
                 </ThemeProvider>
             </GestureHandlerRootView>
