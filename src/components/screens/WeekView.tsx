@@ -196,9 +196,10 @@ export default function WeekView({
         const maxRows = getMaxRowsForDay(dateKey);
         const extraRows = extraRowsByDate[dateKey] ?? 0;
         const rowsToRender = maxRows + extraRows;
-        const isDayFull =
-          getMealsForDay(dateKey, "lunch").length >= maxRows &&
-          getMealsForDay(dateKey, "dinner").length >= maxRows;
+        const lunchFull = getMealsForDay(dateKey, "lunch").length >= rowsToRender;
+        const dinnerFull = getMealsForDay(dateKey, "dinner").length >= rowsToRender;
+
+        const showPlus = lunchFull || dinnerFull;
 
         return (
           <View key={dateKey}>
@@ -225,7 +226,7 @@ export default function WeekView({
                   onPlanTargetPress={handlePlanTargetPress}
                   onEmptySlotLongPress={handleEmptySlotLongPress}
                   onAddDayPress={handleAddDayPress}
-                  showAddButton={i === 0 && isDayFull && extraRows === 0}
+                  showAddButton={i === rowsToRender - 1 && showPlus}
                   onDeletePress={handleDeleteMeal}
                 />
               );

@@ -4,27 +4,18 @@ import { Meal } from "@/types/types";
 async function ensureAuthenticatedSession() {
     const {
         data: { session },
-        error: sessionError,
+        error,
     } = await supabase.auth.getSession();
-
-    if (sessionError) {
-        throw sessionError;
-    }
-
-    if (session?.access_token) {
-        return session;
-    }
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-        email: "dev@dev.com",
-        password: "KochKompass",
-    });
 
     if (error) {
         throw error;
     }
 
-    return data.session;
+    if (!session) {
+        throw new Error("User is not authenticated.");
+    }
+
+    return session;
 }
 
 export async function moveMeal(
