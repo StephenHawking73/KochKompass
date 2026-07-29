@@ -42,6 +42,9 @@ function RootNavigator() {
 
             <Stack.Protected guard={!!session}>
                 <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="recipe/[id]"/>
+                <Stack.Screen name="recipe/edit"/>
+                <Stack.Screen name="recipe-webview"/>
             </Stack.Protected>
 
 

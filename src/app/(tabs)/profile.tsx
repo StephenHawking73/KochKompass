@@ -9,6 +9,7 @@ import { ProfileType } from '@/types/profile';
 import ProfileMenuSection from '@/components/profile/profileMenuSection';
 import { useThemeMode } from '@/hooks/useThemeMode';
 import { supabase } from '@/lib/supabase';
+import { router } from 'expo-router';
 
 export default function Profile() {
   const theme = useTheme();
