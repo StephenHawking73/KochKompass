@@ -633,7 +633,7 @@ const createStyles = (theme: any) =>
     },
 
     description: {
-      marginTop: 10,
+      marginTop: 5,
 
       fontSize: 14,
       fontWeight: "500",

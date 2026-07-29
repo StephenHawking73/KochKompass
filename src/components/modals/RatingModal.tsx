@@ -129,8 +129,6 @@ export default function RatingSheet({
   const [focused, setFocused] = useState(false);
   const [comment, setComment] = useState(initialComment ?? "");
 
-  const [characters, setCharacter] = useState(0);
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -186,7 +184,7 @@ export default function RatingSheet({
         />
 
         <Text style={styles.characterCount}>
-          {characters} / 500
+          {comment.length} / 500
         </Text>
       </View>
 

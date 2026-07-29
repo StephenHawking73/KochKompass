@@ -1,0 +1,5 @@
+Beim Anclicken beim Tauschen, sollen die Gereichte getauscht werden...
+
+Löschen beides Mal mit Double Tap!
+
+Comment Counter
