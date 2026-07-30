@@ -130,6 +130,7 @@ export async function updateRecipe(
             difficulty: recipe.difficulty,
             duration: recipe.duration,
             link: recipe.link,
+            cooking_book: recipe.cooking_book,
         })
         .eq("id", id)
         .select()

@@ -433,6 +433,20 @@ export default function RecipeDetail() {
               </View>
             )}
 
+            {/* Link */}
+            { recipe.cooking_book && (
+              <View>
+                <Text style={styles.heading}>Kochbuch</Text>
+                <View
+                  style={styles.linkBox}
+                >
+                  <Text style={{ color: theme.text.primary, flex: 1 }} numberOfLines={1}>
+                    {recipe.cooking_book}
+                  </Text>
+                </View>
+              </View>
+            )}
+
             {/* Description */}
             { recipe.description && (
               <View>

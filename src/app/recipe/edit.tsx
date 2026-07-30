@@ -49,6 +49,7 @@ export default function RecipeEdit(){
     const [attribute,setAttribute] = useState<RecipeAttribute | null>(null);
     const [link,setLink] = useState("");
     const [image,setImage] = useState("");
+    const [cookingBook, setCookingBook] = useState("");
 
     const canSave = title.trim().length > 0;
 
@@ -68,7 +69,7 @@ export default function RecipeEdit(){
                 setAttribute(recipe.attribute ?? null);
                 setLink(recipe.link ?? "");
                 setImage(recipe.image_url ?? "");
-
+                setCookingBook(recipe.cooking_book ?? "");
             }
         }
         load();
@@ -89,7 +90,8 @@ export default function RecipeEdit(){
             difficulty: difficulty ?? null,
             attribute: attribute ?? null,
             link,
-            image_url:image
+            image_url:image,
+            cooking_book: cookingBook,
         };
 
         try{
@@ -300,6 +302,14 @@ export default function RecipeEdit(){
                             placeholderTextColor={theme.text.op}
                             value={link}
                             onChangeText={setLink}
+                        />
+
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Kochbuch"
+                            placeholderTextColor={theme.text.op}
+                            value={cookingBook}
+                            onChangeText={setCookingBook}
                         />
                     </View>
                 </ScrollView>

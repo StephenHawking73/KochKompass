@@ -1,5 +1,13 @@
+Comment Counter ✅
+
+---------------------------------------------------------------------------------------
+
+Kochbuch unter Link
+
+Anmelde/Register Loading Screen
+
 Beim Anclicken beim Tauschen, sollen die Gereichte getauscht werden...
 
 Löschen beides Mal mit Double Tap!
 
-Comment Counter
+Gruppen implementieren => MAX Meat Gerichte!

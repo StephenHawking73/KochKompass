@@ -31,10 +31,12 @@ export type Recipe = {
     duration?: number | null | undefined;
     difficulty?: Difficulty | null | undefined;
     link: string;
+    cooking_book?: string;
     rating: number;
     rating_count: number;
     last_cooked_at: string;
     created_at: string;
+    created_by: string;
     distribution: JSON;
 };
 
@@ -45,7 +47,8 @@ export type RecipeInput = {
     attribute?: RecipeAttribute | null;
     duration?: number | null;
     difficulty?: Difficulty | null;
-    link: string;
+    link?: string;
+    cooking_book?: string;
 };
 
 export type WeekPlan = {

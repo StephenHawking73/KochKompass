@@ -76,7 +76,6 @@ export default function UnsplashPicker({
         <BasicBottomSheet
             visible={visible}
             onClose={close}
-            heightFactor={0.55}
             fullScreen={true}
         >
             <View style={styles.container}>
