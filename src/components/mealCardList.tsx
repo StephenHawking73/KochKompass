@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import {
   Image,
   ImageBackground,
@@ -17,11 +18,22 @@ type Props = {
   toggleFavorite: (id: string) => any;
   onPress?: () => void;
   onLongPress?: () => void;
+  onDoublePress?: () => void;
 };
 
-export default function MealCardList({ recipe, onPress, favorites, toggleFavorite, onLongPress }: Props) {
+export default function MealCardList({ recipe, onPress, favorites, toggleFavorite, onLongPress, onDoublePress }: Props) {
   const theme = useTheme();
   const styles = createStyles(theme);
+  const tapCountRef = useRef(0);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const isFavorite = favorites.has(recipe.id);
 
@@ -29,8 +41,39 @@ export default function MealCardList({ recipe, onPress, favorites, toggleFavorit
     toggleFavorite(recipe.id);
   };
 
+  const handlePress = () => {
+    tapCountRef.current += 1;
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    if (tapCountRef.current === 2) {
+      tapCountRef.current = 0;
+      timeoutRef.current = null;
+      onDoublePress?.();
+      return;
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      onPress?.();
+      tapCountRef.current = 0;
+      timeoutRef.current = null;
+    }, 250);
+  };
+
+  const handleLongPress = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+
+    tapCountRef.current = 0;
+    onLongPress?.();
+  };
+
   return (
-    <Pressable style={styles.card} onPress={onPress} onLongPress={onLongPress} delayLongPress={500}>
+    <Pressable style={styles.card} onPress={handlePress} onLongPress={handleLongPress} delayLongPress={500}>
       <View style={styles.imageContainer}>
         <Image
           source={

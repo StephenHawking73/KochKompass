@@ -13,7 +13,7 @@ import RatingSheet from "@/components/modals/RatingModal";
 import BasicBottomSheet from "@/components/BasicBottomSheet";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 import { deleteRecipe } from "@/services/recipeService";
-import DeleteMealSheet from "@/components/modals/DeleteMealModal";
+import DeleteRecipeModal from "@/components/modals/DeleteRecipeModal";
 
 export default function RecipeDetail() {
   const { id } = useLocalSearchParams();
@@ -540,7 +540,7 @@ export default function RecipeDetail() {
           />
         </BasicBottomSheet>
 
-        <DeleteMealSheet
+        <DeleteRecipeModal
           visible={deleteVisible}
           mealTitle={recipe.title}
           loading={deleting}

@@ -13,7 +13,7 @@ import SortDropdown from '@/components/SortDropdown';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { addMealToPlan } from '@/services/mealService';
 import { Meal, Recipe } from '@/types/types';
-import DeleteMealSheet from '@/components/modals/DeleteMealModal';
+import DeleteRecipeModal from '@/components/modals/DeleteRecipeModal';
 import { deleteRecipe } from '@/services/recipeService';
 
 type Option = {
@@ -285,12 +285,19 @@ export default function RecipiesScreen() {
           paddingBottom: 80,
         }}
         renderItem={({ item }) => (
-          <MealCardList recipe={item} favorites={favorites.favorites} toggleFavorite={favorites.toggle} onPress={() => handleRecipePress(item.id)} onLongPress={() => setSelectedRecipe(item)}/>
+          <MealCardList
+            recipe={item}
+            favorites={favorites.favorites}
+            toggleFavorite={favorites.toggle}
+            onPress={() => handleRecipePress(item.id)}
+            onLongPress={() => setSelectedRecipe(item)}
+            onDoublePress={() => setSelectedRecipe(item)}
+          />
         )}
         showsVerticalScrollIndicator={false}
       />    
 
-      <DeleteMealSheet
+      <DeleteRecipeModal
         visible={selectedRecipe !== null}
         mealTitle={selectedRecipe?.title ?? ""}
         loading={deleting}
