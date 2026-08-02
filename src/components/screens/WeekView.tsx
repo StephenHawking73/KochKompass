@@ -20,6 +20,7 @@ interface WeekViewProps {
   refreshing: boolean;
   onRefresh: () => void;
   planningRecipeId?: string | null;
+  planningRecipeTitle?: string | null;
 }
 
 export default function WeekView({
@@ -28,6 +29,7 @@ export default function WeekView({
   refreshing,
   onRefresh,
   planningRecipeId,
+  planningRecipeTitle,
 }: WeekViewProps) {
   const theme = useTheme();
   const styles = createStyles(theme);
@@ -169,9 +171,16 @@ export default function WeekView({
               {isPlanningMode
                 ? icons.calendar({ color: theme.accent.primary, size: 17 })
                 : icons.move({ color: theme.accent.primary, size: 17 })}
-              <Text style={styles.modeTitle}>
-                {isPlanningMode ? "Rezept einplanen" : "Mahlzeit verschieben"}
-              </Text>
+              <View style={styles.modeTitleWrap}>
+                <Text style={styles.modeTitle}>
+                  {isPlanningMode ? "Rezept einplanen" : "Mahlzeit verschieben"}
+                </Text>
+                {isPlanningMode && planningRecipeTitle ? (
+                  <Text style={styles.modeSubtitle} numberOfLines={1}>
+                    {planningRecipeTitle}
+                  </Text>
+                ) : null}
+              </View>
             </View>
 
             <Pressable
@@ -184,7 +193,7 @@ export default function WeekView({
           </View>
           <Text style={styles.modeText}>
             {isPlanningMode
-              ? "Wähle einen freien Slot in der Woche aus."
+              ? `Wähle jetzt einen freien Slot aus, um „${planningRecipeTitle ?? "dieses Rezept"}“ dort einzutragen.`
               : "Wähle den neuen freien Slot aus."}
           </Text>
         </View>
@@ -314,10 +323,19 @@ const createStyles = (theme: any) =>
       justifyContent: "space-between",
       gap: 12,
     },
+    modeTitleWrap: {
+      flexShrink: 1,
+    },
     modeTitle: {
       color: theme.text.primary,
       fontSize: 15,
       fontWeight: "700",
+    },
+    modeSubtitle: {
+      color: theme.text.op,
+      fontSize: 12,
+      fontWeight: "600",
+      marginTop: 2,
     },
     modeTitleRow: {
       flexDirection: "row",

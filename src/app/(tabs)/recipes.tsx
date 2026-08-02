@@ -37,6 +37,10 @@ export default function RecipiesScreen() {
     (planningMealType === "lunch" || planningMealType === "dinner") &&
     planningPosition != null;
 
+  const planningSlotLabel = planningDate && planningMealType && planningPosition
+    ? `${formatPlanningDate(planningDate)}, ${planningMealType === "lunch" ? "Mittag" : "Abend"}, Slot ${Number(planningPosition) + 1}`
+    : null;
+
   const sortOptions: Option[] = [
     { label: "Beliebteste", value: "popular" },
     { label: "Schnellste", value: "fastest"},
@@ -165,6 +169,7 @@ export default function RecipiesScreen() {
       pathname: "/(tabs)",
       params: {
         planningRecipeId: recipe.id,
+        planningRecipeTitle: recipe.title,
       },
     });
   };
@@ -231,7 +236,14 @@ export default function RecipiesScreen() {
           <View style={styles.modeHeader}>
             <View style={styles.modeTitleRow}>
               {icons.calendar({ color: theme.accent.primary, size: 17 })}
-              <Text style={styles.modeTitle}>Rezept für den Slot auswählen</Text>
+              <View style={styles.modeTextWrap}>
+                <Text style={styles.modeTitle}>Rezept auswählen</Text>
+                {planningSlotLabel ? (
+                  <Text style={styles.modeText}>Für {planningSlotLabel}</Text>
+                ) : (
+                  <Text style={styles.modeText}>Wähle ein Rezept für diesen Slot aus.</Text>
+                )}
+              </View>
             </View>
 
             <Pressable
@@ -242,7 +254,6 @@ export default function RecipiesScreen() {
               {icons.close({ color: theme.text.op, size: 15 })}
             </Pressable>
           </View>
-          <Text style={styles.modeText}>Die Auswahl wird direkt in den Speiseplan eingetragen.</Text>
         </View>
       )}
 
@@ -410,8 +421,12 @@ const createStyles = (theme: any) =>
 
     modeTitleRow: {
       flexDirection: "row",
-      alignItems: "center",
+      alignItems: "flex-start",
       gap: 8,
+      flexShrink: 1,
+    },
+
+    modeTextWrap: {
       flexShrink: 1,
     },
 
@@ -451,4 +466,20 @@ const createStyles = (theme: any) =>
 
 function getParam(value?: string | string[]) {
   return Array.isArray(value) ? value[0] : value;
+}
+
+function formatPlanningDate(value: string) {
+  const [year, month, day] = value.split("-").map(Number);
+
+  if (!year || !month || !day) {
+    return value;
+  }
+
+  const date = new Date(year, month - 1, day);
+
+  return date.toLocaleDateString("de-DE", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+  });
 }

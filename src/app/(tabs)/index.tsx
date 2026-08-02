@@ -19,10 +19,12 @@ export default function HomeScreen() {
     const styles = createStyles(theme);
     const params = useLocalSearchParams<{
         planningRecipeId?: string;
+        planningRecipeTitle?: string;
         focusDate?: string;
         plannedAt?: string;
     }>();
     const planningRecipeId = getParam(params.planningRecipeId);
+    const planningRecipeTitle = getParam(params.planningRecipeTitle);
     const focusDate = getParam(params.focusDate);
     const plannedAt = getParam(params.plannedAt);
 
@@ -123,6 +125,7 @@ export default function HomeScreen() {
                                 refreshing={refreshing}
                                 onRefresh={onRefresh}
                                 planningRecipeId={planningRecipeId}
+                                planningRecipeTitle={planningRecipeTitle}
                             />
                         ) : (
                             <MonthView referenceDate={rangeStart} meals={meals} refreshing={refreshing} onRefresh={onRefresh} onSelectDay={(date) => {
