@@ -9,6 +9,7 @@ import * as WebBrowser from "expo-web-browser";
 import * as AuthSession from "expo-auth-session";
 import DevelopmentNotice from '@/components/DevelopmentNotice';
 import { getDevelopmentMessage } from '@/assets/messages';
+import { LoadingScreen } from '@/components/loadingScreen';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -23,10 +24,16 @@ export default function login() {
   const [error, setError] = useState<string>("");
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [showDev, setShowDev] = useState(false);
 
   async function handleLogin() {
+    if (isLoading) return;
+
+    setError("");
+    setIsLoading(true);
+
     const { error: err} = await supabase.auth.signInWithPassword({
       email,
       password
@@ -50,6 +57,7 @@ export default function login() {
           setError("Beim Anmelden ist ein Fehler aufgetreten: " + err.message);
       }
 
+      setIsLoading(false);
       return;
     }
 
@@ -57,6 +65,10 @@ export default function login() {
   }
 
   async function signInWithGoogle() {
+    if (isLoading) return;
+
+    setError("");
+    setIsLoading(true);
     const redirectTo = AuthSession.makeRedirectUri();
 
     const { data, error } = await supabase.auth.signInWithOAuth({
@@ -69,6 +81,7 @@ export default function login() {
 
     if (error) {
       setError(error.message);
+      setIsLoading(false);
       return;
     }
 
@@ -82,11 +95,13 @@ export default function login() {
 
       await supabase.auth.exchangeCodeForSession(url);
     }
+
+    setIsLoading(false);
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <Pressable style={styles.back} onPress={() => router.back()}>
+      <Pressable style={styles.back} onPress={() => router.back()} disabled={isLoading}>
         {icons.back({color: theme.text.primary, size: 25})}
       </Pressable>
       
@@ -115,6 +130,7 @@ export default function login() {
               style={styles.input}
               autoCapitalize='none'
               keyboardType='email-address'
+              editable={!isLoading}
             />
           </View>
           
@@ -133,9 +149,10 @@ export default function login() {
               value={password}
               onChangeText={setPassword}
               style={styles.input}
+              editable={!isLoading}
             />
 
-            <Pressable onPress={() => setShowPassword(!showPassword)}>
+            <Pressable onPress={() => setShowPassword(!showPassword)} disabled={isLoading}>
               {showPassword
                 ? icons.eyeOff({ size: 20, color: theme.text.op })
                 : icons.eye({ size: 20, color: theme.text.op })}
@@ -161,9 +178,9 @@ export default function login() {
           </View>
         )}
 
-        <Pressable style={styles.button} onPress={handleLogin}>
+        <Pressable style={[styles.button, isLoading && styles.buttonDisabled]} onPress={handleLogin} disabled={isLoading}>
           <Text style={styles.buttonText}>
-            Anmelden
+            {isLoading ? "Wird angemeldet..." : "Anmelden"}
           </Text>
         </Pressable>
 
@@ -176,12 +193,12 @@ export default function login() {
         </View>
 
         <View style={styles.socials}>
-          <Pressable style={styles.socialButton} onPress={() => setShowDev(true)}>
+          <Pressable style={styles.socialButton} onPress={() => setShowDev(true)} disabled={isLoading}>
             {icons.google({ size: 20 })}
             <Text style={styles.socialText}>Google</Text>
           </Pressable>
 
-          <Pressable style={styles.socialButton} onPress={() => setShowDev(true)}>
+          <Pressable style={styles.socialButton} onPress={() => setShowDev(true)} disabled={isLoading}>
             {icons.apple({ size: 20, color: theme.text.primary })}
             <Text style={styles.socialText}>Apple</Text>
           </Pressable>
@@ -192,7 +209,7 @@ export default function login() {
             Noch kein Konto?
           </Text>
 
-          <Pressable onPress={() => router.push("/register")}>
+          <Pressable onPress={() => router.push("/register")} disabled={isLoading}>
             <Text style={styles.register}>
               Registrieren
             </Text>
@@ -206,6 +223,8 @@ export default function login() {
         message={message.message}
         onClose={() => setShowDev(false)}
       />
+
+      <LoadingScreen text="Anmeldung läuft" visible={isLoading} overlay />
     </SafeAreaView>
   )
 }
@@ -287,6 +306,10 @@ const createStyles = (theme: any) => StyleSheet.create({
     color: "#fff",
     fontWeight: "700",
     fontSize: 18,
+  },
+
+  buttonDisabled: {
+    opacity: 0.7,
   },
 
   separator: {

@@ -9,6 +9,7 @@ import * as WebBrowser from "expo-web-browser";
 import * as AuthSession from "expo-auth-session";
 import DevelopmentNotice from "@/components/DevelopmentNotice";
 import { getDevelopmentMessage } from "@/assets/messages";
+import { LoadingScreen } from "@/components/loadingScreen";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -27,26 +28,33 @@ export default function Register() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [error, setError] = useState("");
 
   const [showDev, setShowDev] = useState(false);
 
   async function handleRegister() {
+    if (isLoading) return;
+
     setError("");
+    setIsLoading(true);
 
     if (!email || !password || !repeatPassword) {
       setError("Bitte fülle alle Felder aus!");
+      setIsLoading(false);
       return;
     }
 
     if (password !== repeatPassword) {
       setError("Die Passwörter stimmen nicht überein.");
+      setIsLoading(false);
       return;
     }
 
     if (!firstName.trim()) {
       setError("Bitte gib deinen Vornamen ein!");
+      setIsLoading(false);
       return;
     }
 
@@ -63,6 +71,7 @@ export default function Register() {
 
     if (err) {
       setError(err.message);
+      setIsLoading(false);
       return;
     }
 
@@ -70,7 +79,10 @@ export default function Register() {
   }
 
   async function handleGoogleRegister() {
+    if (isLoading) return;
+
     setError("");
+    setIsLoading(true);
 
     const redirectTo = AuthSession.makeRedirectUri();
 
@@ -85,6 +97,7 @@ export default function Register() {
 
     if (err) {
       setError("Google Anmeldung fehlgeschlagen.");
+      setIsLoading(false);
       return;
     }
 
@@ -104,6 +117,7 @@ export default function Register() {
 
       if (sessionError) {
         setError(sessionError.message);
+        setIsLoading(false);
         return;
       }
 
@@ -126,13 +140,15 @@ export default function Register() {
 
       router.replace("/(tabs)");
     }
+
+    setIsLoading(false);
   }
 
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === "ios" ? "padding" : "height"}>
         <ScrollView contentContainerStyle={{flexGrow: 1}} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-          <Pressable style={styles.back} onPress={() => router.back()}>
+          <Pressable style={styles.back} onPress={() => router.back()} disabled={isLoading}>
             {icons.back({ color: theme.text.primary, size: 25 })}
           </Pressable>
 
@@ -153,6 +169,7 @@ export default function Register() {
                   value={firstName}
                   onChangeText={setFirstName}
                   style={styles.input}
+                  editable={!isLoading}
                 />
               </View>
 
@@ -165,6 +182,7 @@ export default function Register() {
                   value={lastName}
                   onChangeText={setLastName}
                   style={styles.input}
+                  editable={!isLoading}
                 />
               </View>
 
@@ -178,6 +196,7 @@ export default function Register() {
                   style={styles.input}
                   autoCapitalize="none"
                   keyboardType="email-address"
+                  editable={!isLoading}
                 />
               </View>
 
@@ -191,9 +210,10 @@ export default function Register() {
                   value={password}
                   onChangeText={setPassword}
                   style={styles.input}
+                  editable={!isLoading}
                 />
 
-                <Pressable onPress={() => setShowPassword(!showPassword)}>
+                <Pressable onPress={() => setShowPassword(!showPassword)} disabled={isLoading}>
                   {showPassword
                     ? icons.eyeOff({ size: 20, color: theme.text.op })
                     : icons.eye({ size: 20, color: theme.text.op })}
@@ -210,12 +230,14 @@ export default function Register() {
                   value={repeatPassword}
                   onChangeText={setRepeatPassword}
                   style={styles.input}
+                  editable={!isLoading}
                 />
 
                 <Pressable
                   onPress={() =>
                     setShowRepeatPassword(!showRepeatPassword)
                   }
+                  disabled={isLoading}
                 >
                   {showRepeatPassword
                     ? icons.eyeOff({ size: 20, color: theme.text.op })
@@ -236,8 +258,8 @@ export default function Register() {
               </View>
             )}
 
-            <Pressable style={styles.button} onPress={handleRegister}>
-              <Text style={styles.buttonText}>Registrieren</Text>
+            <Pressable style={[styles.button, isLoading && styles.buttonDisabled]} onPress={handleRegister} disabled={isLoading}>
+              <Text style={styles.buttonText}>{isLoading ? "Wird registriert..." : "Registrieren"}</Text>
             </Pressable>
 
             <View style={styles.separator}>
@@ -247,12 +269,12 @@ export default function Register() {
             </View>
 
             <View style={styles.socials}>
-              <Pressable style={styles.socialButton} onPress={() => setShowDev(true)}>
+              <Pressable style={styles.socialButton} onPress={() => setShowDev(true)} disabled={isLoading}>
                 {icons.google({ size: 20 })}
                 <Text style={styles.socialText}>Google</Text>
               </Pressable>
 
-              <Pressable style={styles.socialButton} onPress={() => setShowDev(true)}>
+              <Pressable style={styles.socialButton} onPress={() => setShowDev(true)} disabled={isLoading}>
                 {icons.apple({ size: 20, color: theme.text.primary })}
                 <Text style={styles.socialText}>Apple</Text>
               </Pressable>
@@ -261,7 +283,7 @@ export default function Register() {
             <View style={styles.footer}>
               <Text style={styles.footerText}>Bereits ein Konto?</Text>
 
-              <Pressable onPress={() => router.replace("/login")}>
+              <Pressable onPress={() => router.replace("/login")} disabled={isLoading}>
                 <Text style={styles.register}>Anmelden</Text>
               </Pressable>
             </View>
@@ -275,6 +297,8 @@ export default function Register() {
         message= {message.message}
         onClose={() => setShowDev(false)}
       />
+
+      <LoadingScreen text="Registrierung läuft" visible={isLoading} overlay />
     </SafeAreaView>
   );
 }
@@ -345,6 +369,10 @@ const createStyles = (theme: any) =>
       color: "#fff",
       fontWeight: "700",
       fontSize: 18,
+    },
+
+    buttonDisabled: {
+      opacity: 0.7,
     },
 
     separator: {

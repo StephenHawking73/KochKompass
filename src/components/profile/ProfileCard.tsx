@@ -21,7 +21,7 @@ export default function ProfileCard({
     const styles = createStyles(theme);
 
 
-    const avatarSource = avatar
+    const avatarSource = avatar && avatar.trim() !== ""
         ? { uri: avatar }
         : {
             uri: "https://avatar.imagik.app/_next/image?url=%2Fimages%2Favatar.webp&w=3840&q=75"
