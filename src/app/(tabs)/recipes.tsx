@@ -160,6 +160,15 @@ export default function RecipiesScreen() {
     router.replace("/recipes");
   };
 
+  const handleRecipeLongPress = (recipe: Recipe) => {
+    router.push({
+      pathname: "/(tabs)",
+      params: {
+        planningRecipeId: recipe.id,
+      },
+    });
+  };
+
   const handleRecipePress = async (recipeId: string) => {
     if (!isPlanningMode || !planningDate || !planningMealType || planningPosition == null) {
       router.push({pathname: "/recipe/[id]", params: { id: recipeId }});
@@ -290,7 +299,7 @@ export default function RecipiesScreen() {
             favorites={favorites.favorites}
             toggleFavorite={favorites.toggle}
             onPress={() => handleRecipePress(item.id)}
-            onLongPress={() => setSelectedRecipe(item)}
+            onLongPress={() => handleRecipeLongPress(item)}
             onDoublePress={() => setSelectedRecipe(item)}
           />
         )}

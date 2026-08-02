@@ -2,12 +2,12 @@ Comment Counter ✅
 
 Kochbuch unter Link ✅
 
+Löschen beides Mal mit Double Tap! ✅
+
 -------------------------------------------------------------------------------------
 
 Anmelde/Register Loading Screen
 
 Beim Anclicken beim Tauschen, sollen die Gereichte getauscht werden...
-
-Löschen beides Mal mit Double Tap!
 
 Gruppen implementieren => MAX Meat Gerichte!
