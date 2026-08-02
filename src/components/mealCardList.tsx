@@ -35,10 +35,12 @@ export default function MealCardList({ recipe, onPress, favorites, toggleFavorit
     };
   }, []);
 
-  const isFavorite = favorites.has(recipe.id);
+  const isFavorite = recipe.id ? favorites.has(recipe.id) : false;
 
   const onPressHeart = () => {
-    toggleFavorite(recipe.id);
+    if (recipe.id) {
+      toggleFavorite(recipe.id);
+    }
   };
 
   const handlePress = () => {

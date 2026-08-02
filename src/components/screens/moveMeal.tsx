@@ -18,12 +18,17 @@ async function ensureAuthenticatedSession() {
     return session;
 }
 
+type MealPlanMutationResult = {
+    error?: unknown;
+    data?: unknown;
+};
+
 export async function moveMeal(
     mealId: string,
     plannedDate: string,
     mealType: Meal["meal_type"],
     mealPosition: number
-) {
+): Promise<MealPlanMutationResult> {
     await ensureAuthenticatedSession();
     const result = await supabase
         .from("meal_plan")
@@ -35,7 +40,10 @@ export async function moveMeal(
         .eq("id", mealId)
         .select("id");
 
-    return result;
+    return {
+        error: result.error ?? undefined,
+        data: result.data ?? null,
+    };
 }
 
 export async function swapMeal(
@@ -44,7 +52,12 @@ export async function swapMeal(
     plannedDate: string,
     mealType: Meal["meal_type"],
     mealPosition: number
-) {
+): Promise<MealPlanMutationResult & {
+    sourceResult?: unknown;
+    targetResult?: unknown;
+    sourceMeal?: unknown;
+    targetMeal?: unknown;
+}> {
     await ensureAuthenticatedSession();
 
     const { data: sourceMeal, error: sourceError } = await supabase

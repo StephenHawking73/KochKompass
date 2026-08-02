@@ -2,10 +2,11 @@ import { useTheme } from "@/hooks/useTheme";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View, Text, Pressable, Image, Animated } from "react-native";
 import * as Haptics from "expo-haptics";
+import type { RecipeAttribute } from "@/types/types";
 
 type MealCardProps = {
     title: string;
-    attribute?: string;
+    attribute?: RecipeAttribute | null;
     selected: boolean;
     onPress?: () => void;
     onLongPress?: () => void;
@@ -85,7 +86,7 @@ export default function MealCard({
     );
 }
 
-const createStyles = (theme: any, attribute: string | undefined) =>
+const createStyles = (theme: any, attribute: RecipeAttribute | null | undefined) =>
     StyleSheet.create({
 
         card: {

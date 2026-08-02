@@ -12,7 +12,7 @@ import RecipeFilterBar from '@/components/Filter/RecipeFilterBar';
 import SortDropdown from '@/components/SortDropdown';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { addMealToPlan } from '@/services/mealService';
-import { Meal, Recipe } from '@/types/types';
+import { Difficulty, Meal, Recipe } from '@/types/types';
 import DeleteRecipeModal from '@/components/modals/DeleteRecipeModal';
 import { deleteRecipe } from '@/services/recipeService';
 
@@ -88,26 +88,21 @@ export default function RecipiesScreen() {
 
       const matchesFavorite =
         !filters.favoritesOnly ||
-        favorites.favorites.has(recipe.id);
+        (recipe.id ? favorites.favorites.has(recipe.id) : false);
 
       const matchesQuick =
         !filters.quickOnly ||
         (recipe.duration ?? Infinity) < 30;
 
+      const selectedDifficulties = [
+        filters.simple ? "Einfach" : null,
+        filters.middle ? "Mittel" : null,
+        filters.hard ? "Schwer" : null,
+      ].filter((value): value is Difficulty => value !== null);
+
       const matchesDifficulty =
-        [
-          filters.simple && "Einfach",
-          filters.middle && "Mittel",
-          filters.hard && "Schwer",
-        ]
-          .filter(Boolean)
-          .length === 0 ||
-        [
-          filters.simple && "Einfach",
-          filters.middle && "Mittel",
-          filters.hard && "Schwer",
-        ]
-          .includes(recipe.difficulty);
+        selectedDifficulties.length === 0 ||
+        (recipe.difficulty != null && selectedDifficulties.includes(recipe.difficulty));
 
       const matchesNeverCooked =
         sortBy !== "neverCooked" ||
@@ -309,7 +304,11 @@ export default function RecipiesScreen() {
             recipe={item}
             favorites={favorites.favorites}
             toggleFavorite={favorites.toggle}
-            onPress={() => handleRecipePress(item.id)}
+            onPress={() => {
+              if (item.id) {
+                handleRecipePress(item.id);
+              }
+            }}
             onLongPress={() => handleRecipeLongPress(item)}
             onDoublePress={() => setSelectedRecipe(item)}
           />

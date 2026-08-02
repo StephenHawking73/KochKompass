@@ -23,21 +23,21 @@ export type RecipeAttribute =
     | "dessert";
 
 export type Recipe = {
-    id?: string;
+    id: string;
     title: string;
-    description?: string;
-    image_url?: string;
+    description?: string | null;
+    image_url?: string | null;
     attribute?: RecipeAttribute | null | undefined;
     duration?: number | null | undefined;
     difficulty?: Difficulty | null | undefined;
-    link: string;
-    cooking_book?: string;
+    link?: string | null;
+    cooking_book?: string | null;
     rating: number;
     rating_count: number;
-    last_cooked_at: string;
+    last_cooked_at: string | null;
     created_at: string;
-    created_by: string;
-    distribution: JSON;
+    created_by?: string | null;
+    distribution?: JSON | null;
 };
 
 export type RecipeInput = {

@@ -2,7 +2,7 @@ import { supabase } from "@/lib/supabase";
 import { Recipe, RecipeInput } from "@/types/types";
 import { deleteRecipeImage } from "./storageService";
 
-export async function getRecipes() {
+export async function getRecipes(): Promise<Recipe[]> {
     let query = supabase.from("recipes").select("id, title, image_url, description, attribute, duration, difficulty, created_at, link, meal_plan(planned_date), recipe_ratings_summary(avg_rating, rating_count)");
 
     const { data, error } = await query.order(
@@ -15,7 +15,7 @@ export async function getRecipes() {
         return [];
     }
 
-    return (data ?? []).map((recipe: any) => ({
+    return (data ?? []).map((recipe: any): Recipe => ({
         id: recipe.id,
         title: recipe.title,
         image_url: recipe.image_url,
@@ -30,6 +30,8 @@ export async function getRecipes() {
         duration: recipe.duration,
         difficulty: recipe.difficulty,
         link: recipe.link,
+        created_by: recipe.created_by ?? null,
+        distribution: recipe.distribution ?? null,
     }));
 }
 
