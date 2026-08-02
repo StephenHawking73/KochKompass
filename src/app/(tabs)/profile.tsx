@@ -11,6 +11,7 @@ import { useThemeMode } from '@/hooks/useThemeMode';
 import { supabase } from '@/lib/supabase';
 import { router } from 'expo-router';
 import BasicBottomSheet from '@/components/BasicBottomSheet';
+import DevelopmentNotice from '@/components/DevelopmentNotice';
 
 export default function Profile() {
   const theme = useTheme();
@@ -20,6 +21,8 @@ export default function Profile() {
 
   const [profile, setProfile] = useState<ProfileType | null>(null);
   const [themeSheetVisible, setThemeSheetVisible] = useState(false);
+  const [devNoticeVisible, setDevNoticeVisible] = useState(false);
+  const [devNoticeContent, setDevNoticeContent] = useState({ title: '', message: '' });
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -37,6 +40,22 @@ export default function Profile() {
       throw error;
     }
   }
+
+  const openDevNotice = (type: 'language' | 'notifications') => {
+    const message =
+      type === 'language'
+        ? {
+            title: 'Sprache kommt bald',
+            message: 'Die Sprachoptionen werden gerade vorbereitet. Bald kannst du die App auch in deiner bevorzugten Sprache nutzen.',
+          }
+        : {
+            title: 'Benachrichtigungen kommen bald',
+            message: 'Die Benachrichtigungseinstellungen werden noch für dich eingebaut. Danach kannst du deine Erinnerungen ganz bequem steuern.',
+          };
+
+    setDevNoticeContent(message);
+    setDevNoticeVisible(true);
+  };
 
   const handleThemeChange = () => {
     setThemeSheetVisible(true);
@@ -68,12 +87,12 @@ export default function Profile() {
     {
       title: "Sprache",
       icon: icons.globe({color: theme.text.primary, size: 20}),
-      onPress: () => {}
+      onPress: () => openDevNotice('language')
     },
     {
       title: "Benachrichtigungen",
       icon: icons.bell({color: theme.text.primary, size: 20}),
-
+      onPress: () => openDevNotice('notifications')
     }
   ]
 
@@ -127,6 +146,13 @@ export default function Profile() {
           })}
         </View>
       </BasicBottomSheet>
+
+      <DevelopmentNotice
+        visible={devNoticeVisible}
+        title={devNoticeContent.title}
+        message={devNoticeContent.message}
+        onClose={() => setDevNoticeVisible(false)}
+      />
     </SafeAreaView>
   )
 }
