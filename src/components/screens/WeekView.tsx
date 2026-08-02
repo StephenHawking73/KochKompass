@@ -9,7 +9,7 @@ import { useMealSelection } from "@/hooks/useMealSelection";
 import { useTheme } from "@/hooks/useTheme";
 import { icons } from "@/assets/icons";
 import { Meal } from "@/types/types";
-import { moveMeal } from "./moveMeal";
+import { moveMeal, swapMeal } from "./moveMeal";
 import { addMealToPlan, deleteMealFromPlan } from "@/services/mealService";
 import DeleteMealModal from "../modals/DeleteMealModal";
 import { useWeekLayout } from "@/hooks/useWeekLayout";
@@ -83,12 +83,18 @@ export default function WeekView({
       setActiveTargetKey(targetKey);
 
       try {
-        const result = await moveMeal(
-            selectedMealId,
-            date,
-            mealType,
-            position
+        const selectedMeal = meals.find((meal) => meal.id === selectedMealId);
+        const targetMeal = meals.find(
+          (meal) =>
+            meal.planned_date === date &&
+            meal.meal_type === mealType &&
+            (meal.position ?? meal.meal_position ?? 0) === position
         );
+
+        const result =
+          targetMeal && targetMeal.id !== selectedMealId
+            ? await swapMeal(selectedMealId, targetMeal.id, date, mealType, position)
+            : await moveMeal(selectedMealId, date, mealType, position);
 
         if (result?.error) {
           throw result.error;
