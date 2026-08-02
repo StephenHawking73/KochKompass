@@ -1,4 +1,4 @@
-import { useThemeContext } from "@/providers/ThemeProvider";
+import { useThemeContext, type ThemeMode } from "@/providers/ThemeProvider";
 import { useColorScheme } from "react-native";
 
 export function useThemeMode() {
@@ -7,7 +7,9 @@ export function useThemeMode() {
     if (themeContext) {
         return {
             colorScheme: themeContext.colorScheme,
+            themeMode: themeContext.themeMode,
             isDark: themeContext.isDark,
+            setThemeMode: themeContext.setThemeMode,
         };
     }
 
@@ -16,6 +18,8 @@ export function useThemeMode() {
 
     return {
         colorScheme,
+        themeMode: "system" as ThemeMode,
         isDark: colorScheme === "dark",
+        setThemeMode: () => undefined,
     };
 }

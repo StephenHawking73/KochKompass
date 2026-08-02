@@ -1,38 +1,89 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StatusBar } from "expo-status-bar";
-import { createContext, type ReactNode, useContext, useMemo } from "react";
+import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import { useColorScheme } from "react-native";
 import { Colors } from "@/styles/Colors";
 import type { ThemeType } from "@/styles/Theme";
 
-type ThemeMode = "light" | "dark";
+export type ThemeMode = "light" | "dark" | "system";
 
 type ThemeContextValue = {
-    colorScheme: ThemeMode;
+    colorScheme: "light" | "dark";
+    themeMode: ThemeMode;
     theme: ThemeType;
     isDark: boolean;
+    setThemeMode: (mode: ThemeMode) => void;
 };
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
+const STORAGE_KEY = "app-theme-mode";
 
-function resolveThemeMode(scheme: string | null | undefined): ThemeMode {
+function resolveThemeMode(scheme: string | null | undefined): "light" | "dark" {
     return scheme === "dark" ? "dark" : "light";
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-    const colorScheme = resolveThemeMode(useColorScheme());
+    const systemColorScheme = useColorScheme();
+    const [themeMode, setThemeModeState] = useState<ThemeMode>("system");
+
+    useEffect(() => {
+        const loadThemeMode = async () => {
+            try {
+                const storedThemeMode = await AsyncStorage.getItem(STORAGE_KEY);
+
+                if (storedThemeMode === "light" || storedThemeMode === "dark" || storedThemeMode === "system") {
+                    setThemeModeState(storedThemeMode);
+                }
+            } catch (error) {
+                console.warn("Could not load theme mode", error);
+            }
+        };
+
+        loadThemeMode();
+    }, []);
+
+    useEffect(() => {
+        const persistThemeMode = async () => {
+            try {
+                await AsyncStorage.setItem(STORAGE_KEY, themeMode);
+            } catch (error) {
+                console.warn("Could not save theme mode", error);
+            }
+        };
+
+        persistThemeMode();
+    }, [themeMode]);
+
+    const resolvedColorScheme = useMemo(() => {
+        if (themeMode === "dark") {
+            return "dark" as const;
+        }
+
+        if (themeMode === "light") {
+            return "light" as const;
+        }
+
+        return resolveThemeMode(systemColorScheme);
+    }, [themeMode, systemColorScheme]);
+
+    const setThemeMode = (mode: ThemeMode) => {
+        setThemeModeState(mode);
+    };
 
     const value = useMemo(
         () => ({
-            colorScheme,
-            theme: Colors[colorScheme],
-            isDark: colorScheme === "dark",
+            colorScheme: resolvedColorScheme,
+            themeMode,
+            theme: Colors[resolvedColorScheme],
+            isDark: resolvedColorScheme === "dark",
+            setThemeMode,
         }),
-        [colorScheme]
+        [resolvedColorScheme, themeMode]
     );
 
     return (
         <ThemeContext.Provider value={value}>
-            <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+            <StatusBar style={resolvedColorScheme === "dark" ? "light" : "dark"} />
             {children}
         </ThemeContext.Provider>
     );
