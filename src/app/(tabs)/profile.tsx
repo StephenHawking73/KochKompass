@@ -12,12 +12,14 @@ import { supabase } from '@/lib/supabase';
 import { router } from 'expo-router';
 import BasicBottomSheet from '@/components/BasicBottomSheet';
 import DevelopmentNotice from '@/components/DevelopmentNotice';
+import { useAuth } from '@/providers/AuthProvider';
 
 export default function Profile() {
   const theme = useTheme();
   const styles = createStyles(theme);
 
   const {isDark, themeMode, setThemeMode} = useThemeMode();
+  const { activeGroupId } = useAuth();
 
   const [profile, setProfile] = useState<ProfileType | null>(null);
   const [themeSheetVisible, setThemeSheetVisible] = useState(false);
@@ -78,6 +80,12 @@ export default function Profile() {
   };
 
   const settings = [
+    {
+      title: "Meine Gruppe",
+      subtitle: activeGroupId ? "Aktive Gruppe" : "Keine Gruppe",
+      icon: icons.person({color: theme.text.primary, size: 20}),
+      onPress: () => router.push('/group' as any)
+    },
     {
       title: "Design",
       subtitle: getThemeLabel(themeMode),

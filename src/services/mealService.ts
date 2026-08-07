@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { Meal } from "@/types/types";
+import { getActiveGroupContext } from "./groupService";
 
 async function ensureAuthenticatedSession() {
     const {
@@ -28,7 +29,15 @@ async function ensureAuthenticatedSession() {
 }
 
 export async function getMeals(weekStart?: Date | null, weekEnd?: Date | null) {
+    const { activeGroupId } = await getActiveGroupContext().catch(() => ({ activeGroupId: null }));
+
     let query = supabase.from("meal_plan").select("id, planned_date, recipe_id, recipes(title, image_url, description, attribute), meal_type, position");
+
+    if (activeGroupId) {
+        query = query.eq("group_id", activeGroupId);
+    } else {
+        query = query.is("group_id", null);
+    }
 
     if (weekStart && weekEnd) {
         query = query
@@ -68,6 +77,7 @@ export async function addMealToPlan(
     mealPosition: number
 ) {
     await ensureAuthenticatedSession();
+    const { activeGroupId } = await getActiveGroupContext().catch(() => ({ activeGroupId: null }));
 
     return supabase
         .from("meal_plan")
@@ -76,6 +86,7 @@ export async function addMealToPlan(
             planned_date: plannedDate,
             meal_type: mealType,
             position: mealPosition,
+            group_id: activeGroupId,
         })
         .select("id")
         .single();

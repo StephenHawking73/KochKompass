@@ -2,12 +2,16 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { Session } from "@supabase/supabase-js";
 
 import { supabase } from "@/lib/supabase";
+import { getActiveGroupContext } from "@/services/groupService";
 
 
 type AuthContextType = {
     session: Session | null;
     loading: boolean;
     error: Error | null;
+    activeGroupId: string | null;
+    userId: string | null;
+    refreshActiveGroup: () => Promise<void>;
 };
 
 
@@ -15,6 +19,9 @@ const AuthContext = createContext<AuthContextType>({
     session: null,
     loading: true,
     error: null,
+    activeGroupId: null,
+    userId: null,
+    refreshActiveGroup: async () => undefined,
 });
 
 
@@ -27,6 +34,19 @@ export function AuthProvider({
     const [session, setSession] = useState<Session | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
+    const [activeGroupId, setActiveGroupId] = useState<string | null>(null);
+    const [userId, setUserId] = useState<string | null>(null);
+
+    const refreshActiveGroup = async () => {
+        try {
+            const context = await getActiveGroupContext();
+            setActiveGroupId(context.activeGroupId);
+            setUserId(context.userId);
+        } catch {
+            setActiveGroupId(null);
+            setUserId(null);
+        }
+    };
 
 
     useEffect(() => {
@@ -48,6 +68,13 @@ export function AuthProvider({
 
                 setSession(data.session);
 
+                if (data.session?.user) {
+                    await refreshActiveGroup();
+                } else {
+                    setUserId(null);
+                    setActiveGroupId(null);
+                }
+
             } catch (err) {
 
                 setError(err as Error);
@@ -66,9 +93,16 @@ export function AuthProvider({
         const {
             data: listener,
         } = supabase.auth.onAuthStateChange(
-            (_event, session) => {
+            async (_event, session) => {
 
                 setSession(session);
+
+                if (session?.user) {
+                    await refreshActiveGroup();
+                } else {
+                    setUserId(null);
+                    setActiveGroupId(null);
+                }
 
             }
         );
@@ -89,6 +123,9 @@ export function AuthProvider({
                 session,
                 loading,
                 error,
+                activeGroupId,
+                userId,
+                refreshActiveGroup,
             }}
         >
             {children}

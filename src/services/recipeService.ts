@@ -1,9 +1,18 @@
 import { supabase } from "@/lib/supabase";
 import { Recipe, RecipeInput } from "@/types/types";
 import { deleteRecipeImage } from "./storageService";
+import { getActiveGroupContext } from "./groupService";
 
 export async function getRecipes(): Promise<Recipe[]> {
+    const { activeGroupId } = await getActiveGroupContext().catch(() => ({ activeGroupId: null }));
+
     let query = supabase.from("recipes").select("id, title, image_url, description, attribute, duration, difficulty, created_at, link, meal_plan(planned_date), recipe_ratings_summary(avg_rating, rating_count)");
+
+    if (activeGroupId) {
+        query = query.eq("group_id", activeGroupId);
+    } else {
+        query = query.is("group_id", null);
+    }
 
     const { data, error } = await query.order(
         "title",
@@ -67,6 +76,8 @@ export async function createRecipe(recipe: RecipeInput) {
         throw new Error("Dieses Rezept exisiert bereits!");
     }
 
+    const { activeGroupId } = await getActiveGroupContext().catch(() => ({ activeGroupId: null }));
+
     const { data, error } = await supabase
         .from("recipes")
         .insert({
@@ -77,6 +88,7 @@ export async function createRecipe(recipe: RecipeInput) {
             difficulty: recipe.difficulty,
             duration: recipe.duration,
             link: recipe.link,
+            group_id: activeGroupId,
         })
         .select()
         .single();
@@ -122,6 +134,8 @@ export async function updateRecipe(
     }
 
     // Rezept aktualisieren
+    const { activeGroupId } = await getActiveGroupContext().catch(() => ({ activeGroupId: null }));
+
     const { data, error } = await supabase
         .from("recipes")
         .update({
@@ -133,6 +147,7 @@ export async function updateRecipe(
             duration: recipe.duration,
             link: recipe.link,
             cooking_book: recipe.cooking_book,
+            group_id: activeGroupId,
         })
         .eq("id", id)
         .select()
