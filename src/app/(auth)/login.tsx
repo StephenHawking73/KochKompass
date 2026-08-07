@@ -159,7 +159,7 @@ export default function login() {
             </Pressable>
           </View>
 
-          <Pressable style={styles.forgot} onPress={() => {}}>
+          <Pressable style={styles.forgot} onPress={() => router.push("/reset-password")}>
             <Text style={styles.forgotText}>
               Passwort vergessen?
             </Text>
