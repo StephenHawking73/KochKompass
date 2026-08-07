@@ -15,6 +15,8 @@ export default function ResetPassword() {
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [mode, setMode] = useState<"request" | "reset">("request");
   const [tokenParams, setTokenParams] = useState<Record<string, string>>({});
   const [error, setError] = useState("");
@@ -114,13 +116,17 @@ export default function ResetPassword() {
 
     setIsLoading(true);
 
-    if (tokenParams.access_token) {
-      await supabase.auth.setSession({
+    if (tokenParams.access_token && tokenParams.refresh_token) {
+      const { error: sessionError } = await supabase.auth.setSession({
         access_token: tokenParams.access_token,
-        refresh_token: tokenParams.refresh_token ?? "",
-        expires_in: tokenParams.expires_in ? Number(tokenParams.expires_in) : undefined,
-        token_type: tokenParams.token_type ?? "bearer",
+        refresh_token: tokenParams.refresh_token,
       });
+
+      if (sessionError) {
+        setError(sessionError.message);
+        setIsLoading(false);
+        return;
+      }
     }
 
     const { error: err } = await supabase.auth.updateUser({
@@ -202,12 +208,17 @@ export default function ResetPassword() {
                     <TextInput
                       placeholder="Neues Passwort"
                       placeholderTextColor={theme.text.op}
-                      secureTextEntry
+                      secureTextEntry={!showPassword}
                       value={newPassword}
                       onChangeText={setNewPassword}
                       style={styles.input}
                       editable={!isLoading}
                     />
+                    <Pressable onPress={() => setShowPassword(!showPassword)} disabled={isLoading}>
+                      {showPassword
+                        ? icons.eyeOff({ size: 20, color: theme.text.op })
+                        : icons.eye({ size: 20, color: theme.text.op })}
+                    </Pressable>
                   </View>
 
                   <View style={[styles.inputContainer, error && styles.inputError]}>
@@ -215,12 +226,17 @@ export default function ResetPassword() {
                     <TextInput
                       placeholder="Passwort wiederholen"
                       placeholderTextColor={theme.text.op}
-                      secureTextEntry
+                      secureTextEntry={!showConfirmPassword}
                       value={confirmPassword}
                       onChangeText={setConfirmPassword}
                       style={styles.input}
                       editable={!isLoading}
                     />
+                    <Pressable onPress={() => setShowConfirmPassword(!showConfirmPassword)} disabled={isLoading}>
+                      {showConfirmPassword
+                        ? icons.eyeOff({ size: 20, color: theme.text.op })
+                        : icons.eye({ size: 20, color: theme.text.op })}
+                    </Pressable>
                   </View>
                 </View>
 
@@ -262,7 +278,7 @@ export default function ResetPassword() {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      <LoadingScreen text="E-Mail wird gesendet" visible={isLoading} overlay />
+      <LoadingScreen text={mode === "reset" ? "Passwort wird zurückgesetzt" : "E-Mail wird gesendet"} visible={isLoading} overlay />
     </SafeAreaView>
   );
 }
