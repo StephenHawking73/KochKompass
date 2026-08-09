@@ -65,7 +65,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.background, padding: 24 },
   headerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 8 },
   iconButton: { width: 42, height: 42, borderRadius: 21, alignItems: "center", justifyContent: "center", backgroundColor: theme.card.background },
-  title: { fontSize: 30, fontWeight: "700", color: theme.text.primary, flex: 1, textAlign: "center", includeFontPadding: false, lineHeight: 32, flexShrink: 0 },
+  title: { fontSize: 25, fontWeight: "700", color: theme.text.primary, flex: 1, textAlign: "center", includeFontPadding: false, lineHeight: 32, flexShrink: 0 },
   subtitle: { fontSize: 15, color: theme.text.op, marginTop: 8, marginBottom: 16 },
   card: { backgroundColor: theme.card.background, borderRadius: 24, padding: 20, gap: 8 },
   label: { color: theme.text.op },

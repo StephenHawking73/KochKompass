@@ -113,7 +113,7 @@ export default function GroupScreen() {
 
 const createStyles = (theme: any) => StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.background, padding: 24 },
-  headerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 20 },
+  headerRow: { flexDirection: "row", alignItems: "center", marginTop: 20 },
   iconButton: { width: 42, height: 42, borderRadius: 21, alignItems: "center", justifyContent: "center", backgroundColor: theme.card.background },
   title: { fontSize: 30, fontWeight: "700", color: theme.text.primary, flex: 1, textAlign: "center" },
   subtitle: { fontSize: 15, color: theme.text.op, marginTop: 8 },
