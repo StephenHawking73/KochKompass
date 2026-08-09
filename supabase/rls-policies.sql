@@ -1,4 +1,9 @@
 -- Gruppen: Nur Mitglieder dürfen Gruppen sehen
+alter table public.groups
+add column if not exists icon text not null default 'users',
+add column if not exists accent_color text not null default '#82C05C',
+add column if not exists design_variant text not null default 'fresh';
+
 create policy if not exists groups_select_members
 on public.groups
 for select
@@ -8,6 +13,33 @@ using (
     from public.group_members gm
     where gm.group_id = groups.id
       and gm.user_id = auth.uid()
+  )
+);
+
+create policy if not exists groups_insert_own
+on public.groups
+for insert
+with check (created_by = auth.uid());
+
+create policy if not exists groups_update_admins
+on public.groups
+for update
+using (
+  exists (
+    select 1
+    from public.group_members gm
+    where gm.group_id = groups.id
+      and gm.user_id = auth.uid()
+      and gm.role = 'admin'
+  )
+)
+with check (
+  exists (
+    select 1
+    from public.group_members gm
+    where gm.group_id = groups.id
+      and gm.user_id = auth.uid()
+      and gm.role = 'admin'
   )
 );
 

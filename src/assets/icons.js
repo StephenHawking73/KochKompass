@@ -35,6 +35,11 @@ export const icons = {
     more: (props) => <AntDesign name="more" size={19} {...props}/>,
 
     link: (props) => <Entypo name="link" size={20} {...props}/>,
+    plus: (props) => <AntDesign name="plus" size={20} {...props}/>,
+    minus: (props) => <AntDesign name="minus" size={20} {...props}/>,
+    settings: (props) => <Feather name="settings" size={20} {...props}/>,
+    userPlus: (props) => <Feather name="user-plus" size={20} {...props}/>,
+    save: (props) => <Feather name="save" size={20} {...props}/>,
 
     calendar: (props) => <Feather name="calendar" size={24} {...props}/>,
     move: (props) => <Feather name="move" size={20} {...props}/>,
@@ -59,4 +64,11 @@ export const icons = {
 
     google: (props) => <Image source={{uri: "https://logos-world.net/wp-content/uploads/2020/09/Google-Symbol.png"}} style={{width: 22, height: 22}} {...props}/>,
     apple: (props) => <AntDesign name="apple" {...props}/>,
+
+    groupUsers: (props) => <Feather name="users" size={22} {...props}/>,
+    groupHome: (props) => <Feather name="home" size={22} {...props}/>,
+    groupChef: (props) => <MaterialCommunityIcons name="chef-hat" size={22} {...props}/>,
+    groupPlate: (props) => <Ionicons name="restaurant-outline" size={22} {...props}/>,
+    groupLeaf: (props) => <Ionicons name="leaf-outline" size={22} {...props}/>,
+    groupCalendar: (props) => <Feather name="calendar" size={22} {...props}/>,
 }
