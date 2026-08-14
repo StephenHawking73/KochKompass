@@ -4,14 +4,14 @@ import { deleteRecipeImage } from "./storageService";
 import { getActiveGroupContext } from "./groupService";
 
 export async function getRecipes(): Promise<Recipe[]> {
-    const { activeGroupId } = await getActiveGroupContext().catch(() => ({ activeGroupId: null }));
+    const { activeGroupId, userId } = await getActiveGroupContext();
 
-    let query = supabase.from("recipes").select("id, title, image_url, description, attribute, duration, difficulty, created_at, link, meal_plan(planned_date), recipe_ratings_summary(avg_rating, rating_count)");
+    let query = supabase.from("recipes").select("id, title, image_url, description, attribute, duration, difficulty, created_at, link, created_by, meal_plan(planned_date), recipe_ratings_summary(avg_rating, rating_count)");
 
     if (activeGroupId) {
         query = query.eq("group_id", activeGroupId);
     } else {
-        query = query.is("group_id", null);
+        query = query.is("group_id", null).eq("created_by", userId);
     }
 
     const { data, error } = await query.order(
@@ -60,12 +60,20 @@ export async function getRecipe(id: string) {
 }
 
 export async function createRecipe(recipe: RecipeInput) {
+    const { activeGroupId, userId } = await getActiveGroupContext();
 
-    const { data: existing, error: checkError } = await supabase
+    let existingQuery = supabase
         .from("recipes")
         .select("id")
-        .ilike("title", recipe.title.trim())
-        .maybeSingle();
+        .ilike("title", recipe.title.trim());
+
+    if (activeGroupId) {
+        existingQuery = existingQuery.eq("group_id", activeGroupId);
+    } else {
+        existingQuery = existingQuery.is("group_id", null).eq("created_by", userId);
+    }
+
+    const { data: existing, error: checkError } = await existingQuery.maybeSingle();
 
     if (checkError) {
         console.log(checkError);
@@ -75,8 +83,6 @@ export async function createRecipe(recipe: RecipeInput) {
     if (existing) {
         throw new Error("Dieses Rezept exisiert bereits!");
     }
-
-    const { activeGroupId } = await getActiveGroupContext().catch(() => ({ activeGroupId: null }));
 
     const { data, error } = await supabase
         .from("recipes")
@@ -88,6 +94,7 @@ export async function createRecipe(recipe: RecipeInput) {
             difficulty: recipe.difficulty,
             duration: recipe.duration,
             link: recipe.link,
+            created_by: userId,
             group_id: activeGroupId,
         })
         .select()

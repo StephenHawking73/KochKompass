@@ -12,12 +12,16 @@ Dark / Light Mode ✅
 
 Gruppen implementieren => MAX Meat Gerichte! ✅
 
+NULL bei group_id für alle ohne Gruppe sichtbar <-> soll gelöscht werden und private Rezepte noch möglich machen! ✅
+
 -------------------------------------------------------------------------------
 
-NULL bei group_id für alle ohne Gruppe sichtbar <-> soll gelöscht werden und private Rezepte noch möglich machen!
+Wenn man ein Rezept auswählt und dann löscht -> Error!
 
 RLS anpassen!
 
 Admin kann User entfernen & Gruppe Löschen
 
 Gruppe verlassen
+
+Ohne Internet Error Message

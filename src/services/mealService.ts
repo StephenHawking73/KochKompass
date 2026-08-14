@@ -29,14 +29,16 @@ async function ensureAuthenticatedSession() {
 }
 
 export async function getMeals(weekStart?: Date | null, weekEnd?: Date | null) {
-    const { activeGroupId } = await getActiveGroupContext().catch(() => ({ activeGroupId: null }));
+    const { activeGroupId, userId } = await getActiveGroupContext();
 
     let query = supabase.from("meal_plan").select("id, planned_date, recipe_id, recipes(title, image_url, description, attribute), meal_type, position");
 
     if (activeGroupId) {
         query = query.eq("group_id", activeGroupId);
     } else {
-        query = query.is("group_id", null);
+        query = query
+            .is("group_id", null)
+            .or(`user_id.eq.${userId},created_by.eq.${userId}`);
     }
 
     if (weekStart && weekEnd) {
@@ -77,7 +79,7 @@ export async function addMealToPlan(
     mealPosition: number
 ) {
     await ensureAuthenticatedSession();
-    const { activeGroupId } = await getActiveGroupContext().catch(() => ({ activeGroupId: null }));
+    const { activeGroupId, userId } = await getActiveGroupContext();
 
     return supabase
         .from("meal_plan")
@@ -87,6 +89,8 @@ export async function addMealToPlan(
             meal_type: mealType,
             position: mealPosition,
             group_id: activeGroupId,
+            created_by: userId,
+            user_id: userId,
         })
         .select("id")
         .single();
