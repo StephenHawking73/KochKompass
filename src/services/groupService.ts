@@ -216,6 +216,48 @@ export async function updateGroupMaxMeat(groupId: string, maxMeat: number) {
     return updateGroupSettings(groupId, { max_meat: maxMeat });
 }
 
+export async function promoteGroupMember(groupId: string, userId: string) {
+    const { error } = await supabase.rpc("promote_group_member", {
+        p_group_id: groupId,
+        p_user_id: userId,
+    });
+
+    if (error) {
+        throw error;
+    }
+}
+
+export async function removeGroupMember(groupId: string, userId: string) {
+    const { error } = await supabase.rpc("remove_group_member", {
+        p_group_id: groupId,
+        p_user_id: userId,
+    });
+
+    if (error) {
+        throw error;
+    }
+}
+
+export async function leaveGroup(groupId: string) {
+    const { error } = await supabase.rpc("leave_group", {
+        p_group_id: groupId,
+    });
+
+    if (error) {
+        throw error;
+    }
+}
+
+export async function deleteGroup(groupId: string) {
+    const { error } = await supabase.rpc("delete_group", {
+        p_group_id: groupId,
+    });
+
+    if (error) {
+        throw error;
+    }
+}
+
 function createInvitationCode() {
     return Math.random().toString(36).slice(2, 8).toUpperCase();
 }
