@@ -132,8 +132,8 @@ export default function Register() {
           id: user.id,
           username:
             user.user_metadata.full_name?.split(" ")[0] ?? "",
-          last_name:
-            user.user_metadata.full_name?.split(" ").slice(1).join(" ") ?? "",
+          full_name:
+            user.user_metadata.full_name ?? "",
           email: user.email,
         });
 

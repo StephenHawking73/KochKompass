@@ -31,7 +31,7 @@ async function ensureAuthenticatedSession() {
 export async function getMeals(weekStart?: Date | null, weekEnd?: Date | null) {
     const { activeGroupId, userId } = await getActiveGroupContext();
 
-    let query = supabase.from("meal_plan").select("id, planned_date, recipe_id, recipes(title, image_url, description, attribute), meal_type, position");
+    let query = supabase.from("meal_plan").select("id, planned_date, recipe_id, recipes(id, title, image_url, description, attribute), meal_type, position");
 
     if (activeGroupId) {
         query = query.eq("group_id", activeGroupId);

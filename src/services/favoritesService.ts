@@ -1,7 +1,16 @@
 import { supabase } from "@/lib/supabase";
 
 export async function getFavorites() {
-    const { data, error } = await supabase.from("favorites").select("meal_id");
+    const {
+        data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return [];
+
+    const { data, error } = await supabase
+        .from("favorites")
+        .select("meal_id")
+        .eq("user_id", user.id);
 
     if (error) {
         console.log(error);
