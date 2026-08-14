@@ -330,6 +330,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   actions: {
     marginTop: 22,
     gap: 12,
+    width: "100%",
   },
   primaryButton: {
     backgroundColor: theme.button?.primary ?? theme.accent.primary,
@@ -339,6 +340,7 @@ const createStyles = (theme: any) => StyleSheet.create({
     justifyContent: "center",
     flexDirection: "row",
     gap: 8,
+    width: "100%",
   },
   primaryButtonText: {
     color: "#fff",
@@ -355,6 +357,7 @@ const createStyles = (theme: any) => StyleSheet.create({
     justifyContent: "center",
     flexDirection: "row",
     gap: 8,
+    width: "100%",
   },
   secondaryButtonText: {
     color: theme.text.primary,

@@ -262,7 +262,7 @@ export async function getGroupMembers(groupId: string): Promise<GroupMember[]> {
         .from("group_members")
         .select("id, role, user_id, profiles(id, username, full_name, avatar_url)")
         .eq("group_id", groupId)
-        .order("role", { ascending: false });
+        .order("role", { ascending: true });
 
     if (error) {
         throw error;

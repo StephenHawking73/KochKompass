@@ -50,7 +50,6 @@ export default function InviteGroupScreen() {
         <View style={styles.card}>
           <Text style={styles.label}>Dein Einladungscode:</Text>
           <Text style={styles.code}>{code ?? "—"}</Text>
-          <Text style={styles.link}>kochkompass://join/{code ?? "CODE"}</Text>
         </View>
       )}
 
