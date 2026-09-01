@@ -108,7 +108,11 @@ export default function WeekView({
         toggleMealSelection(selectedMealId);
         onRefresh();
       } catch (error) {
-        console.error("move target failed", error);
+        const message = error instanceof Error && error.message ? error.message : "Die Mahlzeit konnte nicht verschoben werden.";
+        showAlert({
+          title: "Verschieben fehlgeschlagen",
+          message,
+        });
       } finally {
         window.setTimeout(() => setActiveTargetKey(null), 260);
       }
@@ -157,7 +161,11 @@ export default function WeekView({
         onRefresh();
         router.replace("/");
       } catch (error) {
-        console.error("plan target failed", error);
+        const message = error instanceof Error && error.message ? error.message : "Das Rezept konnte nicht in den Plan übernommen werden.";
+        showAlert({
+          title: "Einplanen fehlgeschlagen",
+          message,
+        });
       } finally {
         window.setTimeout(() => setActiveTargetKey(null), 260);
       }
@@ -181,7 +189,11 @@ export default function WeekView({
 
       await proceedWithPlanning();
     } catch (error) {
-      console.error("plan target limit check failed", error);
+      const message = error instanceof Error && error.message ? error.message : "Die Planungsprüfung konnte nicht abgeschlossen werden.";
+      showAlert({
+        title: "Planungsprüfung fehlgeschlagen",
+        message,
+      });
       await proceedWithPlanning();
     }
   };

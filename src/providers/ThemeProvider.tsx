@@ -34,8 +34,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
                 if (storedThemeMode === "light" || storedThemeMode === "dark" || storedThemeMode === "system") {
                     setThemeModeState(storedThemeMode);
                 }
-            } catch (error) {
-                console.warn("Could not load theme mode", error);
+            } catch {
+                // Theme preference is optional; avoid noisy console output in production builds.
             }
         };
 
@@ -46,8 +46,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         const persistThemeMode = async () => {
             try {
                 await AsyncStorage.setItem(STORAGE_KEY, themeMode);
-            } catch (error) {
-                console.warn("Could not save theme mode", error);
+            } catch {
+                // Theme preference is optional; avoid noisy console output in production builds.
             }
         };
 

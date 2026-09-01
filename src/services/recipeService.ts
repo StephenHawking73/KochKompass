@@ -20,7 +20,6 @@ export async function getRecipes(): Promise<Recipe[]> {
     )
 
     if (error) {
-        console.error(error);
         return [];
     }
 
@@ -52,7 +51,6 @@ export async function getRecipe(id: string) {
         .single();
 
     if (error) {
-        console.error(error);
         return null;
     }
 
@@ -76,8 +74,7 @@ export async function createRecipe(recipe: RecipeInput) {
     const { data: existing, error: checkError } = await existingQuery.maybeSingle();
 
     if (checkError) {
-        console.log(checkError);
-        throw checkError;
+        throw new Error("Rezeptprüfung fehlgeschlagen. Bitte versuche es erneut.");
     }
 
     if (existing) {
@@ -101,8 +98,7 @@ export async function createRecipe(recipe: RecipeInput) {
         .single();
     
     if (error) {
-        console.error(error);
-        throw error;
+        throw new Error("Rezept konnte nicht erstellt werden.");
     }
 
     return data;
@@ -121,8 +117,7 @@ export async function updateRecipe(
         .single();
 
     if (currentError) {
-        console.error(currentError);
-        throw currentError;
+        throw new Error("Aktuelles Rezept konnte nicht geladen werden.");
     }
 
     // Hat sich das Bild geändert?
@@ -135,8 +130,8 @@ export async function updateRecipe(
     ) {
         try {
             await deleteRecipeImage(oldImage);
-        } catch (error) {
-            console.error("Altes Bild konnte nicht gelöscht werden:", error);
+        } catch {
+            // Das ursprüngliche Rezept wird trotzdem aktualisiert; das Bild ist nicht kritisch.
         }
     }
 
@@ -161,8 +156,7 @@ export async function updateRecipe(
         .single();
 
     if (error) {
-        console.error(error);
-        throw error;
+        throw new Error("Rezept konnte nicht aktualisiert werden.");
     }
 
     return data;
@@ -178,15 +172,14 @@ export async function deleteRecipe(id: string) {
         .single();
 
     if (recipeError) {
-        console.error(recipeError);
-        throw recipeError;
+        throw new Error("Rezeptdaten konnten nicht geladen werden.");
     }
 
     // Bild löschen (falls eigenes)
     try {
         await deleteRecipeImage(recipe.image_url);
-    } catch (error) {
-        console.error("Fehler beim Löschen des Bildes:", error);
+    } catch {
+        // Bildlöschung ist nicht kritisch, das Rezept soll trotzdem entfernt werden.
     }
 
     // Rezept löschen
@@ -198,8 +191,7 @@ export async function deleteRecipe(id: string) {
         .single();
 
     if (error) {
-        console.error(error);
-        throw error;
+        throw new Error("Rezept konnte nicht gelöscht werden.");
     }
 
     return data;

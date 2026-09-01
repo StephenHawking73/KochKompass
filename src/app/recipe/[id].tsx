@@ -146,7 +146,11 @@ export default function RecipeDetail() {
       router.back();
 
     } catch (error) {
-      console.error("Recipe delete failed:", error);
+      const message = error instanceof Error && error.message ? error.message : "Das Rezept konnte nicht gelöscht werden.";
+      showAlert({
+        title: "Löschen fehlgeschlagen",
+        message,
+      });
     } finally {
       setDeleting(false);
     }

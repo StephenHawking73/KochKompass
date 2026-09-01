@@ -211,7 +211,11 @@ export default function RecipiesScreen() {
           });
         });
       } catch (error) {
-        console.error("recipe planning failed", error);
+        const message = error instanceof Error && error.message ? error.message : "Das Rezept konnte nicht in den Plan übernommen werden.";
+        showAlert({
+          title: "Einplanen fehlgeschlagen",
+          message,
+        });
       }
     };
 
@@ -233,7 +237,11 @@ export default function RecipiesScreen() {
 
       await proceedWithPlanning();
     } catch (error) {
-      console.error("recipe planning limit check failed", error);
+      const message = error instanceof Error && error.message ? error.message : "Die Planungsprüfung konnte nicht abgeschlossen werden.";
+      showAlert({
+        title: "Planungsprüfung fehlgeschlagen",
+        message,
+      });
       await proceedWithPlanning();
     }
   };

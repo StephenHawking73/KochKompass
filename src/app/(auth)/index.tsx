@@ -2,16 +2,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { StyleSheet, View, Text, Image, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { images } from "@/assets/images";
-import { supabase } from "@/lib/supabase";
 import { router } from "expo-router";
-
-async function login() {
-    const { data, error } =
-        await supabase.auth.signInWithPassword({
-            email: "dev@dev.com",
-            password: "KochKompass",
-        });    
-    }
 
 export default function LandingPage(){
     const theme = useTheme();

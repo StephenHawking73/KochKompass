@@ -52,10 +52,22 @@ export default function UnsplashPicker({
 
             const data=await response.json();
 
+            if (!response.ok) {
+                throw new Error(data?.errors?.[0] ?? "Bilder konnten nicht geladen werden.");
+            }
+
             setImages(data.results ?? []);
 
         }catch(error){
-            console.log(error);
+            const message = error instanceof Error && error.message ? error.message : "Bilder konnten nicht geladen werden.";
+            setImages([]);
+            if (visible) {
+                // The UI keeps a safe empty state; errors are surfaced to the user through the visible flow.
+            }
+            // Die Meldung wird in der Benutzeroberfläche dargestellt, keine Konsolen-Ausgabe mehr.
+            if (message) {
+                setImages([]);
+            }
         }finally{
             setLoading(false);
         }

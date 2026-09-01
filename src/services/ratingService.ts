@@ -17,7 +17,6 @@ export async function getRecipeRatings(recipeId: string) {
     .maybeSingle();
 
   if (rErr || sErr) {
-    console.error(rErr || sErr);
     return null;
   }
 

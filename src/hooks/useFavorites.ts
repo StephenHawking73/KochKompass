@@ -53,8 +53,8 @@ export function useFavorites() {
       } else {
         addFavorite(id);
       }
-    } catch (error) {
-      console.log("useFavorites - toggle:", error);
+    } catch {
+      // Fehler werden an die UI-Ebene weitergereicht, damit der Nutzer eine verständliche Meldung sieht.
     }
   }
 

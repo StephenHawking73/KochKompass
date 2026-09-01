@@ -32,9 +32,9 @@ Profile Edit ✅
 
 Ohne Internet Error Message ✅
 
--------------------------------------------------------------------------------
+Custom Error Messages ✅
 
-Custom Error Messages
+-------------------------------------------------------------------------------
 
 Design noch umsetzen!
 

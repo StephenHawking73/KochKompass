@@ -8,6 +8,7 @@ import {
 import { useState } from "react";
 import { useTheme } from "@/hooks/useTheme";
 import { icons } from "@/assets/icons";
+import { useAppAlert } from "@/providers/AlertProvider";
 import UnsplashPicker from "./UnsplashPicker";
 
 import * as ImagePicker from "expo-image-picker";
@@ -31,6 +32,7 @@ export default function RecipeImagePicker({
 
     const [pickerOpen, setPickerOpen] = useState(false);
     const [unsplashOpen, setUnsplashOpen] = useState(false);
+    const { showAlert } = useAppAlert();
 
     const pickFromGallery = async () => {
         const permission =
@@ -199,7 +201,11 @@ export default function RecipeImagePicker({
                             onChange("");
                             setPickerOpen(false);
                         } catch (err) {
-                            console.log("Fehler beim Löschen des Bildes: ", err)
+                            const message = err instanceof Error && err.message ? err.message : "Das Bild konnte nicht entfernt werden.";
+                            showAlert({
+                                title: "Bild konnte nicht gelöscht werden",
+                                message,
+                            });
                         }
                     }}
                 >

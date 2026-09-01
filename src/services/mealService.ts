@@ -12,20 +12,11 @@ async function ensureAuthenticatedSession() {
         throw sessionError;
     }
 
-    if (session?.access_token) {
-        return session;
+    if (!session?.access_token) {
+        throw new Error("Bitte melde dich an, um deinen Speiseplan zu laden.");
     }
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-        email: "dev@dev.com",
-        password: "KochKompass",
-    });
-
-    if (error) {
-        throw error;
-    }
-
-    return data.session;
+    return session;
 }
 
 export async function getMeals(weekStart?: Date | null, weekEnd?: Date | null) {
@@ -52,7 +43,6 @@ export async function getMeals(weekStart?: Date | null, weekEnd?: Date | null) {
     });
 
     if (error) {
-        console.error(error);
         return [];
     }
 

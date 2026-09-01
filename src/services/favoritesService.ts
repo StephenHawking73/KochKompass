@@ -13,9 +13,8 @@ export async function getFavorites() {
         .eq("user_id", user.id);
 
     if (error) {
-        console.log(error);
         return [];
-    };
+    }
 
     return data.map((f) => f.meal_id)
 }
@@ -35,9 +34,8 @@ export async function addFavorite(mealId: string) {
     });
 
     if (error) {
-        console.log(error);
-        return [];
-    };
+        return;
+    }
 }
 
 export async function removeFavorite(mealId: string) {
@@ -54,9 +52,8 @@ export async function removeFavorite(mealId: string) {
     .eq("meal_id", mealId);
 
     if (error) {
-        console.log(error);
-        return [];
-    };
+        return;
+    }
 }
 
 export async function toggleFavorite(
