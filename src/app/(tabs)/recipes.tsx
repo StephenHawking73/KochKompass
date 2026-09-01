@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TextInput, ScrollView, Platform, FlatList, Pressable } from 'react-native'
+import { View, Text, StyleSheet, TextInput, ScrollView, Platform, FlatList, Pressable, Alert } from 'react-native'
 import React, { useCallback, useMemo, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTheme } from '@/hooks/useTheme';
@@ -11,7 +11,7 @@ import { FilterState, SortOption } from '@/types/recipeFilters';
 import RecipeFilterBar from '@/components/Filter/RecipeFilterBar';
 import SortDropdown from '@/components/SortDropdown';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { addMealToPlan } from '@/services/mealService';
+import { addMealToPlan, getMealLimitStatusForRecipe } from '@/services/mealService';
 import { Difficulty, Meal, Recipe } from '@/types/types';
 import DeleteRecipeModal from '@/components/modals/DeleteRecipeModal';
 import { deleteRecipe } from '@/services/recipeService';
@@ -175,30 +175,54 @@ export default function RecipiesScreen() {
       return;
     }
 
-    try {
-      const result = await addMealToPlan(
-        recipeId,
-        planningDate,
-        planningMealType,
-        Number(planningPosition)
-      );
+    const proceedWithPlanning = async () => {
+      try {
+        const result = await addMealToPlan(
+          recipeId,
+          planningDate,
+          planningMealType,
+          Number(planningPosition)
+        );
 
-      if (result?.error) {
-        throw result.error;
+        if (result?.error) {
+          throw result.error;
+        }
+
+        router.replace("/recipes");
+        requestAnimationFrame(() => {
+          router.replace({
+            pathname: "/",
+            params: {
+              focusDate: planningDate,
+              plannedAt: String(Date.now()),
+            },
+          });
+        });
+      } catch (error) {
+        console.error("recipe planning failed", error);
+      }
+    };
+
+    try {
+      const status = await getMealLimitStatusForRecipe(recipeId, planningDate);
+
+      if (status.exceedsLimit && status.limit != null) {
+        const wouldBe = status.currentCount + 1;
+        Alert.alert(
+          "Fleischlimit erreicht",
+          `Du hast bereits ${status.currentCount} von ${status.limit} Fleischgerichten in dieser Woche geplant. Wenn du noch eines einplanst, wären es ${wouldBe}. Möchtest du wirklich mehr Fleisch in der Woche machen?`,
+          [
+            { text: "Abbrechen", style: "cancel" },
+            { text: "Trotzdem einplanen", style: "destructive", onPress: proceedWithPlanning },
+          ]
+        );
+        return;
       }
 
-      router.replace("/recipes");
-      requestAnimationFrame(() => {
-        router.replace({
-          pathname: "/",
-          params: {
-            focusDate: planningDate,
-            plannedAt: String(Date.now()),
-          },
-        });
-      });
+      await proceedWithPlanning();
     } catch (error) {
-      console.error("recipe planning failed", error);
+      console.error("recipe planning limit check failed", error);
+      await proceedWithPlanning();
     }
   };
 

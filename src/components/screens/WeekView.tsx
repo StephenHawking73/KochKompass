@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { router } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import WeekViewContainer from "@/components/screens/WeekViewContainer";
 import WeekViewHeader from "@/components/screens/WeekViewHeader";
 import WeekViewDay from "@/components/screens/WeekViewDay";
@@ -10,7 +10,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { icons } from "@/assets/icons";
 import { Meal } from "@/types/types";
 import { moveMeal, swapMeal } from "./moveMeal";
-import { addMealToPlan, deleteMealFromPlan } from "@/services/mealService";
+import { addMealToPlan, deleteMealFromPlan, getMealLimitStatusForRecipe } from "@/services/mealService";
 import DeleteMealModal from "../modals/DeleteMealModal";
 import { useWeekLayout } from "@/hooks/useWeekLayout";
 
@@ -136,24 +136,48 @@ export default function WeekView({
     const targetKey = `${date}-${mealType}-${position}`;
     setActiveTargetKey(targetKey);
 
-    try {
-      const result = await addMealToPlan(
-        planningRecipeId,
-        date,
-        mealType,
-        position
-      );
+    const proceedWithPlanning = async () => {
+      try {
+        const result = await addMealToPlan(
+          planningRecipeId,
+          date,
+          mealType,
+          position
+        );
 
-      if (result?.error) {
-        throw result.error;
+        if (result?.error) {
+          throw result.error;
+        }
+
+        onRefresh();
+        router.replace("/");
+      } catch (error) {
+        console.error("plan target failed", error);
+      } finally {
+        window.setTimeout(() => setActiveTargetKey(null), 260);
+      }
+    };
+
+    try {
+      const status = await getMealLimitStatusForRecipe(planningRecipeId, date);
+
+      if (status.exceedsLimit && status.limit != null) {
+        const wouldBe = status.currentCount + 1;
+        Alert.alert(
+          "Fleischlimit erreicht",
+          `Du hast bereits ${status.currentCount} von ${status.limit} Fleischgerichten in dieser Woche geplant. Wenn du noch eines einplanst, wären es ${wouldBe}. Möchtest du wirklich mehr Fleisch in der Woche machen?`,
+          [
+            { text: "Abbrechen", style: "cancel" },
+            { text: "Trotzdem einplanen", style: "destructive", onPress: proceedWithPlanning },
+          ]
+        );
+        return;
       }
 
-      onRefresh();
-      router.replace("/");
+      await proceedWithPlanning();
     } catch (error) {
-      console.error("plan target failed", error);
-    } finally {
-      window.setTimeout(() => setActiveTargetKey(null), 260);
+      console.error("plan target limit check failed", error);
+      await proceedWithPlanning();
     }
   };
 

@@ -72,6 +72,100 @@ export async function getMeals(weekStart?: Date | null, weekEnd?: Date | null) {
     }));
 }
 
+export async function getMealLimitStatusForRecipe(recipeId: string, plannedDate: string) {
+    const { data: recipeData, error: recipeError } = await supabase
+        .from("recipes")
+        .select("attribute")
+        .eq("id", recipeId)
+        .maybeSingle();
+
+    if (recipeError) {
+        throw recipeError;
+    }
+
+    if (recipeData?.attribute !== "meat") {
+        return {
+            limit: null,
+            currentCount: 0,
+            wouldExceed: false,
+            exceedsLimit: false,
+        };
+    }
+
+    const limit = await getCurrentMealLimit();
+    const currentCount = await getCurrentWeeklyMeatCount(plannedDate);
+
+    return {
+        limit,
+        currentCount,
+        wouldExceed: currentCount + 1 > limit,
+        exceedsLimit: currentCount + 1 > limit,
+    };
+}
+
+async function getCurrentMealLimit() {
+    const { activeGroupId, userId } = await getActiveGroupContext();
+
+    if (activeGroupId) {
+        const { data, error } = await supabase
+            .from("groups")
+            .select("max_meat")
+            .eq("id", activeGroupId)
+            .maybeSingle();
+
+        if (error) {
+            throw error;
+        }
+
+        return Number(data?.max_meat ?? 3);
+    }
+
+    const { data, error } = await supabase
+        .from("profiles")
+        .select("max_meat")
+        .eq("id", userId)
+        .maybeSingle();
+
+    if (error) {
+        throw error;
+    }
+
+    return Number(data?.max_meat ?? 3);
+}
+
+async function getCurrentWeeklyMeatCount(plannedDate: string) {
+    const { activeGroupId, userId } = await getActiveGroupContext();
+
+    const date = new Date(`${plannedDate}T12:00:00`);
+    const day = (date.getDay() + 6) % 7;
+    const weekStart = new Date(date);
+    weekStart.setDate(date.getDate() - day);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+
+    let query = supabase
+        .from("meal_plan")
+        .select("id, recipes(attribute)")
+        .gte("planned_date", formatLocalDate(weekStart))
+        .lte("planned_date", formatLocalDate(weekEnd));
+
+    if (activeGroupId) {
+        query = query.eq("group_id", activeGroupId);
+    } else {
+        query = query
+            .is("group_id", null)
+            .or(`user_id.eq.${userId},created_by.eq.${userId}`);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+        throw error;
+    }
+
+    return (data ?? []).filter((entry: any) => entry.recipes?.attribute === "meat").length;
+}
+
 export async function addMealToPlan(
     recipeId: string,
     plannedDate: string,

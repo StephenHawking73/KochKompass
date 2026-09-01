@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, Image, Pressable } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTheme } from '@/hooks/useTheme'
-import { getProfile } from '@/services/profileService';
+import { getProfile, updateProfileMaxMeat } from '@/services/profileService';
 import ProfileCard from '@/components/profile/ProfileCard';
 import { icons } from '@/assets/icons';
 import { ProfileType } from '@/types/profile';
@@ -23,6 +23,9 @@ export default function Profile() {
 
   const [profile, setProfile] = useState<ProfileType | null>(null);
   const [themeSheetVisible, setThemeSheetVisible] = useState(false);
+  const [meatLimitSheetVisible, setMeatLimitSheetVisible] = useState(false);
+  const [maxMeatSetting, setMaxMeatSetting] = useState(3);
+  const [savingMaxMeat, setSavingMaxMeat] = useState(false);
   const [devNoticeVisible, setDevNoticeVisible] = useState(false);
   const [devNoticeContent, setDevNoticeContent] = useState({ title: '', message: '' });
 
@@ -30,6 +33,7 @@ export default function Profile() {
     const loadProfile = async () => {
       const data = await getProfile()
       setProfile(data)
+      setMaxMeatSetting(data?.max_meat ?? 3)
     }
 
     loadProfile()
@@ -87,6 +91,15 @@ export default function Profile() {
       onPress: () => router.push('/group' as any)
     },
     {
+      title: "Max. Fleisch pro Woche",
+      subtitle: `${profile?.max_meat ?? maxMeatSetting ?? 3} Fleischgerichte`,
+      icon: icons.meat({color: theme.text.primary, size: 20}),
+      onPress: () => {
+        setMaxMeatSetting(profile?.max_meat ?? 3);
+        setMeatLimitSheetVisible(true);
+      }
+    },
+    {
       title: "Design",
       subtitle: getThemeLabel(themeMode),
       icon: isDark ? icons.moon({color: theme.text.primary, size: 20}): icons.sun({color: theme.text.primary, size: 20}),
@@ -103,6 +116,19 @@ export default function Profile() {
       onPress: () => openDevNotice('notifications')
     }
   ]
+
+  const handleSavePrivateMeatLimit = async () => {
+    try {
+      setSavingMaxMeat(true);
+      await updateProfileMaxMeat(maxMeatSetting);
+      setProfile((current) => current ? { ...current, max_meat: maxMeatSetting } : current);
+      setMeatLimitSheetVisible(false);
+    } catch (error: any) {
+      alert(error?.message ?? "Einstellung konnte nicht gespeichert werden.");
+    } finally {
+      setSavingMaxMeat(false);
+    }
+  };
 
   const dangerZone = [
     {
@@ -152,6 +178,43 @@ export default function Profile() {
               </Pressable>
             );
           })}
+        </View>
+      </BasicBottomSheet>
+
+      <BasicBottomSheet
+        visible={meatLimitSheetVisible}
+        onClose={() => setMeatLimitSheetVisible(false)}
+        initialHeight={290}
+      >
+        <View style={styles.meatLimitSheet}>
+          <Text style={styles.sheetTitle}>Max. Fleischgerichte</Text>
+          <Text style={styles.sheetSubtitle}>Wähle dein persönliches Limit für diese Woche.</Text>
+
+          <View style={styles.meatLimitRow}>
+            <Pressable
+              style={styles.counterButton}
+              onPress={() => setMaxMeatSetting((value) => Math.max(0, value - 1))}
+            >
+              <Text style={styles.counterButtonText}>−</Text>
+            </Pressable>
+
+            <Text style={styles.meatLimitValue}>{maxMeatSetting}</Text>
+
+            <Pressable
+              style={styles.counterButton}
+              onPress={() => setMaxMeatSetting((value) => Math.min(21, value + 1))}
+            >
+              <Text style={styles.counterButtonText}>+</Text>
+            </Pressable>
+          </View>
+
+          <Pressable
+            style={[styles.saveMeatLimitButton, savingMaxMeat && styles.saveMeatLimitButtonDisabled]}
+            onPress={handleSavePrivateMeatLimit}
+            disabled={savingMaxMeat}
+          >
+            <Text style={styles.saveMeatLimitText}>{savingMaxMeat ? "Speichert..." : "Speichern"}</Text>
+          </Pressable>
         </View>
       </BasicBottomSheet>
 
@@ -245,5 +308,52 @@ const createStyles = (theme : any) => StyleSheet.create({
     color: theme.accent.primary,
     fontWeight: '700',
     fontSize: 16,
+  },
+  meatLimitSheet: {
+    paddingTop: 4,
+    gap: 18,
+  },
+  meatLimitRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 18,
+    paddingVertical: 8,
+  },
+  counterButton: {
+    width: 46,
+    height: 46,
+    borderRadius: 14,
+    backgroundColor: theme.accent.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  counterButtonText: {
+    color: '#fff',
+    fontSize: 26,
+    fontWeight: '700',
+    lineHeight: 26,
+  },
+  meatLimitValue: {
+    minWidth: 44,
+    textAlign: 'center',
+    color: theme.text.primary,
+    fontSize: 30,
+    fontWeight: '800',
+  },
+  saveMeatLimitButton: {
+    backgroundColor: theme.accent.primary,
+    borderRadius: 16,
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  saveMeatLimitButtonDisabled: {
+    opacity: 0.7,
+  },
+  saveMeatLimitText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
   },
 })

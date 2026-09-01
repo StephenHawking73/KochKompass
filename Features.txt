@@ -14,14 +14,23 @@ Gruppen implementieren => MAX Meat Gerichte! ✅
 
 NULL bei group_id für alle ohne Gruppe sichtbar <-> soll gelöscht werden und private Rezepte noch möglich machen! ✅
 
+Admin kann User entfernen & Gruppe Löschen ✅
+
+Gruppe verlassen ✅
+
+RLS anpassen! ✅
+
 -------------------------------------------------------------------------------
 
 Wenn man ein Rezept auswählt und dann löscht -> Error!
 
-RLS anpassen!
-
-Admin kann User entfernen & Gruppe Löschen
-
-Gruppe verlassen
-
 Ohne Internet Error Message
+
+Custom Error Messages
+
+Wenn Gruppe gelöscht -> Alles muss gerefresht werden! + Rating muss gelöscht werden
+Nur Admin Gruppe bearbeiten und user adden
+
+Max Meat muss auch eingehalten werden -> Alert!
+
+Profile Edit

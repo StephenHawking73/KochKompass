@@ -40,7 +40,7 @@ export default function ProfileCard({
             <View>
 
                 <Text style={styles.name}>
-                    {username} {fullName}
+                    {fullName}
                 </Text>
 
 
