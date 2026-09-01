@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import NetInfo from "@react-native-community/netinfo";
 import { Session } from "@supabase/supabase-js";
 
 import { supabase } from "@/lib/supabase";
@@ -9,6 +10,7 @@ type AuthContextType = {
     session: Session | null;
     loading: boolean;
     error: Error | null;
+    isOffline: boolean;
     activeGroupId: string | null;
     userId: string | null;
     refreshActiveGroup: () => Promise<void>;
@@ -19,11 +21,17 @@ const AuthContext = createContext<AuthContextType>({
     session: null,
     loading: true,
     error: null,
+    isOffline: false,
     activeGroupId: null,
     userId: null,
     refreshActiveGroup: async () => undefined,
 });
 
+
+function isNetworkError(err: unknown): boolean {
+    const message = err instanceof Error ? err.message : String(err ?? "");
+    return /(network|fetch|failed to fetch|offline|connection|timed out|socket)/i.test(message);
+}
 
 export function AuthProvider({
     children,
@@ -34,6 +42,7 @@ export function AuthProvider({
     const [session, setSession] = useState<Session | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
+    const [isOffline, setIsOffline] = useState(false);
     const [activeGroupId, setActiveGroupId] = useState<string | null>(null);
     const [userId, setUserId] = useState<string | null>(null);
 
@@ -50,6 +59,17 @@ export function AuthProvider({
 
 
     useEffect(() => {
+        const unsubscribe = NetInfo.addEventListener((state) => {
+            const offline = !state.isConnected || state.isInternetReachable === false;
+            setIsOffline(offline);
+        });
+
+        return () => {
+            unsubscribe();
+        };
+    }, []);
+
+    useEffect(() => {
 
         async function loadSession() {
 
@@ -60,23 +80,43 @@ export function AuthProvider({
                     error,
                 } = await supabase.auth.getSession();
 
+                if (data?.session) {
+                    setSession(data.session);
+                    setError(null);
+
+                    if (data.session.user) {
+                        await refreshActiveGroup();
+                    } else {
+                        setUserId(null);
+                        setActiveGroupId(null);
+                    }
+
+                    return;
+                }
 
                 if (error) {
+                    if (isNetworkError(error)) {
+                        setError(null);
+                        return;
+                    }
+
                     throw error;
                 }
 
-
-                setSession(data.session);
-
-                if (data.session?.user) {
-                    await refreshActiveGroup();
-                } else {
-                    setUserId(null);
-                    setActiveGroupId(null);
-                }
+                setSession(null);
+                setUserId(null);
+                setActiveGroupId(null);
 
             } catch (err) {
 
+                if (isNetworkError(err)) {
+                    setError(null);
+                    return;
+                }
+
+                setSession(null);
+                setUserId(null);
+                setActiveGroupId(null);
                 setError(err as Error);
 
             } finally {
@@ -123,6 +163,7 @@ export function AuthProvider({
                 session,
                 loading,
                 error,
+                isOffline,
                 activeGroupId,
                 userId,
                 refreshActiveGroup,
