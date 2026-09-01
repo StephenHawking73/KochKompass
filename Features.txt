@@ -22,6 +22,8 @@ RLS anpassen! ✅
 
 Max Meat muss auch eingehalten werden -> Alert! ✅
 
+Wenn Gruppe gelöscht -> Alles muss gerefresht werden! + Rating muss gelöscht werden ✅
+
 -------------------------------------------------------------------------------
 
 Wenn man ein Rezept auswählt und dann löscht -> Error!
@@ -30,9 +32,7 @@ Ohne Internet Error Message
 
 Custom Error Messages
 
-Wenn Gruppe gelöscht -> Alles muss gerefresht werden! + Rating muss gelöscht werden
-
-(Nur Admin Gruppe bearbeiten und user adden)
+Nur Admin Gruppe bearbeiten und user adden
 
 Profile Edit
 

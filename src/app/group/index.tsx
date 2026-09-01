@@ -132,7 +132,7 @@ export default function GroupScreen() {
     const willDeleteGroup = members.length <= 1;
     const willTransferAdmin = currentMember?.role === "admin" && adminCount <= 1 && members.length > 1;
     const message = willDeleteGroup
-      ? "Du bist das letzte Mitglied. Wenn du gehst, wird die Gruppe gelöscht und Gruppenrezepte werden privat ihren Erstellern zugeordnet."
+      ? "Du bist das letzte Mitglied. Wenn du gehst, wird die Gruppe gelöscht und alle zugehörigen Rezepte sowie Meal-Plan-Einträge werden unwiderruflich entfernt."
       : willTransferAdmin
         ? "Wenn du gehst, wird das nächste Mitglied automatisch Admin."
         : "Du verlässt diese Gruppe und verlierst den Zugriff auf die Gruppenrezepte.";
@@ -168,7 +168,7 @@ export default function GroupScreen() {
   function handleDeleteGroup() {
     Alert.alert(
       "Gruppe löschen",
-      "Alle Mitglieder werden entfernt. Gruppenrezepte werden privat ihren Erstellern zugeordnet; Essenspläne und Einladungen werden gelöscht.",
+      "Diese Aktion löscht die Gruppe endgültig. Alle zugehörigen Rezepte und Meal-Plan-Einträge werden unwiderruflich entfernt.",
       [
         { text: "Abbrechen", style: "cancel" },
         {
