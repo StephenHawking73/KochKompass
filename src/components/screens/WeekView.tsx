@@ -14,6 +14,7 @@ import { addMealToPlan, deleteMealFromPlan, getMealLimitStatusForRecipe } from "
 import DeleteMealModal from "../modals/DeleteMealModal";
 import { useWeekLayout } from "@/hooks/useWeekLayout";
 import { usePlanningStore } from "@/store/planningStore";
+import { useAppAlert } from "@/providers/AlertProvider";
 
 interface WeekViewProps {
   meals?: Meal[];
@@ -34,6 +35,7 @@ export default function WeekView({
 }: WeekViewProps) {
   const theme = useTheme();
   const styles = createStyles(theme);
+  const { showAlert } = useAppAlert();
 
   const {
     extraRowsByDate,
@@ -166,14 +168,14 @@ export default function WeekView({
 
       if (status.exceedsLimit && status.limit != null) {
         const wouldBe = status.currentCount + 1;
-        Alert.alert(
-          "Fleischlimit erreicht",
-          `Du hast bereits ${status.currentCount} von ${status.limit} Fleischgerichten in dieser Woche geplant. Wenn du noch eines einplanst, wären es ${wouldBe}. Möchtest du wirklich mehr Fleisch in der Woche machen?`,
-          [
+        showAlert({
+          title: "Fleischlimit erreicht",
+          message: `Du hast bereits ${status.currentCount} von ${status.limit} Fleischgerichten in dieser Woche geplant. Wenn du noch eines einplanst, wären es ${wouldBe}. Möchtest du wirklich mehr Fleisch in der Woche machen?`,
+          actions: [
             { text: "Abbrechen", style: "cancel" },
             { text: "Trotzdem einplanen", style: "destructive", onPress: proceedWithPlanning },
-          ]
-        );
+          ],
+        });
         return;
       }
 

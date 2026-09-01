@@ -6,10 +6,12 @@ import { router } from "expo-router";
 import { useTheme } from "@/hooks/useTheme";
 import { createInvitation, getActiveGroup, getActiveGroupContext, getGroupMembers } from "@/services/groupService";
 import { icons } from "@/assets/icons";
+import { useAppAlert } from "@/providers/AlertProvider";
 
 export default function InviteGroupScreen() {
   const theme = useTheme();
   const styles = createStyles(theme);
+  const { showAlert } = useAppAlert();
   const [code, setCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -28,7 +30,7 @@ export default function InviteGroupScreen() {
         const currentMember = members.find((member) => member.user_id === context.userId);
 
         if (currentMember?.role !== "admin") {
-          Alert.alert("Keine Berechtigung", "Nur Admins können Mitglieder einladen.");
+          showAlert({ title: "Keine Berechtigung", message: "Nur Admins können Mitglieder einladen." });
           router.replace("/group" as any);
           return;
         }
@@ -36,7 +38,7 @@ export default function InviteGroupScreen() {
         const invitation = await createInvitation(group.id);
         setCode(invitation.code);
       } catch (error: any) {
-        alert(error?.message ?? "Einladung konnte nicht erstellt werden.");
+        showAlert({ title: error?.message ?? "Einladung konnte nicht erstellt werden." });
       } finally {
         setLoading(false);
       }

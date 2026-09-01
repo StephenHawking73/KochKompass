@@ -6,12 +6,14 @@ import { router } from "expo-router";
 import { useTheme } from "@/hooks/useTheme";
 import { joinGroup } from "@/services/groupService";
 import { useAuth } from "@/providers/AuthProvider";
+import { useAppAlert } from "@/providers/AlertProvider";
 import { icons } from "@/assets/icons";
 
 export default function JoinGroupScreen() {
   const theme = useTheme();
   const styles = createStyles(theme);
   const { refreshActiveGroup } = useAuth();
+  const { showAlert } = useAppAlert();
   const [code, setCode] = useState("");
   const [joining, setJoining] = useState(false);
 
@@ -26,7 +28,7 @@ export default function JoinGroupScreen() {
       await refreshActiveGroup();
       router.replace("/group" as any);
     } catch (error: any) {
-      alert(error?.message ?? "Beitritt fehlgeschlagen.");
+      showAlert({ title: error?.message ?? "Beitritt fehlgeschlagen." });
     } finally {
       setJoining(false);
     }

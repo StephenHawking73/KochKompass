@@ -8,10 +8,12 @@ import { icons } from "@/assets/icons";
 import { useTheme } from "@/hooks/useTheme";
 import { GroupIconName, hexToRgba, normalizeGroupIcon, renderGroupIcon } from "@/lib/groupDesign";
 import { getActiveGroup, getActiveGroupContext, getGroupMembers, GroupSummary, updateGroupSettings } from "@/services/groupService";
+import { useAppAlert } from "@/providers/AlertProvider";
 
 export default function GroupSettingsScreen() {
   const theme = useTheme();
   const styles = createStyles(theme);
+  const { showAlert } = useAppAlert();
   const [group, setGroup] = useState<GroupSummary | null>(null);
   const [groupName, setGroupName] = useState("");
   const [maxMeat, setMaxMeat] = useState(3);
@@ -36,7 +38,7 @@ export default function GroupSettingsScreen() {
         const currentMember = members.find((member) => member.user_id === context.userId);
 
         if (currentMember?.role !== "admin") {
-          Alert.alert("Keine Berechtigung", "Nur Admins können Gruppeneinstellungen bearbeiten.");
+          showAlert({ title: "Keine Berechtigung", message: "Nur Admins können Gruppeneinstellungen bearbeiten." });
           router.replace("/group" as any);
           return;
         }
@@ -47,7 +49,7 @@ export default function GroupSettingsScreen() {
         setSelectedIcon(normalizeGroupIcon(data.icon));
         setSelectedAccent(data.accent_color ?? theme.accent.primary);
       } catch (error: any) {
-        alert(error?.message ?? "Gruppeneinstellungen konnten nicht geladen werden.");
+        showAlert({ title: error?.message ?? "Gruppeneinstellungen konnten nicht geladen werden." });
       } finally {
         setLoading(false);
       }
@@ -62,7 +64,7 @@ export default function GroupSettingsScreen() {
     }
 
     if (!groupName.trim()) {
-      alert("Bitte gib einen Gruppennamen ein.");
+      showAlert({ title: "Bitte gib einen Gruppennamen ein." });
       return;
     }
 
@@ -77,7 +79,7 @@ export default function GroupSettingsScreen() {
       });
       router.back();
     } catch (error: any) {
-      alert(error?.message ?? "Speichern fehlgeschlagen.");
+      showAlert({ title: error?.message ?? "Speichern fehlgeschlagen." });
     } finally {
       setSaving(false);
     }

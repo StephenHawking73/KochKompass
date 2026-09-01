@@ -8,12 +8,14 @@ import { icons } from "@/assets/icons";
 import { useTheme } from "@/hooks/useTheme";
 import { GroupIconName } from "@/lib/groupDesign";
 import { useAuth } from "@/providers/AuthProvider";
+import { useAppAlert } from "@/providers/AlertProvider";
 import { createGroup } from "@/services/groupService";
 
 export default function CreateGroupScreen() {
   const theme = useTheme();
   const styles = createStyles(theme);
   const { refreshActiveGroup } = useAuth();
+  const { showAlert } = useAppAlert();
   const [name, setName] = useState("");
   const [selectedIcon, setSelectedIcon] = useState<GroupIconName>("users");
   const [selectedAccent, setSelectedAccent] = useState("#82C05C");
@@ -21,7 +23,7 @@ export default function CreateGroupScreen() {
 
   async function handleCreate() {
     if (!name.trim()) {
-      alert("Bitte gib einen Gruppennamen ein.");
+      showAlert({ title: "Bitte gib einen Gruppennamen ein." });
       return;
     }
 
@@ -34,7 +36,7 @@ export default function CreateGroupScreen() {
       await refreshActiveGroup();
       router.replace("/group" as any);
     } catch (error: any) {
-      alert(error?.message ?? "Gruppe konnte nicht erstellt werden.");
+      showAlert({ title: error?.message ?? "Gruppe konnte nicht erstellt werden." });
     } finally {
       setSaving(false);
     }

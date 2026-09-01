@@ -16,6 +16,7 @@ import { Difficulty, Meal, Recipe } from '@/types/types';
 import DeleteRecipeModal from '@/components/modals/DeleteRecipeModal';
 import { deleteRecipe } from '@/services/recipeService';
 import { usePlanningStore } from '@/store/planningStore';
+import { useAppAlert } from "@/providers/AlertProvider";
 
 type Option = {
   label: string;
@@ -25,6 +26,7 @@ type Option = {
 export default function RecipiesScreen() {
   const theme = useTheme();
   const styles = createStyles(theme);
+  const { showAlert } = useAppAlert();
   const params = useLocalSearchParams<{
     planningDate?: string;
     planningMealType?: Meal["meal_type"];
@@ -163,10 +165,10 @@ export default function RecipiesScreen() {
 
   const handleRecipeLongPress = (recipe: Recipe) => {
     if (planningBlocked) {
-      Alert.alert(
-        "Planungsmodus aktiv",
-        "Beende zuerst den Planungsmodus, bevor du ein Rezept löschst oder erneut ein Rezept auswählst."
-      );
+      showAlert({
+        title: "Planungsmodus aktiv",
+        message: "Beende zuerst den Planungsmodus, bevor du ein Rezept löschst oder erneut ein Rezept auswählst.",
+      });
       return;
     }
 
@@ -218,14 +220,14 @@ export default function RecipiesScreen() {
 
       if (status.exceedsLimit && status.limit != null) {
         const wouldBe = status.currentCount + 1;
-        Alert.alert(
-          "Fleischlimit erreicht",
-          `Du hast bereits ${status.currentCount} von ${status.limit} Fleischgerichten in dieser Woche geplant. Wenn du noch eines einplanst, wären es ${wouldBe}. Möchtest du wirklich mehr Fleisch in der Woche machen?`,
-          [
+        showAlert({
+          title: "Fleischlimit erreicht",
+          message: `Du hast bereits ${status.currentCount} von ${status.limit} Fleischgerichten in dieser Woche geplant. Wenn du noch eines einplanst, wären es ${wouldBe}. Möchtest du wirklich mehr Fleisch in der Woche machen?`,
+          actions: [
             { text: "Abbrechen", style: "cancel" },
             { text: "Trotzdem einplanen", style: "destructive", onPress: proceedWithPlanning },
-          ]
-        );
+          ],
+        });
         return;
       }
 
@@ -362,10 +364,10 @@ export default function RecipiesScreen() {
 
           if (planningBlocked) {
             setSelectedRecipe(null);
-            Alert.alert(
-              "Löschen gesperrt",
-              "Beende den Planungsmodus, bevor du ein Rezept löschst."
-            );
+            showAlert({
+              title: "Löschen gesperrt",
+              message: "Beende den Planungsmodus, bevor du ein Rezept löschst.",
+            });
             return;
           }
 

@@ -15,11 +15,13 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } fr
 import { deleteRecipe } from "@/services/recipeService";
 import DeleteRecipeModal from "@/components/modals/DeleteRecipeModal";
 import { usePlanningStore } from "@/store/planningStore";
+import { useAppAlert } from "@/providers/AlertProvider";
 
 export default function RecipeDetail() {
   const { id } = useLocalSearchParams();
   const theme = useTheme();
   const styles = createStyles(theme);
+  const { showAlert } = useAppAlert();
 
   const { favorites, toggle } = useFavorites();
   const { planningRecipeId } = usePlanningStore();
@@ -123,10 +125,10 @@ export default function RecipeDetail() {
 
     if (isPlanningThisRecipe) {
       setDeleteVisible(false);
-      Alert.alert(
-        "Löschen gesperrt",
-        "Beende den aktiven Planungsmodus, bevor du dieses Rezept löschst."
-      );
+      showAlert({
+        title: "Löschen gesperrt",
+        message: "Beende den aktiven Planungsmodus, bevor du dieses Rezept löschst.",
+      });
       return;
     }
 
@@ -218,10 +220,10 @@ export default function RecipeDetail() {
                             setShowMenu(false);
 
                             if (isPlanningThisRecipe) {
-                              Alert.alert(
-                                "Löschen gesperrt",
-                                "Beende den aktiven Planungsmodus, bevor du dieses Rezept löschst."
-                              );
+                              showAlert({
+                                title: "Löschen gesperrt",
+                                message: "Beende den aktiven Planungsmodus, bevor du dieses Rezept löschst.",
+                              });
                               return;
                             }
 

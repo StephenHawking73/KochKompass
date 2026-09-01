@@ -33,6 +33,7 @@ import { router, useFocusEffect } from 'expo-router';
 import BasicBottomSheet from '@/components/BasicBottomSheet';
 import DevelopmentNotice from '@/components/DevelopmentNotice';
 import { useAuth } from '@/providers/AuthProvider';
+import { useAppAlert } from '@/providers/AlertProvider';
 import { getActiveGroup } from '@/services/groupService';
 
 const MAX_AVATAR_SIZE_MB = 5;
@@ -79,6 +80,7 @@ export default function Profile() {
 
   const { isDark, themeMode, setThemeMode } = useThemeMode();
   const { activeGroupId, refreshActiveGroup } = useAuth();
+  const { showAlert } = useAppAlert();
 
   const [profile, setProfile] = useState<ProfileType | null>(null);
   const [activeGroupName, setActiveGroupName] = useState<string | null>(null);
@@ -165,7 +167,10 @@ export default function Profile() {
       setProfile((current) => (current ? { ...current, max_meat: maxMeatSetting } : current));
       setMeatLimitSheetVisible(false);
     } catch (error: unknown) {
-      Alert.alert('Fehler', getFriendlyErrorMessage(error, 'Einstellung konnte nicht gespeichert werden.'));
+      showAlert({
+        title: 'Fehler',
+        message: getFriendlyErrorMessage(error, 'Einstellung konnte nicht gespeichert werden.'),
+      });
     } finally {
       setSavingMaxMeat(false);
     }

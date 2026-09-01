@@ -26,12 +26,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { selectImage } from "@/lib/selectImage";
 import RecipeImagePicker from "@/components/RecipeImagePicker";
 import { deleteRecipeImage } from "@/services/storageService";
-
+import { useAppAlert } from "@/providers/AlertProvider";
 
 export default function RecipeEdit(){
 
     const theme = useTheme();
     const styles = createStyles(theme);
+    const { showAlert } = useAppAlert();
 
     const { id } = useLocalSearchParams();
 
@@ -106,9 +107,9 @@ export default function RecipeEdit(){
                 setUploadedImage(null);
             }
         } catch (err: any) {
-            alert(
-                err.message ?? "Rezept konnte nicht gespeichert werden..."
-            )
+            showAlert({
+                title: err.message ?? "Rezept konnte nicht gespeichert werden..."
+            });
         }
 
         router.back();

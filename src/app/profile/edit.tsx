@@ -7,7 +7,6 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
-  Alert,
   Image,
 } from 'react-native';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -16,6 +15,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useTheme } from '@/hooks/useTheme';
 import { icons } from '@/assets/icons';
+import { useAppAlert } from '@/providers/AlertProvider';
 import {
   changePassword,
   getProfile,
@@ -66,6 +66,7 @@ function getFriendlyErrorMessage(error: unknown, fallback: string): string {
 export default function ProfileEdit() {
   const theme = useTheme();
   const styles = createStyles(theme);
+  const { showAlert } = useAppAlert();
 
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -237,28 +238,32 @@ export default function ProfileEdit() {
       return;
     }
 
-    Alert.alert('Profilbild entfernen', 'Möchtest du dein Profilbild wirklich löschen?', [
-      { text: 'Abbrechen', style: 'cancel' },
-      {
-        text: 'Löschen',
-        style: 'destructive',
-        onPress: async () => {
-          setDeletingAvatar(true);
-          setError('');
-          setSuccess('');
+    showAlert({
+      title: 'Profilbild entfernen',
+      message: 'Möchtest du dein Profilbild wirklich löschen?',
+      actions: [
+        { text: 'Abbrechen', style: 'cancel' },
+        {
+          text: 'Löschen',
+          style: 'destructive',
+          onPress: async () => {
+            setDeletingAvatar(true);
+            setError('');
+            setSuccess('');
 
-          try {
-            await removeAvatarImage();
-            setProfile((current: any) => (current ? { ...current, avatar_url: null } : current));
-            setSuccess('Dein Profilbild wurde gelöscht.');
-          } catch (err: unknown) {
-            setError(getFriendlyErrorMessage(err, 'Das Profilbild konnte nicht gelöscht werden.'));
-          } finally {
-            setDeletingAvatar(false);
-          }
+            try {
+              await removeAvatarImage();
+              setProfile((current: any) => (current ? { ...current, avatar_url: null } : current));
+              setSuccess('Dein Profilbild wurde gelöscht.');
+            } catch (err: unknown) {
+              setError(getFriendlyErrorMessage(err, 'Das Profilbild konnte nicht gelöscht werden.'));
+            } finally {
+              setDeletingAvatar(false);
+            }
+          },
         },
-      },
-    ]);
+      ],
+    });
   };
 
   const initials = useMemo(() => {
@@ -370,7 +375,7 @@ export default function ProfileEdit() {
               />
             </View>
 
-            <View style={styles.fieldGroup}>
+            {/*<View style={styles.fieldGroup}>
               <Text style={styles.label}>E-Mail-Adresse</Text>
               <TextInput
                 value={emailInput}
@@ -382,7 +387,7 @@ export default function ProfileEdit() {
                 keyboardType="email-address"
                 editable={!savingProfile}
               />
-            </View>
+            </View>*/}
           </View>
 
           <View style={styles.sectionCard}>

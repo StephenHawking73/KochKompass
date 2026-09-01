@@ -5,6 +5,7 @@ import { router, useFocusEffect } from "expo-router";
 
 import { icons } from "@/assets/icons";
 import { useTheme } from "@/hooks/useTheme";
+import { useAppAlert } from "@/providers/AlertProvider";
 import {
   deleteGroup,
   getActiveGroup,
@@ -21,6 +22,7 @@ import { hexToRgba, renderGroupIcon } from "@/lib/groupDesign";
 export default function GroupScreen() {
   const theme = useTheme();
   const styles = createStyles(theme);
+  const { showAlert } = useAppAlert();
   const [group, setGroup] = useState<GroupSummary | null>(null);
   const [members, setMembers] = useState<GroupMember[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -44,7 +46,7 @@ export default function GroupScreen() {
         setMembers([]);
       }
     } catch (error: any) {
-      alert(error?.message ?? "Gruppe konnte nicht geladen werden.");
+      showAlert({ title: error?.message ?? "Gruppe konnte nicht geladen werden." });
     } finally {
       setLoading(false);
     }
@@ -70,13 +72,14 @@ export default function GroupScreen() {
   function handlePromoteMember(member: GroupMember) {
     const displayName = getMemberDisplayName(member);
 
-    Alert.alert(
-      "Admin ernennen",
-      `${displayName} zum Admin dieser Gruppe machen?`,
-      [
+    showAlert({
+      title: "Admin ernennen",
+      message: `${displayName} zum Admin dieser Gruppe machen?`,
+      actions: [
         { text: "Abbrechen", style: "cancel" },
         {
           text: "Ernennen",
+          style: "primary",
           onPress: async () => {
             if (!group?.id) {
               return;
@@ -87,23 +90,23 @@ export default function GroupScreen() {
               await promoteGroupMember(group.id, member.user_id);
               await loadGroup();
             } catch (error: any) {
-              alert(error?.message ?? "Mitglied konnte nicht zum Admin ernannt werden.");
+              showAlert({ title: error?.message ?? "Mitglied konnte nicht zum Admin ernannt werden." });
             } finally {
               setMemberActionId(null);
             }
           },
         },
-      ]
-    );
+      ],
+    });
   }
 
   function handleRemoveMember(member: GroupMember) {
     const displayName = getMemberDisplayName(member);
 
-    Alert.alert(
-      "Mitglied entfernen",
-      `${displayName} aus der Gruppe entfernen?`,
-      [
+    showAlert({
+      title: "Mitglied entfernen",
+      message: `${displayName} aus der Gruppe entfernen?`,
+      actions: [
         { text: "Abbrechen", style: "cancel" },
         {
           text: "Entfernen",
@@ -118,14 +121,14 @@ export default function GroupScreen() {
               await removeGroupMember(group.id, member.user_id);
               await loadGroup();
             } catch (error: any) {
-              alert(error?.message ?? "Mitglied konnte nicht entfernt werden.");
+              showAlert({ title: error?.message ?? "Mitglied konnte nicht entfernt werden." });
             } finally {
               setMemberActionId(null);
             }
           },
         },
-      ]
-    );
+      ],
+    });
   }
 
   function handleLeaveGroup() {
@@ -137,10 +140,10 @@ export default function GroupScreen() {
         ? "Wenn du gehst, wird das nächste Mitglied automatisch Admin."
         : "Du verlässt diese Gruppe und verlierst den Zugriff auf die Gruppenrezepte.";
 
-    Alert.alert(
-      "Gruppe verlassen",
+    showAlert({
+      title: "Gruppe verlassen",
       message,
-      [
+      actions: [
         { text: "Abbrechen", style: "cancel" },
         {
           text: "Verlassen",
@@ -155,21 +158,21 @@ export default function GroupScreen() {
               await leaveGroup(group.id);
               refreshAfterLeavingGroup();
             } catch (error: any) {
-              alert(error?.message ?? "Gruppe konnte nicht verlassen werden.");
+              showAlert({ title: error?.message ?? "Gruppe konnte nicht verlassen werden." });
             } finally {
               setLeaving(false);
             }
           },
         },
-      ]
-    );
+      ],
+    });
   }
 
   function handleDeleteGroup() {
-    Alert.alert(
-      "Gruppe löschen",
-      "Diese Aktion löscht die Gruppe endgültig. Alle zugehörigen Rezepte und Meal-Plan-Einträge werden unwiderruflich entfernt.",
-      [
+    showAlert({
+      title: "Gruppe löschen",
+      message: "Diese Aktion löscht die Gruppe endgültig. Alle zugehörigen Rezepte und Meal-Plan-Einträge werden unwiderruflich entfernt.",
+      actions: [
         { text: "Abbrechen", style: "cancel" },
         {
           text: "Löschen",
@@ -184,14 +187,14 @@ export default function GroupScreen() {
               await deleteGroup(group.id);
               refreshAfterLeavingGroup();
             } catch (error: any) {
-              alert(error?.message ?? "Gruppe konnte nicht gelöscht werden.");
+              showAlert({ title: error?.message ?? "Gruppe konnte nicht gelöscht werden." });
             } finally {
               setDeleting(false);
             }
           },
         },
-      ]
-    );
+      ],
+    });
   }
 
   return (

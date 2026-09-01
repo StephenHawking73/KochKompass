@@ -9,6 +9,7 @@ import { LoadingScreen } from "@/components/loadingScreen";
 import { View, Text, Image, StyleSheet } from "react-native";
 import { WeekLayoutProvider } from "@/hooks/useWeekLayout";
 import { images } from "@/assets/images";
+import { AlertProvider } from "@/providers/AlertProvider";
 
 
 function RootNavigator() {
@@ -116,11 +117,13 @@ export default function RootLayout() {
         <SafeAreaProvider>
             <GestureHandlerRootView style={{flex:1}}>
                 <ThemeProvider>
-                    <AuthProvider>
-                        <WeekLayoutProvider>
-                            <RootNavigator />
-                        </WeekLayoutProvider>
-                    </AuthProvider>
+                    <AlertProvider>
+                        <AuthProvider>
+                            <WeekLayoutProvider>
+                                <RootNavigator />
+                            </WeekLayoutProvider>
+                        </AuthProvider>
+                    </AlertProvider>
                 </ThemeProvider>
             </GestureHandlerRootView>
         </SafeAreaProvider>

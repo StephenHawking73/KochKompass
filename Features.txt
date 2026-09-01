@@ -4,7 +4,7 @@ Kochbuch unter Link ✅
 
 Löschen beides Mal mit Double Tap! ✅
 
-Beim Anclicken beim Tauschen, sollen die Gereichte getauscht werden... ✅
+Beim Anklicken beim Tauschen, sollen die Gereichte getauscht werden... ✅
 
 Anmelde/Register Loading Screen ✅
 
@@ -30,10 +30,12 @@ Wenn man ein Rezept auswählt und dann löscht -> Error! ✅
 
 Profile Edit ✅
 
+Ohne Internet Error Message ✅
+
 -------------------------------------------------------------------------------
 
-Ohne Internet Error Message
-
 Custom Error Messages
+
+Design noch umsetzen!
 
 (man muss 2x zurück)

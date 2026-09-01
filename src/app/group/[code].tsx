@@ -5,12 +5,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/providers/AuthProvider";
+import { useAppAlert } from "@/providers/AlertProvider";
 import { joinGroup } from "@/services/groupService";
 
 export default function JoinCodeScreen() {
   const { code } = useLocalSearchParams<{ code?: string }>();
   const theme = useTheme();
   const { refreshActiveGroup } = useAuth();
+  const { showAlert } = useAppAlert();
 
   useEffect(() => {
     async function handle() {
@@ -24,7 +26,7 @@ export default function JoinCodeScreen() {
         await refreshActiveGroup();
         router.replace("/group" as any);
       } catch (error: any) {
-        alert(error?.message ?? "Beitritt fehlgeschlagen.");
+        showAlert({ title: error?.message ?? "Beitritt fehlgeschlagen." });
         router.replace("/group" as any);
       }
     }
