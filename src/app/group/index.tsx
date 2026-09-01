@@ -226,15 +226,19 @@ export default function GroupScreen() {
             </View>
 
             <View style={styles.actions}>
-              <Pressable style={styles.primaryButton} onPress={() => router.push("/group/invite")}>
-                {icons.userPlus({ color: "#fff", size: 18 })}
-                <Text style={styles.primaryButtonText}>Mitglied einladen</Text>
-              </Pressable>
+              {isAdmin ? (
+                <>
+                  <Pressable style={styles.primaryButton} onPress={() => router.push("/group/invite")}>
+                    {icons.userPlus({ color: "#fff", size: 18 })}
+                    <Text style={styles.primaryButtonText}>Mitglied einladen</Text>
+                  </Pressable>
 
-              <Pressable style={styles.secondaryButton} onPress={() => router.push("/group/settings")}>
-                {icons.settings({ color: theme.text.primary, size: 18 })}
-                <Text style={styles.secondaryButtonText}>Gruppeneinstellungen</Text>
-              </Pressable>
+                  <Pressable style={styles.secondaryButton} onPress={() => router.push("/group/settings")}>
+                    {icons.settings({ color: theme.text.primary, size: 18 })}
+                    <Text style={styles.secondaryButtonText}>Gruppeneinstellungen</Text>
+                  </Pressable>
+                </>
+              ) : null}
 
               <Pressable
                 style={[styles.secondaryButton, isBusy && styles.buttonDisabled]}

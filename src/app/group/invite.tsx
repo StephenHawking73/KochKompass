@@ -1,10 +1,10 @@
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
 import { useEffect, useState } from "react";
 import { router } from "expo-router";
 
 import { useTheme } from "@/hooks/useTheme";
-import { createInvitation, getActiveGroup } from "@/services/groupService";
+import { createInvitation, getActiveGroup, getActiveGroupContext, getGroupMembers } from "@/services/groupService";
 import { icons } from "@/assets/icons";
 
 export default function InviteGroupScreen() {
@@ -16,11 +16,23 @@ export default function InviteGroupScreen() {
   useEffect(() => {
     async function load() {
       try {
+        const context = await getActiveGroupContext();
         const group = await getActiveGroup();
+
         if (!group?.id) {
           router.replace("/group" as any);
           return;
         }
+
+        const members = await getGroupMembers(group.id);
+        const currentMember = members.find((member) => member.user_id === context.userId);
+
+        if (currentMember?.role !== "admin") {
+          Alert.alert("Keine Berechtigung", "Nur Admins können Mitglieder einladen.");
+          router.replace("/group" as any);
+          return;
+        }
+
         const invitation = await createInvitation(group.id);
         setCode(invitation.code);
       } catch (error: any) {

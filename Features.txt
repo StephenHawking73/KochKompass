@@ -36,6 +36,4 @@ Nur Admin Gruppe bearbeiten und user adden
 
 Profile Edit
 
-man muss 2x zurück 
-
-Beim Löschen -> duplicate key value violates unique constraint "recipes_personal_title_lower_unique"
+(man muss 2x zurück)

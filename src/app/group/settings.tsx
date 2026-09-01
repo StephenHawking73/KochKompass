@@ -1,5 +1,5 @@
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useEffect, useState } from "react";
 import { router } from "expo-router";
 
@@ -7,7 +7,7 @@ import GroupIconPicker from "@/components/group/GroupIconPicker";
 import { icons } from "@/assets/icons";
 import { useTheme } from "@/hooks/useTheme";
 import { GroupIconName, hexToRgba, normalizeGroupIcon, renderGroupIcon } from "@/lib/groupDesign";
-import { getActiveGroup, GroupSummary, updateGroupSettings } from "@/services/groupService";
+import { getActiveGroup, getActiveGroupContext, getGroupMembers, GroupSummary, updateGroupSettings } from "@/services/groupService";
 
 export default function GroupSettingsScreen() {
   const theme = useTheme();
@@ -24,12 +24,28 @@ export default function GroupSettingsScreen() {
     async function load() {
       try {
         setLoading(true);
+        const context = await getActiveGroupContext();
         const data = await getActiveGroup();
+
+        if (!data?.id) {
+          router.replace("/group" as any);
+          return;
+        }
+
+        const members = await getGroupMembers(data.id);
+        const currentMember = members.find((member) => member.user_id === context.userId);
+
+        if (currentMember?.role !== "admin") {
+          Alert.alert("Keine Berechtigung", "Nur Admins können Gruppeneinstellungen bearbeiten.");
+          router.replace("/group" as any);
+          return;
+        }
+
         setGroup(data);
-        setGroupName(data?.name ?? "");
-        setMaxMeat(data?.max_meat ?? 3);
-        setSelectedIcon(normalizeGroupIcon(data?.icon));
-        setSelectedAccent(data?.accent_color ?? theme.accent.primary);
+        setGroupName(data.name ?? "");
+        setMaxMeat(data.max_meat ?? 3);
+        setSelectedIcon(normalizeGroupIcon(data.icon));
+        setSelectedAccent(data.accent_color ?? theme.accent.primary);
       } catch (error: any) {
         alert(error?.message ?? "Gruppeneinstellungen konnten nicht geladen werden.");
       } finally {
