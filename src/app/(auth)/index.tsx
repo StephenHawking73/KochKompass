@@ -88,9 +88,11 @@ const createStyles = (theme: any) => StyleSheet.create({
 
     picture: {
         width: "100%",
+        maxWidth: 820,
         height: 240,
         marginTop: 25,
         borderRadius: 20,
+        alignSelf: "center",
     },
 
     subtitle: {

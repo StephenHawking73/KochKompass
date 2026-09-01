@@ -252,7 +252,7 @@ export default function RecipiesScreen() {
   const planningBlocked = isPlanningMode || Boolean(activePlanningRecipeId);
 
   return (
-    <SafeAreaView style={{flex: 1, paddingHorizontal: 30, backgroundColor: theme.background}}>
+    <SafeAreaView style={{flex: 1, paddingHorizontal: Platform.OS === 'web' ? 16 : 30, backgroundColor: theme.background}}>
       {/* Add button */}
       {/* Title */}
       <View style={styles.header}>
@@ -312,8 +312,8 @@ export default function RecipiesScreen() {
         refreshing={loadingRecipes}
         onRefresh={refresh}
         columnWrapperStyle={{
-          gap: 15,
-          marginBottom: 20,
+          justifyContent: 'space-between',
+          marginBottom: 18,
         }}
         ListHeaderComponent={
           <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center",}}>
@@ -340,22 +340,24 @@ export default function RecipiesScreen() {
           paddingBottom: 80,
         }}
         renderItem={({ item }) => (
-          <MealCardList
-            recipe={item}
-            favorites={favorites.favorites}
-            toggleFavorite={favorites.toggle}
-            onPress={() => {
-              if (item.id) {
-                handleRecipePress(item.id);
-              }
-            }}
-            onLongPress={() => handleRecipeLongPress(item)}
-            onDoublePress={() => {
-              if (!planningBlocked) {
-                setSelectedRecipe(item);
-              }
-            }}
-          />
+          <View style={styles.recipeCardItem}>
+            <MealCardList
+              recipe={item}
+              favorites={favorites.favorites}
+              toggleFavorite={favorites.toggle}
+              onPress={() => {
+                if (item.id) {
+                  handleRecipePress(item.id);
+                }
+              }}
+              onLongPress={() => handleRecipeLongPress(item)}
+              onDoublePress={() => {
+                if (!planningBlocked) {
+                  setSelectedRecipe(item);
+                }
+              }}
+            />
+          </View>
         )}
         showsVerticalScrollIndicator={false}
       />    
@@ -495,7 +497,13 @@ const createStyles = (theme: any) =>
       fontSize: 28,
       fontWeight: "500",
       marginTop: -2,
-    }
+    },
+
+    recipeCardItem: {
+      width: "48%",
+      maxWidth: "48%",
+      minWidth: 0,
+    },
 })
 
 function getParam(value?: string | string[]) {

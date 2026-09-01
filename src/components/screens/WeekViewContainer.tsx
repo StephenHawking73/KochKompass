@@ -20,7 +20,7 @@ export default function WeekViewContainer({
       style={styles.container}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{
-        paddingBottom: Platform.OS === "android" ? 120 : 80,
+        paddingBottom: Platform.OS === "android" || Platform.OS === "web" ? 120 : 80,
       }}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

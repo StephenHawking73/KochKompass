@@ -69,27 +69,35 @@ const createStyles = (theme: any) => StyleSheet.create({
   tabbar: {
     position: "absolute",
     bottom: 20,
+    left: 0,
+    right: 0,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     alignSelf: "center",
-    
-    width: Platform.OS === 'web' ? 300 : null,
+
+    width: "min(92vw, 320px)",
+    maxWidth: 320,
 
     backgroundColor: theme.tabBar.background,
 
-    marginHorizontal: 50,
+    marginHorizontal: 16,
     paddingVertical: 15,
 
     borderRadius: 25,
     borderWidth: 1,
     borderColor: theme.tabBar.border,
 
-    shadowColor: theme.tabBar.shadow,
-    shadowOffset: {width: 0, height: 12},
-    shadowRadius: 18,
-    shadowOpacity: 1,
-
-    elevation: 12,
-  }
+    ...(Platform.OS === 'web'
+      ? {
+          boxShadow: `0 12px 18px ${theme.tabBar.shadow || 'rgba(0,0,0,0.18)'}`,
+        }
+      : {
+          shadowColor: theme.tabBar.shadow,
+          shadowOffset: { width: 0, height: 12 },
+          shadowRadius: 18,
+          shadowOpacity: 1,
+          elevation: 12,
+        }),
+  },
 })
