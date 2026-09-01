@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Image, StyleSheet, Pressable } from "react-native";
+import { View, Text, ScrollView, Image, StyleSheet, Pressable, Alert } from "react-native";
 import { useLocalSearchParams, router, useFocusEffect } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
@@ -14,6 +14,7 @@ import BasicBottomSheet from "@/components/BasicBottomSheet";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 import { deleteRecipe } from "@/services/recipeService";
 import DeleteRecipeModal from "@/components/modals/DeleteRecipeModal";
+import { usePlanningStore } from "@/store/planningStore";
 
 export default function RecipeDetail() {
   const { id } = useLocalSearchParams();
@@ -21,9 +22,11 @@ export default function RecipeDetail() {
   const styles = createStyles(theme);
 
   const { favorites, toggle } = useFavorites();
+  const { planningRecipeId } = usePlanningStore();
 
   const recipeId = Array.isArray(id) ? id[0] : id;
   const isFavorite = recipeId != null && favorites.has(recipeId);
+  const isPlanningThisRecipe = Boolean(recipeId && planningRecipeId === recipeId);
 
   const [recipe, setRecipe] = useState<any>(null);
   const [rating, setRatings] = useState<any>(null);
@@ -118,6 +121,15 @@ export default function RecipeDetail() {
   const handleDeleteRecipe = async () => {
     if (!recipeId) return;
 
+    if (isPlanningThisRecipe) {
+      setDeleteVisible(false);
+      Alert.alert(
+        "Löschen gesperrt",
+        "Beende den aktiven Planungsmodus, bevor du dieses Rezept löschst."
+      );
+      return;
+    }
+
     setDeleting(true);
 
     try {
@@ -204,8 +216,16 @@ export default function RecipeDetail() {
                         style={styles.menuItem}
                         onPress={() => {
                             setShowMenu(false);
+
+                            if (isPlanningThisRecipe) {
+                              Alert.alert(
+                                "Löschen gesperrt",
+                                "Beende den aktiven Planungsmodus, bevor du dieses Rezept löschst."
+                              );
+                              return;
+                            }
+
                             setDeleteVisible(true);
-                            
                         }}
                     >
                         {icons.delete({
@@ -541,7 +561,7 @@ export default function RecipeDetail() {
         </BasicBottomSheet>
 
         <DeleteRecipeModal
-          visible={deleteVisible}
+          visible={deleteVisible && !isPlanningThisRecipe}
           mealTitle={recipe.title}
           loading={deleting}
           onClose={() => setDeleteVisible(false)}

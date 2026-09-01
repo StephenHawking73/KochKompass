@@ -5,6 +5,7 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { FadeIn, FadeOut, runOnJS } from "react-native-reanimated";
 import { useFocusEffect, useLocalSearchParams } from "expo-router";
 
+import { usePlanningStore } from "@/store/planningStore";
 import WeekView from "@/components/screens/WeekView";
 import MonthView from "@/components/screens/MonthView";
 import { AnimatedWeekSelector } from "@/components/weekSelector/AnimatedWeekSelector";
@@ -27,6 +28,7 @@ export default function HomeScreen() {
     const planningRecipeTitle = getParam(params.planningRecipeTitle);
     const focusDate = getParam(params.focusDate);
     const plannedAt = getParam(params.plannedAt);
+    const { setPlanningMode, clearPlanningMode } = usePlanningStore();
 
     const [viewMode, setViewMode] = useState<"week" | "month">("week");
     const [refreshing, setRefreshing] = useState(false);
@@ -56,6 +58,14 @@ export default function HomeScreen() {
             refresh()
         }, [])
     );
+
+    useEffect(() => {
+        if (planningRecipeId) {
+            setPlanningMode(planningRecipeId, planningRecipeTitle ?? null);
+        } else {
+            clearPlanningMode();
+        }
+    }, [planningRecipeId, planningRecipeTitle, setPlanningMode, clearPlanningMode]);
 
     useEffect(() => {
         if (!focusDate) {

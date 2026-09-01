@@ -13,6 +13,7 @@ import { moveMeal, swapMeal } from "./moveMeal";
 import { addMealToPlan, deleteMealFromPlan, getMealLimitStatusForRecipe } from "@/services/mealService";
 import DeleteMealModal from "../modals/DeleteMealModal";
 import { useWeekLayout } from "@/hooks/useWeekLayout";
+import { usePlanningStore } from "@/store/planningStore";
 
 interface WeekViewProps {
   meals?: Meal[];
@@ -43,6 +44,7 @@ export default function WeekView({
   // Logik-Hooks
   const { todayKey, weekDays, getMealsForDay, getMaxRowsForDay, formatDate } =
     useWeekData(meals, weekStart);
+  const { clearPlanningMode } = usePlanningStore();
 
   const {
     selectedMealId,
@@ -64,6 +66,7 @@ export default function WeekView({
 
   const handleExitMode = () => {
     if (isPlanningMode) {
+      clearPlanningMode();
       router.replace("/");
       return;
     }

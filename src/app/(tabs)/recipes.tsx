@@ -15,6 +15,7 @@ import { addMealToPlan, getMealLimitStatusForRecipe } from '@/services/mealServi
 import { Difficulty, Meal, Recipe } from '@/types/types';
 import DeleteRecipeModal from '@/components/modals/DeleteRecipeModal';
 import { deleteRecipe } from '@/services/recipeService';
+import { usePlanningStore } from '@/store/planningStore';
 
 type Option = {
   label: string;
@@ -156,10 +157,19 @@ export default function RecipiesScreen() {
   const count = displayedMeals.length;
 
   const handleExitPlanningMode = () => {
+    clearPlanningMode();
     router.replace("/recipes");
   };
 
   const handleRecipeLongPress = (recipe: Recipe) => {
+    if (planningBlocked) {
+      Alert.alert(
+        "Planungsmodus aktiv",
+        "Beende zuerst den Planungsmodus, bevor du ein Rezept löschst oder erneut ein Rezept auswählst."
+      );
+      return;
+    }
+
     router.push({
       pathname: "/(tabs)",
       params: {
@@ -228,6 +238,8 @@ export default function RecipiesScreen() {
 
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const { planningRecipeId: activePlanningRecipeId, clearPlanningMode } = usePlanningStore();
+  const planningBlocked = isPlanningMode || Boolean(activePlanningRecipeId);
 
   return (
     <SafeAreaView style={{flex: 1, paddingHorizontal: 30, backgroundColor: theme.background}}>
@@ -334,14 +346,18 @@ export default function RecipiesScreen() {
               }
             }}
             onLongPress={() => handleRecipeLongPress(item)}
-            onDoublePress={() => setSelectedRecipe(item)}
+            onDoublePress={() => {
+              if (!planningBlocked) {
+                setSelectedRecipe(item);
+              }
+            }}
           />
         )}
         showsVerticalScrollIndicator={false}
       />    
 
       <DeleteRecipeModal
-        visible={selectedRecipe !== null}
+        visible={selectedRecipe !== null && !planningBlocked}
         mealTitle={selectedRecipe?.title ?? ""}
         loading={deleting}
         onClose={() => setSelectedRecipe(null)}
@@ -349,6 +365,15 @@ export default function RecipiesScreen() {
 
           if (!selectedRecipe)
             return;
+
+          if (planningBlocked) {
+            setSelectedRecipe(null);
+            Alert.alert(
+              "Löschen gesperrt",
+              "Beende den Planungsmodus, bevor du ein Rezept löschst."
+            );
+            return;
+          }
 
           setDeleting(true);
 
