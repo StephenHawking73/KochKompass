@@ -252,7 +252,7 @@ export default function RecipiesScreen() {
   const planningBlocked = isPlanningMode || Boolean(activePlanningRecipeId);
 
   return (
-    <SafeAreaView style={{flex: 1, paddingHorizontal: Platform.OS === 'web' ? 16 : 30, backgroundColor: theme.background}}>
+    <SafeAreaView style={{flex: 1, paddingHorizontal: 16, backgroundColor: theme.background}}>
       {/* Add button */}
       {/* Title */}
       <View style={styles.header}>
@@ -314,6 +314,7 @@ export default function RecipiesScreen() {
         columnWrapperStyle={{
           justifyContent: 'space-between',
           marginBottom: 18,
+          columnGap: 12,
         }}
         ListHeaderComponent={
           <View style={{flexDirection: "row", justifyContent: "space-between", alignItems: "center",}}>
@@ -500,8 +501,8 @@ const createStyles = (theme: any) =>
     },
 
     recipeCardItem: {
-      width: "48%",
-      maxWidth: "48%",
+      flexBasis: "48%",
+      flexGrow: 1,
       minWidth: 0,
     },
 })

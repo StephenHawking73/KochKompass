@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 import {
   Image,
   ImageBackground,
-  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -141,19 +140,19 @@ export default function MealCardList({ recipe, onPress, favorites, toggleFavorit
 const createStyles = (theme: any) =>
   StyleSheet.create({
     card: {
-      width: Platform.OS === "web" ? 220 : "100%",
-      maxWidth: Platform.OS === "web" ? 220 : "100%",
+      flex: 1,
+      width: "100%",
       minWidth: 0,
       borderRadius: 22,
       overflow: "hidden",
       backgroundColor: theme.card.background,
-      alignSelf: Platform.OS === "web" ? "center" : "stretch",
+      alignSelf: "stretch",
     },
 
     imageContainer: {
       overflow: "hidden",
       position: "relative",
-      height: 180,
+      aspectRatio: 1.1,
       backgroundColor: theme.card.background,
     },
 
@@ -174,7 +173,7 @@ const createStyles = (theme: any) =>
 
     image: {
       width: "100%",
-      height: 180,
+      height: "100%",
       borderRadius: 13,
     },
 
