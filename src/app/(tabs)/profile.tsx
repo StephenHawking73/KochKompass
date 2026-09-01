@@ -1,8 +1,28 @@
-import { View, Text, StyleSheet, Image, Pressable, ScrollView } from 'react-native'
-import React, { useCallback, useEffect, useState } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { useTheme } from '@/hooks/useTheme'
-import { getProfile, updateProfileMaxMeat } from '@/services/profileService';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Pressable,
+  ScrollView,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
+} from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import * as ImagePicker from 'expo-image-picker';
+import { useTheme } from '@/hooks/useTheme';
+import {
+  changePassword,
+  getProfile,
+  removeAvatarImage,
+  updateProfileDetails,
+  updateProfileEmail,
+  updateProfileMaxMeat,
+  uploadAvatarImage,
+} from '@/services/profileService';
 import ProfileCard from '@/components/profile/ProfileCard';
 import { icons } from '@/assets/icons';
 import { ProfileType } from '@/types/profile';
@@ -15,11 +35,49 @@ import DevelopmentNotice from '@/components/DevelopmentNotice';
 import { useAuth } from '@/providers/AuthProvider';
 import { getActiveGroup } from '@/services/groupService';
 
+const MAX_AVATAR_SIZE_MB = 5;
+
+function getFriendlyErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof Error && error.message) {
+    const message = error.message.toLowerCase();
+
+    if (message.includes('network') || message.includes('failed to fetch')) {
+      return 'Bitte prüfe deine Internetverbindung und versuche es erneut.';
+    }
+
+    if (message.includes('session') || message.includes('token') || message.includes('jwt')) {
+      return 'Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.';
+    }
+
+    if (message.includes('permission') || message.includes('policy') || message.includes('rls')) {
+      return 'Du hast keine Berechtigung für diese Änderung.';
+    }
+
+    if (message.includes('already registered') || message.includes('already exists') || message.includes('email already') || message.includes('duplicate')) {
+      return 'Diese E-Mail-Adresse wird bereits verwendet.';
+    }
+
+    if (message.includes('normalization') || message.includes('invalid email')) {
+      return 'Bitte gib eine gültige E-Mail-Adresse ein.';
+    }
+
+    if (message.includes('weak password') || message.includes('password should')) {
+      return 'Das Passwort ist zu schwach. Bitte nutze eine längere und sicherere Kombination.';
+    }
+
+    if (message.includes('wrong password') || message.includes('incorrect password') || message.includes('invalid login credentials')) {
+      return 'Das aktuelle Passwort ist falsch.';
+    }
+  }
+
+  return fallback;
+}
+
 export default function Profile() {
   const theme = useTheme();
   const styles = createStyles(theme);
 
-  const {isDark, themeMode, setThemeMode} = useThemeMode();
+  const { isDark, themeMode, setThemeMode } = useThemeMode();
   const { activeGroupId, refreshActiveGroup } = useAuth();
 
   const [profile, setProfile] = useState<ProfileType | null>(null);
@@ -56,13 +114,13 @@ export default function Profile() {
     }, [loadProfileAndGroup, refreshActiveGroup])
   );
 
-  const handleLogout = async() => {
+  const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
 
     if (error) {
       throw error;
     }
-  }
+  };
 
   const openDevNotice = (type: 'language' | 'notifications') => {
     const message =
@@ -100,75 +158,87 @@ export default function Profile() {
     }
   };
 
-  const group = [
-    {
-      title: "Meine Gruppe",
-      subtitle: activeGroupId ? (activeGroupName ?? "Aktive Gruppe") : "Keine Gruppe",
-      icon: icons.person({color: theme.text.primary, size: 20}),
-      onPress: () => router.push('/group' as any)
-    }
-  ]
-
-  const settings = [
-    ...(!activeGroupId ? [{
-      title: "Max. Fleisch pro Woche",
-      subtitle: `${profile?.max_meat ?? maxMeatSetting ?? 3} Fleischgerichte`,
-      icon: icons.meat({color: theme.text.primary, size: 20}),
-      onPress: () => {
-        setMaxMeatSetting(profile?.max_meat ?? 3);
-        setMeatLimitSheetVisible(true);
-      }
-    }] : []),
-    {
-      title: "Design",
-      subtitle: getThemeLabel(themeMode),
-      icon: isDark ? icons.moon({color: theme.text.primary, size: 20}): icons.sun({color: theme.text.primary, size: 20}),
-      onPress: handleThemeChange
-    },
-    {
-      title: "Sprache",
-      icon: icons.globe({color: theme.text.primary, size: 20}),
-      onPress: () => openDevNotice('language')
-    },
-    {
-      title: "Benachrichtigungen",
-      icon: icons.bell({color: theme.text.primary, size: 20}),
-      onPress: () => openDevNotice('notifications')
-    }
-  ]
-
   const handleSavePrivateMeatLimit = async () => {
     try {
       setSavingMaxMeat(true);
       await updateProfileMaxMeat(maxMeatSetting);
-      setProfile((current) => current ? { ...current, max_meat: maxMeatSetting } : current);
+      setProfile((current) => (current ? { ...current, max_meat: maxMeatSetting } : current));
       setMeatLimitSheetVisible(false);
-    } catch (error: any) {
-      alert(error?.message ?? "Einstellung konnte nicht gespeichert werden.");
+    } catch (error: unknown) {
+      Alert.alert('Fehler', getFriendlyErrorMessage(error, 'Einstellung konnte nicht gespeichert werden.'));
     } finally {
       setSavingMaxMeat(false);
     }
   };
 
+  const group = [
+    {
+      title: 'Meine Gruppe',
+      subtitle: activeGroupId ? (activeGroupName ?? 'Aktive Gruppe') : 'Keine Gruppe',
+      icon: icons.person({ color: theme.text.primary, size: 20 }),
+      onPress: () => router.push('/group' as any),
+    },
+  ];
+
+  const settings = useMemo(
+    () => [
+      ...(!activeGroupId
+        ? [{
+            title: 'Max. Fleisch pro Woche',
+            subtitle: `${profile?.max_meat ?? maxMeatSetting ?? 3} Fleischgerichte`,
+            icon: icons.meat({ color: theme.text.primary, size: 20 }),
+            onPress: () => {
+              setMaxMeatSetting(profile?.max_meat ?? 3);
+              setMeatLimitSheetVisible(true);
+            },
+          }]
+        : []),
+      {
+        title: 'Design',
+        subtitle: getThemeLabel(themeMode),
+        icon: isDark ? icons.moon({ color: theme.text.primary, size: 20 }) : icons.sun({ color: theme.text.primary, size: 20 }),
+        onPress: handleThemeChange,
+      },
+      {
+        title: 'Sprache',
+        icon: icons.globe({ color: theme.text.primary, size: 20 }),
+        onPress: () => openDevNotice('language'),
+      },
+      {
+        title: 'Benachrichtigungen',
+        icon: icons.bell({ color: theme.text.primary, size: 20 }),
+        onPress: () => openDevNotice('notifications'),
+      },
+    ],
+    [activeGroupId, profile?.max_meat, maxMeatSetting, theme, themeMode, isDark]
+  );
+
   const dangerZone = [
     {
-      title: "Ausloggen",
-      icon: icons.exit({color: theme.notification, size: 20}),
+      title: 'Ausloggen',
+      icon: icons.exit({ color: theme.notification, size: 20 }),
       onPress: handleLogout,
-    }
-  ]
+    },
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Profil</Text>
 
-      {profile &&
-        <ProfileCard username={profile.username} fullName={profile.full_name} avatar={profile.avatar_url} email={profile.email}/>
-      }
-      <ScrollView contentContainerStyle={{paddingBottom: 80}} showsVerticalScrollIndicator={false}>
-        <ProfileMenuSection title="Meine Gruppe" items={group}/>
-        <ProfileMenuSection title="Einstellungen" items={settings}/>
-        <ProfileMenuSection title="Danger Zone" items={dangerZone}/>
+      {profile && (
+        <ProfileCard
+          username={profile.username}
+          fullName={profile.full_name}
+          avatar={profile.avatar_url}
+          email={profile.email}
+          onEditPress={() => router.push('/profile/edit')}
+        />
+      )}
+
+      <ScrollView contentContainerStyle={{ paddingBottom: 80 }} showsVerticalScrollIndicator={false}>
+        <ProfileMenuSection title="Meine Gruppe" items={group} />
+        <ProfileMenuSection title="Einstellungen" items={settings} />
+        <ProfileMenuSection title="Danger Zone" items={dangerZone} />
       </ScrollView>
 
       <BasicBottomSheet
@@ -235,7 +305,7 @@ export default function Profile() {
             onPress={handleSavePrivateMeatLimit}
             disabled={savingMaxMeat}
           >
-            <Text style={styles.saveMeatLimitText}>{savingMaxMeat ? "Speichert..." : "Speichern"}</Text>
+            <Text style={styles.saveMeatLimitText}>{savingMaxMeat ? 'Speichert...' : 'Speichern'}</Text>
           </Pressable>
         </View>
       </BasicBottomSheet>
@@ -247,10 +317,10 @@ export default function Profile() {
         onClose={() => setDevNoticeVisible(false)}
       />
     </SafeAreaView>
-  )
+  );
 }
 
-const createStyles = (theme : any) => StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   container: {
     backgroundColor: theme.background,
     flex: 1,
@@ -259,27 +329,9 @@ const createStyles = (theme : any) => StyleSheet.create({
 
   title: {
     fontSize: 30,
-    fontWeight: "700",
+    fontWeight: '700',
     color: theme.text.primary,
     marginTop: 20,
-  },
-
-  topRow: {
-    marginTop: 30,
-    alignItems: "center",
-    gap: 10,
-  },
-
-  username: {
-    color: theme.text.primary,
-    fontSize: 17,
-    fontWeight: 600,
-  },
-
-  avatar: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
   },
 
   sheetContent: {
@@ -331,10 +383,12 @@ const createStyles = (theme : any) => StyleSheet.create({
     fontWeight: '700',
     fontSize: 16,
   },
+
   meatLimitSheet: {
     paddingTop: 4,
     gap: 18,
   },
+
   meatLimitRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -342,6 +396,7 @@ const createStyles = (theme : any) => StyleSheet.create({
     gap: 18,
     paddingVertical: 8,
   },
+
   counterButton: {
     width: 46,
     height: 46,
@@ -350,12 +405,14 @@ const createStyles = (theme : any) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+
   counterButtonText: {
     color: '#fff',
     fontSize: 26,
     fontWeight: '700',
     lineHeight: 26,
   },
+
   meatLimitValue: {
     minWidth: 44,
     textAlign: 'center',
@@ -363,6 +420,7 @@ const createStyles = (theme : any) => StyleSheet.create({
     fontSize: 30,
     fontWeight: '800',
   },
+
   saveMeatLimitButton: {
     backgroundColor: theme.accent.primary,
     borderRadius: 16,
@@ -370,12 +428,195 @@ const createStyles = (theme : any) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+
   saveMeatLimitButtonDisabled: {
     opacity: 0.7,
   },
+
   saveMeatLimitText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '700',
   },
-})
+
+  profileSheet: {
+    paddingBottom: 16,
+    gap: 16,
+  },
+
+  avatarSection: {
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 6,
+  },
+
+  profileAvatar: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+  },
+
+  profileAvatarPlaceholder: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: theme.accent.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  profileAvatarPlaceholderText: {
+    color: '#fff',
+    fontSize: 30,
+    fontWeight: '700',
+  },
+
+  avatarActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+
+  primaryButton: {
+    backgroundColor: theme.accent.primary,
+    borderRadius: 16,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+
+  primaryButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+
+  secondaryButton: {
+    backgroundColor: theme.card.background,
+    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: theme.tabBar.border ?? '#E5E5E5',
+    alignItems: 'center',
+  },
+
+  secondaryButtonDisabled: {
+    opacity: 0.6,
+  },
+
+  secondaryButtonText: {
+    color: theme.text.primary,
+    fontSize: 14,
+    fontWeight: '700',
+  },
+
+  dangerInlineButton: {
+    backgroundColor: '#FEE2E2',
+    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+  },
+
+  dangerInlineButtonText: {
+    color: '#B91C1C',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+
+  inputGroup: {
+    gap: 8,
+  },
+
+  label: {
+    color: theme.text.primary,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+
+  input: {
+    backgroundColor: theme.background,
+    borderWidth: 1,
+    borderColor: theme.tabBar.border ?? '#E5E5E5',
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    color: theme.text.primary,
+    fontSize: 15,
+  },
+
+  passwordRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  passwordInput: {
+    flex: 1,
+    paddingRight: 42,
+  },
+
+  eyeButton: {
+    position: 'absolute',
+    right: 12,
+    top: 12,
+    padding: 4,
+  },
+
+  helperText: {
+    fontSize: 12,
+    color: theme.text.op,
+    lineHeight: 18,
+  },
+
+  divider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: theme.tabBar.border ?? '#E5E5E5',
+    marginVertical: 4,
+  },
+
+  sectionTitle: {
+    color: theme.text.primary,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+
+  passwordHint: {
+    color: theme.text.op,
+    fontSize: 12,
+    lineHeight: 18,
+  },
+
+  errorText: {
+    color: '#B91C1C',
+    fontSize: 13,
+    lineHeight: 18,
+    backgroundColor: '#FEE2E2',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+
+  successText: {
+    color: '#166534',
+    fontSize: 13,
+    lineHeight: 18,
+    backgroundColor: '#DCFCE7',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+
+  buttonDisabled: {
+    opacity: 0.75,
+  },
+
+  cancelButton: {
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+
+  cancelButtonText: {
+    color: theme.accent.primary,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+});

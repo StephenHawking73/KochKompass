@@ -28,12 +28,12 @@ Nur Admin Gruppe bearbeiten und user adden ✅
 
 Wenn man ein Rezept auswählt und dann löscht -> Error! ✅
 
+Profile Edit ✅
+
 -------------------------------------------------------------------------------
 
 Ohne Internet Error Message
 
 Custom Error Messages
-
-Profile Edit
 
 (man muss 2x zurück)
