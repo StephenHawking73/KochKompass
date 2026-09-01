@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet, Image, Pressable } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, Text, StyleSheet, Image, Pressable, ScrollView } from 'react-native'
+import React, { useCallback, useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTheme } from '@/hooks/useTheme'
 import { getProfile, updateProfileMaxMeat } from '@/services/profileService';
@@ -9,19 +9,21 @@ import { ProfileType } from '@/types/profile';
 import ProfileMenuSection from '@/components/profile/profileMenuSection';
 import { useThemeMode } from '@/hooks/useThemeMode';
 import { supabase } from '@/lib/supabase';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import BasicBottomSheet from '@/components/BasicBottomSheet';
 import DevelopmentNotice from '@/components/DevelopmentNotice';
 import { useAuth } from '@/providers/AuthProvider';
+import { getActiveGroup } from '@/services/groupService';
 
 export default function Profile() {
   const theme = useTheme();
   const styles = createStyles(theme);
 
   const {isDark, themeMode, setThemeMode} = useThemeMode();
-  const { activeGroupId } = useAuth();
+  const { activeGroupId, refreshActiveGroup } = useAuth();
 
   const [profile, setProfile] = useState<ProfileType | null>(null);
+  const [activeGroupName, setActiveGroupName] = useState<string | null>(null);
   const [themeSheetVisible, setThemeSheetVisible] = useState(false);
   const [meatLimitSheetVisible, setMeatLimitSheetVisible] = useState(false);
   const [maxMeatSetting, setMaxMeatSetting] = useState(3);
@@ -29,15 +31,30 @@ export default function Profile() {
   const [devNoticeVisible, setDevNoticeVisible] = useState(false);
   const [devNoticeContent, setDevNoticeContent] = useState({ title: '', message: '' });
 
-  useEffect(() => {
-    const loadProfile = async () => {
-      const data = await getProfile()
-      setProfile(data)
-      setMaxMeatSetting(data?.max_meat ?? 3)
+  const loadProfileAndGroup = useCallback(async () => {
+    const profileData = await getProfile();
+    setProfile(profileData);
+    setMaxMeatSetting(profileData?.max_meat ?? 3);
+
+    if (!activeGroupId) {
+      setActiveGroupName(null);
+      return;
     }
 
-    loadProfile()
-  }, [])
+    const group = await getActiveGroup();
+    setActiveGroupName(group?.name ?? null);
+  }, [activeGroupId]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const refreshProfile = async () => {
+        await refreshActiveGroup();
+        await loadProfileAndGroup();
+      };
+
+      refreshProfile();
+    }, [loadProfileAndGroup, refreshActiveGroup])
+  );
 
   const handleLogout = async() => {
     const { error } = await supabase.auth.signOut();
@@ -83,14 +100,17 @@ export default function Profile() {
     }
   };
 
-  const settings = [
+  const group = [
     {
       title: "Meine Gruppe",
-      subtitle: activeGroupId ? "Aktive Gruppe" : "Keine Gruppe",
+      subtitle: activeGroupId ? (activeGroupName ?? "Aktive Gruppe") : "Keine Gruppe",
       icon: icons.person({color: theme.text.primary, size: 20}),
       onPress: () => router.push('/group' as any)
-    },
-    {
+    }
+  ]
+
+  const settings = [
+    ...(!activeGroupId ? [{
       title: "Max. Fleisch pro Woche",
       subtitle: `${profile?.max_meat ?? maxMeatSetting ?? 3} Fleischgerichte`,
       icon: icons.meat({color: theme.text.primary, size: 20}),
@@ -98,7 +118,7 @@ export default function Profile() {
         setMaxMeatSetting(profile?.max_meat ?? 3);
         setMeatLimitSheetVisible(true);
       }
-    },
+    }] : []),
     {
       title: "Design",
       subtitle: getThemeLabel(themeMode),
@@ -145,9 +165,11 @@ export default function Profile() {
       {profile &&
         <ProfileCard username={profile.username} fullName={profile.full_name} avatar={profile.avatar_url} email={profile.email}/>
       }
-
-      <ProfileMenuSection title="Einstellungen" items={settings}/>
-      <ProfileMenuSection title="Danger Zone" items={dangerZone}/>
+      <ScrollView contentContainerStyle={{paddingBottom: 80}} showsVerticalScrollIndicator={false}>
+        <ProfileMenuSection title="Meine Gruppe" items={group}/>
+        <ProfileMenuSection title="Einstellungen" items={settings}/>
+        <ProfileMenuSection title="Danger Zone" items={dangerZone}/>
+      </ScrollView>
 
       <BasicBottomSheet
         visible={themeSheetVisible}

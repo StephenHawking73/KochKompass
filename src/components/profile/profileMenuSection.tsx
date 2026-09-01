@@ -58,7 +58,7 @@ const createStyles = (theme: any) =>
 StyleSheet.create({
 
     section: {
-        marginTop: 40,
+        marginTop: 30,
     },
 
 
@@ -67,7 +67,7 @@ StyleSheet.create({
         fontWeight: "600",
         color: theme.text.primary,
 
-        marginBottom: 12,
+        marginBottom: 8,
         marginLeft: 5,
     },
 
