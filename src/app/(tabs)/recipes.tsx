@@ -264,25 +264,19 @@ export default function RecipiesScreen() {
 
       {isPlanningMode && (
         <View style={styles.modeBanner}>
-          <View style={styles.modeHeader}>
-            <View style={styles.modeTitleRow}>
-              {icons.calendar({ color: theme.accent.primary, size: 17 })}
-              <View style={styles.modeTextWrap}>
-                <Text style={styles.modeTitle}>Rezept auswählen</Text>
-                {planningSlotLabel ? (
-                  <Text style={styles.modeText}>Für {planningSlotLabel}</Text>
-                ) : (
-                  <Text style={styles.modeText}>Wähle ein Rezept für diesen Slot aus.</Text>
-                )}
-              </View>
-            </View>
+          <View style={styles.modeContent}>
+            {icons.calendar({ color: theme.accent.primary, size: 16 })}
+            
+            <Text style={styles.modeLabel} numberOfLines={1}>
+              Rezept auswählen
+            </Text>
 
             <Pressable
-              style={styles.closeButton}
+              style={styles.closeModeButton}
               onPress={handleExitPlanningMode}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              {icons.close({ color: theme.text.op, size: 15 })}
+              {icons.close({ color: theme.text.op, size: 13 })}
             </Pressable>
           </View>
         </View>
@@ -445,53 +439,35 @@ const createStyles = (theme: any) =>
     },
 
     modeBanner: {
-      marginTop: 22,
-      borderRadius: 14,
-      borderWidth: 1,
-      borderColor: theme.accent.primary + "55",
+      marginTop: 14,
+      marginBottom: 12,
+      borderRadius: 10,
       backgroundColor: theme.accent.op,
-      paddingHorizontal: 14,
-      paddingVertical: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
     },
 
-    modeHeader: {
+    modeContent: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      gap: 12,
+      gap: 10,
     },
 
-    modeTitle: {
+    modeLabel: {
       color: theme.text.primary,
-      fontSize: 15,
-      fontWeight: "700",
+      fontSize: 14,
+      fontWeight: "600",
+      flex: 1,
     },
 
-    modeTitleRow: {
-      flexDirection: "row",
-      alignItems: "flex-start",
-      gap: 8,
-      flexShrink: 1,
-    },
-
-    modeTextWrap: {
-      flexShrink: 1,
-    },
-
-    closeButton: {
-      width: 28,
-      height: 28,
-      borderRadius: 14,
+    closeModeButton: {
+      width: 24,
+      height: 24,
+      borderRadius: 12,
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: theme.card.background,
-    },
-
-    modeText: {
-      color: theme.text.op,
-      fontSize: 13,
-      fontWeight: "500",
-      marginTop: 3,
+      backgroundColor: theme.card.background + "40",
     },
 
     addButton: {

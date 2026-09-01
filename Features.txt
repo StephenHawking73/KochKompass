@@ -26,9 +26,9 @@ Wenn Gruppe gelöscht -> Alles muss gerefresht werden! + Rating muss gelöscht w
 
 Nur Admin Gruppe bearbeiten und user adden ✅
 
--------------------------------------------------------------------------------
+Wenn man ein Rezept auswählt und dann löscht -> Error! ✅
 
-Wenn man ein Rezept auswählt und dann löscht -> Error!
+-------------------------------------------------------------------------------
 
 Ohne Internet Error Message
 

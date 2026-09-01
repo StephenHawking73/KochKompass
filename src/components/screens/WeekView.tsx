@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { router } from "expo-router";
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import WeekViewContainer from "@/components/screens/WeekViewContainer";
@@ -199,36 +199,28 @@ export default function WeekView({
     <WeekViewContainer refreshing={refreshing} onRefresh={onRefresh}>
       {(isMoveMode || isPlanningMode) && (
         <View style={styles.modeBanner}>
-          <View style={styles.modeHeader}>
-            <View style={styles.modeTitleRow}>
-              {isPlanningMode
-                ? icons.calendar({ color: theme.accent.primary, size: 17 })
-                : icons.move({ color: theme.accent.primary, size: 17 })}
-              <View style={styles.modeTitleWrap}>
-                <Text style={styles.modeTitle}>
-                  {isPlanningMode ? "Rezept einplanen" : "Mahlzeit verschieben"}
-                </Text>
-                {isPlanningMode && planningRecipeTitle ? (
-                  <Text style={styles.modeSubtitle} numberOfLines={1}>
-                    {planningRecipeTitle}
-                  </Text>
-                ) : null}
-              </View>
-            </View>
+          <View style={styles.modeContent}>
+            {isPlanningMode
+              ? icons.calendar({ color: theme.accent.primary, size: 16 })
+              : icons.move({ color: theme.accent.primary, size: 16 })}
+            
+            <Text style={styles.modeLabel} numberOfLines={1}>
+              {isPlanningMode && planningRecipeTitle
+                ? planningRecipeTitle
+                : isPlanningMode
+                ? "Rezept einplanen"
+                : "Mahlzeit verschieben"}
+            </Text>
 
             <Pressable
-              style={styles.closeButton}
+              style={styles.closeModeButton}
               onPress={handleExitMode}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              {icons.close({ color: theme.text.op, size: 15 })}
+              {icons.close({ color: theme.text.op, size: 13 })}
             </Pressable>
           </View>
-          <Text style={styles.modeText}>
-            {isPlanningMode
-              ? `Wähle jetzt einen freien Slot aus, um „${planningRecipeTitle ?? "dieses Rezept"}“ dort einzutragen.`
-              : "Wähle den neuen freien Slot aus."}
-          </Text>
+          
         </View>
       )}
 
@@ -341,53 +333,32 @@ export default function WeekView({
 const createStyles = (theme: any) =>
   StyleSheet.create({
     modeBanner: {
-      marginTop: 16,
-      marginBottom: 18,
-      borderRadius: 14,
-      borderWidth: 1,
-      borderColor: theme.accent.primary + "55",
+      marginTop: 14,
+      marginBottom: 12,
+      borderRadius: 10,
       backgroundColor: theme.accent.op,
-      paddingHorizontal: 14,
-      paddingVertical: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
     },
-    modeHeader: {
+    modeContent: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      gap: 12,
+      gap: 10,
     },
-    modeTitleWrap: {
-      flexShrink: 1,
-    },
-    modeTitle: {
+    modeLabel: {
       color: theme.text.primary,
-      fontSize: 15,
-      fontWeight: "700",
-    },
-    modeSubtitle: {
-      color: theme.text.op,
-      fontSize: 12,
+      fontSize: 14,
       fontWeight: "600",
-      marginTop: 2,
+      flex: 1,
     },
-    modeTitleRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-      flexShrink: 1,
-    },
-    closeButton: {
-      width: 28,
-      height: 28,
-      borderRadius: 14,
+    closeModeButton: {
+      width: 24,
+      height: 24,
+      borderRadius: 12,
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: theme.card.background,
-    },
-    modeText: {
-      color: theme.text.op,
-      fontSize: 13,
-      fontWeight: "500",
-      marginTop: 3,
+      backgroundColor: theme.card.background + "40",
     },
   });
+
