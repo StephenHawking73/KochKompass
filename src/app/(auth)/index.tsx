@@ -1,5 +1,5 @@
 import { useTheme } from "@/hooks/useTheme";
-import { StyleSheet, View, Text, Image, Pressable } from "react-native";
+import { StyleSheet, View, Text, Image, Pressable, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { images } from "@/assets/images";
 import { router } from "expo-router";
@@ -10,7 +10,7 @@ export default function LandingPage(){
 
     return (
         <SafeAreaView style={styles.container}> 
-            <View style={styles.content}>
+            <ScrollView style={styles.content} horizontal={false} showsVerticalScrollIndicator={false} contentContainerStyle={{paddingBottom: 40}}>
                 <View style={styles.header}>
                     <Image 
                         source={images.appIcon} 
@@ -52,7 +52,7 @@ export default function LandingPage(){
                         </Pressable>
                     </View>
                 </View>
-            </View>
+            </ScrollView>
         </SafeAreaView>
     )
 }
